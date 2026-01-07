@@ -19,7 +19,7 @@
         <helpers:ApplicationThemeToBooleanConverter x:Key="ThemeToBooleanConverter"/>
     </Page.Resources>
 
-    <StackPanel>
+    <StackPanel Margin="20">
         <TextBlock
             FontSize="20"
             FontWeight="Medium"

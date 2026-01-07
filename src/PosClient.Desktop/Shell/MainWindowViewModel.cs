@@ -12,21 +12,7 @@ namespace PosClient.Desktop.Shell
         private string _applicationTitle;
 
         [ObservableProperty]
-        private ObservableCollection<object> _menuItems = new()
-        {
-            new NavigationViewItem()
-            {
-                Content = "Home",
-                Icon = new SymbolIcon { Symbol = SymbolRegular.Home24 },
-                TargetPageType = typeof(DashboardPage)
-            },
-            new NavigationViewItem()
-            {
-                Content = "Categories",
-                Icon = new SymbolIcon { Symbol = SymbolRegular.DataHistogram24 },
-                TargetPageType = typeof(Features.Catalog.Categories.CategoriesPage)
-            }
-        };
+        private ObservableCollection<object> _menuItems = new();
 
         [ObservableProperty]
         private ObservableCollection<object> _footerMenuItems = new()
@@ -49,6 +35,38 @@ namespace PosClient.Desktop.Shell
         {
             // Read from JSON. If missing, fallback to "Default POS Name"
             _applicationTitle = configuration["AppSettings:Title"] ?? "POS Client";
+
+            var home = new NavigationViewItem()
+            {
+                Content = "Home",
+                Icon = new SymbolIcon { Symbol = SymbolRegular.Home24 },
+                TargetPageType = typeof(DashboardPage)
+
+            };
+
+            _menuItems.Add(home);
+
+            var catalog = new NavigationViewItem()
+            {
+                Content = "Catalog",
+                Icon = new SymbolIcon { Symbol = SymbolRegular.DataHistogram24 }
+            };
+
+            catalog.MenuItems.Add(new NavigationViewItem()
+            {
+                Content = "Categories",
+                Icon = new SymbolIcon { Symbol = SymbolRegular.DataHistogram24 },
+                TargetPageType = typeof(Features.Catalog.Categories.CategoriesPage)
+            });
+
+            catalog.MenuItems.Add(new NavigationViewItem()
+            {
+                Content = "Products",
+                Icon = new SymbolIcon { Symbol = SymbolRegular.ShoppingBag24 },
+                TargetPageType = typeof(Features.Catalog.Products.ProductsPage)
+            });
+
+            _menuItems.Add(catalog);
         }
     }
 }

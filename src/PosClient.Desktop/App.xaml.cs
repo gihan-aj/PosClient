@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using PosClient.Desktop.Features.Catalog.Categories;
+using PosClient.Desktop.Features.Catalog.Products;
 using PosClient.Desktop.Features.Dashboard;
 using PosClient.Desktop.Features.Settings;
 using PosClient.Desktop.Infrastructure.Configuration;
@@ -74,6 +75,9 @@ namespace PosClient.Desktop
 
                 services.AddTransient<CategoriesPage>();
                 services.AddTransient<CategoriesViewModel>();
+
+                services.AddTransient<ProductsPage>();
+                services.AddTransient<ProductsViewModel>();
 
                 services.AddSingleton<SettingsPage>();
                 services.AddSingleton<SettingsViewModel>();
