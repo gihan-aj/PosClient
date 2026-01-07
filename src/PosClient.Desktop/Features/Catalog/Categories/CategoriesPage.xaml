@@ -40,7 +40,19 @@
                    Appearance="Primary" 
                    Icon="{ui:SymbolIcon Add24}"
                    Command="{Binding ViewModel.CreateNewCommand}"
-                   Margin="0,0,0,0"/>
+                   Margin="0,0,0,0">
+                <ui:Button.Style>
+                    <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                        <Setter Property="Visibility" Value="Visible"/>
+
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ViewModel.SelectedCategory}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ui:Button.Style>
+            </ui:Button>
         </Grid>
 
         <Grid Grid.Row="1" Margin="20,0,20,20">
@@ -58,9 +70,9 @@
                 <Border 
                     Background="{DynamicResource ControlFillColorDefaultBrush}" 
                     CornerRadius="8" 
-                    BorderBrush="{DynamicResource SurfaceStrokeColorDefaultBrush}"
+                    
                     BorderThickness="1"
-                    Margin="0,0,10,0" Padding="10">
+                    Margin="0,0,0,0" Padding="10">
 
                 
                     <TreeView x:Name="CategoryTree" 
@@ -128,83 +140,151 @@
                 </Border>
             </ScrollViewer>
 
-            <Border Grid.Column="1"
-                Background="{DynamicResource SolidBackgroundFillColorSecondaryBrush}" 
-                CornerRadius="8" 
-                Padding="20" VerticalAlignment="Top">
+            <Grid Grid.Column="0" 
+                  Background="{DynamicResource ApplicationBackgroundBrush}"
+                  Opacity="0.8"
+                  Visibility="{Binding ViewModel.IsLoading, Converter={StaticResource BoolToVisConverter}}">
 
-                <Border.Style>
-                    <Style TargetType="Border">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding ViewModel.SelectedCategory}" Value="x:Null">
-                                <Setter Property="Visibility" Value="Collapsed"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Border.Style>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <ui:ProgressRing IsIndeterminate="True" 
+                 Width="50" Height="50" />
 
-                <StackPanel>
-                    <TextBlock Text="{Binding ViewModel.SelectedCategory.FormTitle}" 
-                   FontSize="18" FontWeight="SemiBold" Margin="0,0,0,5"/>
-                    <TextBlock Text="Select a category to edit or create new" 
-                   Foreground="Gray" Margin="0,0,0,10" />
-
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="120"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-
-                        <TextBlock Text="Name *" VerticalAlignment="Center" Margin="0,0,0,15" Grid.Row="0"/>
-                        <ui:TextBox Text="{Binding ViewModel.SelectedCategory.Name, UpdateSourceTrigger=PropertyChanged}"
-                    PlaceholderText="Required" Margin="0,0,0,15" Grid.Row="0" Grid.Column="1"/>
-
-                        <TextBlock Text="Parent" VerticalAlignment="Center" Margin="0,0,0,15" Grid.Row="1"/>
-                        <ComboBox ItemsSource="{Binding ViewModel.FlatCategories}"
-                                  DisplayMemberPath="Name"
-                                  SelectedValuePath="Id"
-                                  SelectedValue="{Binding ViewModel.SelectedCategory.ParentCategoryId}"
-                                  Margin="0,0,0,15" Grid.Row="1" Grid.Column="1"/>
-
-                        <TextBlock Text="Description" VerticalAlignment="Top" Margin="0,5,0,15" Grid.Row="2"/>
-                        <ui:TextBox Text="{Binding ViewModel.SelectedCategory.Description}" 
-                                    Height="80" AcceptsReturn="True" TextWrapping="Wrap"
-                                    Margin="0,0,0,15" Grid.Row="2" Grid.Column="1" />
-
-                        <TextBlock Text="Order" VerticalAlignment="Center" Margin="0,0,0,15" Grid.Row="3"/>
-                        <ui:NumberBox Value="{Binding ViewModel.SelectedCategory.DisplayOrder, UpdateSourceTrigger=PropertyChanged}"
-                                      Width="100" HorizontalAlignment="Left"
-                                      Margin="0,0,0,15" Grid.Row="3" Grid.Column="1" />
-
-                        <TextBlock Text="Status" 
-                                   Visibility="{Binding ViewModel.SelectedCategory.IsNew, Converter={StaticResource InverseBoolToVisConverter}}"
-                                   VerticalAlignment="Center" Margin="0,0,0,15" Grid.Row="4"/>
-                        <ui:ToggleSwitch IsChecked="{Binding ViewModel.SelectedCategory.IsActive, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                         Command="{Binding ViewModel.ToggleStatusCommand}"
-                                         CommandParameter="{Binding ViewModel.SelectedCategory}"
-                                         Visibility="{Binding ViewModel.SelectedCategory.IsNew, Converter={StaticResource InverseBoolToVisConverter}}"
-                                         Content="{Binding ViewModel.SelectedCategory.IsActive, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Active|Inactive'}"
-                                         Grid.Row="4" Grid.Column="1" />
-                    </Grid>
-
-                    <Separator Margin="0,10" />
-
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                        <ui:Button Content="Delete" Appearance="Danger" Command="{Binding ViewModel.DeleteCommand}" Margin="0,0,5,0"/>
-                        <ui:Button Content="Save Changes" Appearance="Primary" Width="150" Command="{Binding ViewModel.SaveCommand}" />
-                    </StackPanel>
+                    <TextBlock Text="Loading data..." 
+                               Margin="0,15,0,0" 
+                               HorizontalAlignment="Center" 
+                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
                 </StackPanel>
-            </Border>
+            </Grid>
+
+            <Grid Grid.Column="1" Margin="10,0,0,0">
+
+                <StackPanel HorizontalAlignment="Center" 
+                            VerticalAlignment="Center"
+                            Opacity="0.6">
+
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Setter Property="Visibility" Value="Visible"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ViewModel.SelectedCategory, Converter={StaticResource IsNotNullConverter}}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+
+                    <ui:SymbolIcon Symbol="CursorClick24" FontSize="48" Margin="0,0,0,10" Foreground="Gray"/>
+                    <TextBlock Text="Select a category to edit" 
+                               FontSize="18" FontWeight="SemiBold" 
+                               HorizontalAlignment="Center" Foreground="Gray"/>
+                    <TextBlock Text="or create a new one" 
+                               FontSize="14" 
+                               HorizontalAlignment="Center" Foreground="Gray"/>
+
+                    <ui:Button Content="Create New Category" 
+                               Icon="{ui:SymbolIcon Add24}" 
+                               Appearance="Secondary"
+                               Command="{Binding ViewModel.CreateNewCommand}"
+                               Margin="0,20,0,0" HorizontalAlignment="Center"/>
+                </StackPanel>
+
+                <Border
+                    Background="{DynamicResource ApplicationBackgroundBrush}" 
+                    CornerRadius="8" 
+                    Padding="20" VerticalAlignment="Top">
+
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ViewModel.SelectedCategory, Converter={StaticResource IsNotNullConverter}}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+
+                    <StackPanel>
+                        <TextBlock Text="{Binding ViewModel.SelectedCategory.FormTitle}" 
+                       FontSize="18" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                        <TextBlock Text="Select a category to edit or create new" 
+                       Foreground="Gray" Margin="0,0,0,10" />
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Text="Name *" VerticalAlignment="Center" Margin="0,0,0,15" Grid.Row="0"/>
+                            <ui:TextBox Text="{Binding ViewModel.SelectedCategory.Name, UpdateSourceTrigger=PropertyChanged}"
+                        PlaceholderText="Required" Margin="0,0,0,15" Grid.Row="0" Grid.Column="1"/>
+
+                            <TextBlock Text="Parent" VerticalAlignment="Center" Margin="0,0,0,15" Grid.Row="1"/>
+                            <ComboBox ItemsSource="{Binding ViewModel.FlatCategories}"
+                                      DisplayMemberPath="Name"
+                                      SelectedValuePath="Id"
+                                      SelectedValue="{Binding ViewModel.SelectedCategory.ParentCategoryId}"
+                                      Margin="0,0,0,15" Grid.Row="1" Grid.Column="1"/>
+
+                            <TextBlock Text="Description" VerticalAlignment="Top" Margin="0,5,0,15" Grid.Row="2"/>
+                            <ui:TextBox Text="{Binding ViewModel.SelectedCategory.Description}" 
+                                        Height="80" AcceptsReturn="True" TextWrapping="Wrap"
+                                        Margin="0,0,0,15" Grid.Row="2" Grid.Column="1" />
+
+                            <TextBlock Text="Order" VerticalAlignment="Center" Margin="0,0,0,15" Grid.Row="3"/>
+                            <ui:NumberBox Value="{Binding ViewModel.SelectedCategory.DisplayOrder, UpdateSourceTrigger=PropertyChanged}"
+                                          Width="100" HorizontalAlignment="Left"
+                                          Margin="0,0,0,15" Grid.Row="3" Grid.Column="1" />
+
+                            <TextBlock Text="Status" 
+                                       Visibility="{Binding ViewModel.SelectedCategory.IsNew, Converter={StaticResource InverseBoolToVisConverter}}"
+                                       VerticalAlignment="Center" Margin="0,0,0,15" Grid.Row="4"/>
+                            <ui:ToggleSwitch IsChecked="{Binding ViewModel.SelectedCategory.IsActive, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                             Command="{Binding ViewModel.ToggleStatusCommand}"
+                                             CommandParameter="{Binding ViewModel.SelectedCategory}"
+                                             Visibility="{Binding ViewModel.SelectedCategory.IsNew, Converter={StaticResource InverseBoolToVisConverter}}"
+                                             Content="{Binding ViewModel.SelectedCategory.IsActive, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Active|Inactive'}"
+                                             Grid.Row="4" Grid.Column="1" />
+                        </Grid>
+
+                        <Separator Margin="0,10" />
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <ui:Button Content="Delete" Appearance="Danger" Command="{Binding ViewModel.DeleteCommand}" Margin="0,0,5,0"/>
+                            <ui:Button Content="Save Changes" Appearance="Primary" Width="150" Command="{Binding ViewModel.SaveCommand}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+                
+            </Grid>
 
 
+            <Grid Grid.Column="1" 
+                  Background="{DynamicResource ApplicationBackgroundBrush}"
+                  Opacity="0.8"
+                  Visibility="{Binding ViewModel.IsLoadingDetails, Converter={StaticResource BoolToVisConverter}}">
+
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <ui:ProgressRing IsIndeterminate="True" 
+                                     Width="50" Height="50" />
+
+                    <TextBlock Text="Loading data..." 
+                               Margin="0,15,0,0" 
+                               HorizontalAlignment="Center" 
+                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                </StackPanel>
+            </Grid>
         </Grid>
+
+        
     </Grid>
 </Page>

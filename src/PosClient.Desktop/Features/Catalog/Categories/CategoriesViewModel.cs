@@ -66,8 +66,8 @@ namespace PosClient.Desktop.Features.Catalog.Categories
             FlatCategories.Insert(0, new Category { Id = Guid.Empty, Name = "-- Root Category --" });
 
             // Create a category to bind with the form
-            CreateNew();
-
+            //CreateNew();
+            SelectedCategory = null;
             IsLoading = false;
         }
 
