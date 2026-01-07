@@ -24,10 +24,12 @@
   </ItemGroup>
 
 	<ItemGroup>
+		<None Remove="Assets\placeholder.png" />
 		<None Remove="Assets\pos-client-icon.png" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<Resource Include="Assets\placeholder.png" />
 		<Resource Include="Assets\pos-client-icon.png" />
 	</ItemGroup>
 
