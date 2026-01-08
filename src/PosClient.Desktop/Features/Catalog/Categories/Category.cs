@@ -14,6 +14,10 @@ namespace PosClient.Desktop.Features.Catalog.Categories
         private string _name = string.Empty;
 
         [ObservableProperty]
+        [property: JsonPropertyName("namePath")]
+        private string _namePath = string.Empty;
+
+        [ObservableProperty]
         [property: JsonPropertyName("description")]
         private string? _description;
 

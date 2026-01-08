@@ -42,48 +42,150 @@
         </Grid>
 
         <Grid Grid.Row="1" Margin="0,0,0,20">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="10" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-            <ui:TextBox PlaceholderText="Search products..."
-                        Text="{Binding ViewModel.Request.Search, UpdateSourceTrigger=PropertyChanged}"
-                        Width="250" Margin="0,0,10,0">
-                <ui:TextBox.InputBindings>
-                    <KeyBinding Key="Return" Command="{Binding ViewModel.SearchCommand}"/>
-                </ui:TextBox.InputBindings>
-            </ui:TextBox>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="400"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-            <CheckBox Grid.Column="1"
-                      Content="Include Sub-Categories"
-                      IsChecked="{Binding ViewModel.Request.IncludeSubCategories}"
-                      Command="{Binding ViewModel.ApplyFiltersCommand}"
-                      VerticalAlignment="Center"/>
 
-            <ComboBox Grid.Column="3"
-                      SelectedIndex="0"
-                      SelectedValuePath="Tag"
-                      SelectedValue="{Binding ViewModel.Request.SortBy}">
-                <b:Interaction.Triggers>
-                    <b:EventTrigger EventName="SelectionChanged">
-                        <b:InvokeCommandAction Command="{Binding ViewModel.SearchCommand}"/>
-                    </b:EventTrigger>
-                </b:Interaction.Triggers>
+                <ComboBox x:Name="SearchInCombo" Grid.Column="0" 
+                  ItemsSource="{Binding ViewModel.SearchScopeList}"
+                  SelectedItem="{Binding ViewModel.Request.SearchIn}"
+                  Width="110" Margin="0,0,10,0"
+                  ToolTip="Search In Field"/>
 
-                <ComboBoxItem Content="Newest First" Tag="created"/>
-                <ComboBoxItem Content="Name (A-Z)" Tag="name"/>
-                <ComboBoxItem Content="Price (Low-High)" Tag="price"/>
-            </ComboBox>
+                <TextBlock Text="Search In..."
+                           VerticalAlignment="Center"
+                           Margin="15,0,0,0"
+                           Foreground="Gray"
+                           IsHitTestVisible="False">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=SearchInCombo, Path=SelectedIndex}" Value="-1">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+
+                                <DataTrigger Binding="{Binding ElementName=SearchInCombo, Path=SelectedValue}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <ui:TextBox Grid.Column="1" 
+                    PlaceholderText="Search products..." 
+                    Text="{Binding ViewModel.Request.Search, UpdateSourceTrigger=PropertyChanged}"
+                    Margin="0,0,10,0">
+                    <ui:TextBox.InputBindings>
+                        <KeyBinding Key="Return" Command="{Binding ViewModel.SearchCommand}"/>
+                    </ui:TextBox.InputBindings>
+                </ui:TextBox>
+
+                <ui:Button Grid.Column="2"
+                           Height="36"
+                           Icon="{ui:SymbolIcon Search24}"
+                           Appearance="Primary"
+                           Command="{Binding ViewModel.SearchCommand}"/>
+            </Grid>
+
+
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <ComboBox x:Name="CategoryCombo" 
+                          Grid.Column="0" 
+                          Width="250"
+                          ItemsSource="{Binding ViewModel.Categories}"
+                          DisplayMemberPath="NamePath" 
+                          SelectedValuePath="Id"
+                          SelectedValue="{Binding ViewModel.Request.CategoryId}"
+                          ToolTip="Filter by Category"
+                          Margin="0,0,15,0">
+                    <b:Interaction.Triggers>
+                        <b:EventTrigger EventName="SelectionChanged">
+                            <b:InvokeCommandAction Command="{Binding ViewModel.SearchCommand}"/>
+                        </b:EventTrigger>
+                    </b:Interaction.Triggers>
+                </ComboBox>
+
+                <TextBlock Text="Filter by Category"
+                           VerticalAlignment="Center"
+                           Margin="15,0,0,0"
+                           Foreground="Gray"
+                           IsHitTestVisible="False">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=CategoryCombo, Path=SelectedIndex}" Value="-1">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+
+                                <DataTrigger Binding="{Binding ElementName=CategoryCombo, Path=SelectedValue}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <CheckBox Grid.Column="1" 
+                          Content="Include sub-categories" 
+                          IsChecked="{Binding ViewModel.Request.IncludeSubCategories}"
+                          Command="{Binding ViewModel.ApplyFilterCommand}"
+                          IsEnabled="{Binding ViewModel.Request.CategoryId, Converter={StaticResource IsNotNullConverter}}"
+                          VerticalAlignment="Center"/>
+
+                <ComboBox Grid.Column="3"
+                          Width="140"
+                          ItemsSource="{Binding ViewModel.StatusOptions}"
+                          DisplayMemberPath="Label"
+                          SelectedValuePath="Value"
+                          SelectedValue="{Binding ViewModel.Request.IsActive}"
+                          Margin="15,0,0,0">
+
+                    <b:Interaction.Triggers>
+                        <b:EventTrigger EventName="SelectionChanged">
+                            <b:InvokeCommandAction Command="{Binding ViewModel.SearchCommand}"/>
+                        </b:EventTrigger>
+                    </b:Interaction.Triggers>
+                </ComboBox>
+
+                <ui:Button Grid.Column="4"
+                           Height="36"
+                           Content="Reset Filters"
+                           Icon="{ui:SymbolIcon Dismiss24}"
+                           Appearance="Secondary"
+                           Command="{Binding ViewModel.ClearFiltersCommand}"/>
+            </Grid>
         </Grid>
 
         <ui:DataGrid Grid.Row="2"
                      ItemsSource="{Binding ViewModel.Products}"
                      AutoGenerateColumns="False"
+                     HeadersVisibility="Column"
                      CanUserAddRows="False"
-                     SelectionMode="Single">
+                     BorderThickness="1"
+                     SelectionMode="Single"
+                     Sorting="DataGrid_Sorting"
+                     BorderBrush="{DynamicResource SurfaceStrokeColorDefaultBrush}">
 
             <ui:DataGrid.Columns>
 
@@ -99,7 +201,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="Product" Width="*">
+                <DataGridTemplateColumn Header="Product" Width="*" SortMemberPath="Name">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel VerticalAlignment="Center" Margin="10,0,0,0">
@@ -110,7 +212,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTextColumn Header="Category" Binding="{Binding CategoryName}" Width="150"/>
+                <DataGridTextColumn Header="Category" Binding="{Binding CategoryName}" Width="*"/>
 
                 <DataGridTextColumn Header="Price" Binding="{Binding BasePrice, StringFormat=N2}" Width="100"/>
 
@@ -130,7 +232,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="Status" Width="100">
+                <DataGridTemplateColumn Header="Status" Width="100" SortMemberPath="IsActive">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Border CornerRadius="4" Padding="8,2" HorizontalAlignment="Left" Margin="10,0,0,0">
@@ -151,6 +253,16 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
+                <DataGridTemplateColumn Header="Actions" Width="Auto">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ui:Button Icon="{ui:SymbolIcon MoreVertical24}" 
+                                   Appearance="Transparent"
+                                   ToolTip="Actions" Margin="10,0,0,0"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
             </ui:DataGrid.Columns>
             
         </ui:DataGrid>
@@ -167,27 +279,60 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <TextBlock Text="Total Items: " Foreground="Gray"/>
-                <TextBlock Text="{Binding ViewModel.TotalCount}" FontWeight="SemiBold"/>
+            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="Rows per page:" 
+                   VerticalAlignment="Center" 
+                   Margin="0,0,10,0" 
+                   Foreground="Gray"/>
+
+                <ComboBox ItemsSource="{Binding ViewModel.PageSizeOptions}"
+                  SelectedItem="{Binding ViewModel.Request.PageSize}"
+                  Width="70">
+                    <b:Interaction.Triggers>
+                        <b:EventTrigger EventName="SelectionChanged">
+                            <b:InvokeCommandAction Command="{Binding ViewModel.ChangePageSizeCommand}"/>
+                        </b:EventTrigger>
+                    </b:Interaction.Triggers>
+                </ComboBox>
             </StackPanel>
 
-            <StackPanel Grid.Column="2" Orientation="Horizontal">
-                <ui:Button Icon="{ui:SymbolIcon ChevronLeft24}" 
-                       Command="{Binding ViewModel.PreviousPageCommand}"
-                       IsEnabled="{Binding ViewModel.HasPreviousPage}"
-                       Appearance="Secondary"/>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" 
+                VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="{Binding ViewModel.TotalCount}" FontWeight="SemiBold"/>
+                <TextBlock Text=" items found" Foreground="Gray"/>
+            </StackPanel>
 
-                <TextBlock Text="{Binding ViewModel.Request.Page}" 
-                       VerticalAlignment="Center" Margin="10,0"/>
-                <TextBlock Text="/" VerticalAlignment="Center"/>
-                <TextBlock Text="{Binding ViewModel.TotalPages}" 
-                       VerticalAlignment="Center" Margin="10,0"/>
+            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+
+                <ui:Button Icon="{ui:SymbolIcon ChevronLeft24}" 
+                   Command="{Binding ViewModel.PreviousPageCommand}"
+                   IsEnabled="{Binding ViewModel.HasPreviousPage}"
+                   Appearance="Secondary"
+                   ToolTip="Previous Page"/>
+
+                <StackPanel Orientation="Horizontal" Margin="10,0" VerticalAlignment="Center">
+                    <TextBlock Text="Page" VerticalAlignment="Center" Margin="0,0,5,0" Foreground="Gray"/>
+
+                    <ui:TextBox x:Name="PageInput"
+                        Text="{Binding ViewModel.Request.Page, UpdateSourceTrigger=LostFocus}"
+                        Width="70" 
+                        HorizontalContentAlignment="Center">
+                        <ui:TextBox.InputBindings>
+                            <KeyBinding Key="Return" 
+                                Command="{Binding ViewModel.JumpToPageCommand}"
+                                CommandParameter="{Binding Text, ElementName=PageInput}"/>
+                        </ui:TextBox.InputBindings>
+                    </ui:TextBox>
+
+                    <TextBlock Text="of" VerticalAlignment="Center" Margin="5,0"/>
+                    <TextBlock Text="{Binding ViewModel.TotalPages}" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                </StackPanel>
 
                 <ui:Button Icon="{ui:SymbolIcon ChevronRight24}" 
-                       Command="{Binding ViewModel.NextPageCommand}"
-                       IsEnabled="{Binding ViewModel.HasNextPage}"
-                       Appearance="Secondary"/>
+                   Command="{Binding ViewModel.NextPageCommand}"
+                   IsEnabled="{Binding ViewModel.HasNextPage}"
+                   Appearance="Secondary"
+                   ToolTip="Next Page"/>
             </StackPanel>
         </Grid>
     </Grid>

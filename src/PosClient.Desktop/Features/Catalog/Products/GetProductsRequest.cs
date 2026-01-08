@@ -4,12 +4,12 @@ namespace PosClient.Desktop.Features.Catalog.Products
 {
     public class GetProductsRequest : PagedRequest
     {
-        public Guid? CategoryId { get; set; }
+        public Guid? CategoryId { get; set; } = null;
 
         public bool IncludeSubCategories { get; set; } = true;
 
-        public string? Brand { get; init; }
+        public string? SearchIn { get; init; } = null;
 
-        public bool? IsActive { get; set; }
+        public bool? IsActive { get; set; } = null;
     }
 }
