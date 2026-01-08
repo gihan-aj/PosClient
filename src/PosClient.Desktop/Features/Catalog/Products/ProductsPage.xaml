@@ -110,6 +110,8 @@
                 </Grid.ColumnDefinitions>
 
                 <ComboBox x:Name="CategoryCombo" 
+                          IsEditable="True"
+                          IsTextSearchEnabled="True"
                           Grid.Column="0" 
                           Width="250"
                           ItemsSource="{Binding ViewModel.Categories}"
@@ -189,11 +191,13 @@
 
             <ui:DataGrid.Columns>
 
-                <DataGridTemplateColumn Header="Image" Width="80">
+                <DataGridTemplateColumn Header="Image" 
+                                        Width="80">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Border Width="50" Height="50" CornerRadius="4" 
-                                Background="{DynamicResource ControlFillColorSecondaryBrush}">
+                                Background="{DynamicResource ControlFillColorSecondaryBrush}"
+                                    HorizontalAlignment="Center">
                                 <ui:ImageIcon Source="{Binding PrimaryImageUrl, TargetNullValue={StaticResource PlaceholderImage}}" 
                                       Width="50" Height="50"/>
                             </Border>
@@ -201,7 +205,9 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="Product" Width="*" SortMemberPath="Name">
+                <DataGridTemplateColumn Header="Product" 
+                                        Width="*" MinWidth="180"
+                                        SortMemberPath="Name">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel VerticalAlignment="Center" Margin="10,0,0,0">
@@ -212,13 +218,19 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTextColumn Header="Category" Binding="{Binding CategoryName}" Width="*"/>
+                <DataGridTextColumn Header="Category" 
+                                    Binding="{Binding CategoryName}"
+                                    Width="*" MinWidth="100"/>
 
-                <DataGridTextColumn Header="Price" Binding="{Binding BasePrice, StringFormat=N2}" Width="100"/>
+                <DataGridTextColumn Header="Price" 
+                                    HeaderTemplate="{StaticResource RightHeader}"
+                                    Binding="{Binding BasePrice, StringFormat='Rs. {0:N2}'}" 
+                                    Width="100"/>
 
                 <!--<DataGridTextColumn Header="Stock" Binding="{Binding TotalStock}" Width="80"/>-->
 
-                <DataGridTemplateColumn Header="Stock" Width="60">
+                <DataGridTemplateColumn Header="Stock" 
+                                        Width="60">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel VerticalAlignment="Center" Margin="10,0,0,0">

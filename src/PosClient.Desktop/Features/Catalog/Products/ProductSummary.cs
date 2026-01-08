@@ -33,7 +33,25 @@ namespace PosClient.Desktop.Features.Catalog.Products
 
         // UI helpers and computed properties
         [JsonIgnore]
-        public string StockStatusBar => TotalStock <= 10 ? "#FFA500" : "#00CC66";
+        public string StockStatusBar
+        {
+            get
+            {
+                const int lowThreshold = 5;
+                const int mediumThreshold = 20;
+                if (TotalStock <= lowThreshold)
+                {
+                    return "#FF4D4F"; // Red (low)
+                }
+
+                if (TotalStock <= mediumThreshold)
+                {
+                    return "#FFA500"; // Orange (medium)
+                }
+
+                return "#00CC66"; // Green (healthy)
+            }
+        }
 
     }
 }
