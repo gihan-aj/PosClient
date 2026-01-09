@@ -38,7 +38,7 @@
                    Content="New Product"
                    Icon="{ui:SymbolIcon Add24}"
                    Appearance="Primary"
-                   Command="{Binding NavigateToAddCommand}"/>
+                   Command="{Binding ViewModel.NavigateToAddCommand}"/>
         </Grid>
 
         <Grid Grid.Row="1" Margin="0,0,0,20">
@@ -223,7 +223,6 @@
                                     Width="*" MinWidth="100"/>
 
                 <DataGridTextColumn Header="Price" 
-                                    HeaderTemplate="{StaticResource RightHeader}"
                                     Binding="{Binding BasePrice, StringFormat='Rs. {0:N2}'}" 
                                     Width="100"/>
 

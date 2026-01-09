@@ -13,6 +13,13 @@ namespace PosClient.Desktop.Features.Catalog.Products
         [JsonPropertyName("namePath")]
         public string NamePath { get; set; } = string.Empty;
 
+        [JsonPropertyName("level")]
+        public int Level { get; set; }
+
+        [JsonPropertyName("displayOrder")]
+
+        public int DisplayOrder { get; set; }
+
         [JsonPropertyName("children")]
         public List<CategoryListItem> Children { get; set; } = new();
     }

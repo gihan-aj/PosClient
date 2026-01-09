@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using PosClient.Desktop.Features.Catalog.Categories;
 using PosClient.Desktop.Features.Catalog.Products;
+using PosClient.Desktop.Features.Catalog.Products.Editor;
 using PosClient.Desktop.Features.Dashboard;
 using PosClient.Desktop.Features.Settings;
 using PosClient.Desktop.Infrastructure.Configuration;
@@ -78,6 +79,8 @@ namespace PosClient.Desktop
 
                 services.AddTransient<ProductsPage>();
                 services.AddTransient<ProductsViewModel>();
+                services.AddTransient<ProductEditorPage>();
+                services.AddTransient<ProductEditorViewModel>();
 
                 services.AddSingleton<SettingsPage>();
                 services.AddSingleton<SettingsViewModel>();

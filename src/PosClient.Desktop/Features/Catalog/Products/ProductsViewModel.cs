@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using PosClient.Desktop.Features.Catalog.Categories;
+using PosClient.Desktop.Features.Catalog.Products.Editor;
 using PosClient.Desktop.Infrastructure.Network;
 using PosClient.Desktop.Shared;
 using PosClient.Desktop.Shared.Utilities;
@@ -192,7 +192,10 @@ namespace PosClient.Desktop.Features.Catalog.Products
         }
 
         [RelayCommand]
-        public void NavigateToAdd() { }
+        public void NavigateToAdd() 
+        {
+            _navigationService.Navigate(typeof(ProductEditorPage));
+        }
 
         [RelayCommand]
         public void EditProduct(Product product) { }

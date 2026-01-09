@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
+using PosClient.Desktop.Shared;
 
 namespace PosClient.Desktop.Features.Catalog.Products
 {
@@ -22,6 +23,10 @@ namespace PosClient.Desktop.Features.Catalog.Products
         public string _categoryName = string.Empty;
 
         [ObservableProperty]
+        [JsonPropertyName("description")]
+        public string? _description;
+
+        [ObservableProperty]
         [JsonPropertyName("sku")]
         public string? _sku;
 
@@ -35,11 +40,15 @@ namespace PosClient.Desktop.Features.Catalog.Products
 
         [ObservableProperty]
         [JsonPropertyName("gender")]
-        public string? _gender;
+        public Gender? _gender;
 
         [ObservableProperty]
         [JsonPropertyName("basePrice")]
         public decimal _basePrice;
+        
+        [ObservableProperty]
+        [JsonPropertyName("isActive")]
+        public bool _isActive;
 
         [ObservableProperty]
         [property: JsonPropertyName("tags")]
