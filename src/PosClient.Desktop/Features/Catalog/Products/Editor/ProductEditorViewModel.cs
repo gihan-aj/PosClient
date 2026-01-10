@@ -128,11 +128,14 @@ namespace PosClient.Desktop.Features.Catalog.Products.Editor
             var isNew = IsNew;
             if (isNew)
             {
-                var result = await _apiClient.PostAsync("api/products", CurrentProduct);
+                var result = await _apiClient.PostAsync<CreateResponse>("api/products", CurrentProduct);
                 if (result.IsSuccess)
                 {
                     _snackbarService.Show("Success", "Product Saved!", ControlAppearance.Success, null, TimeSpan.FromSeconds(5));
-                    await InitializeEdit(CurrentProduct.Id);
+                    if (result.Data != null)
+                        await InitializeEdit(result.Data.Id);
+                    else
+                        NavigateBack();
                 }
             }
 
