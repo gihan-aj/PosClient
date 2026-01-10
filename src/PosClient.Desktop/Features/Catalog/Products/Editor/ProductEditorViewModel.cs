@@ -2,6 +2,8 @@
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using PosClient.Desktop.Features.Catalog.Products.Messages;
 using PosClient.Desktop.Infrastructure.Network;
 using PosClient.Desktop.Shared;
 using PosClient.Desktop.Shared.Utilities;
@@ -11,7 +13,7 @@ using Wpf.Ui.Controls;
 
 namespace PosClient.Desktop.Features.Catalog.Products.Editor
 {
-    public partial class ProductEditorViewModel : ObservableObject, INavigationAware
+    public partial class ProductEditorViewModel : ObservableObject, INavigationAware, IRecipient<EditProductMessage>
     {
         private readonly IApiClient _apiClient;
         private readonly INavigationService _navigationService;
@@ -37,13 +39,15 @@ namespace PosClient.Desktop.Features.Catalog.Products.Editor
             _apiClient = apiClient;
             _navigationService = navigationService;
             _snackbarService = snackbarService;
+
+            WeakReferenceMessenger.Default.Register<EditProductMessage>(this);
         }
 
         public IEnumerable<Gender> GenderOptions => Enum.GetValues(typeof(Gender)).Cast<Gender>();
 
         public async Task OnNavigatedFromAsync()
         {
-            
+            CurrentProduct = null;
         }
 
         public async Task OnNavigatedToAsync()
@@ -98,6 +102,11 @@ namespace PosClient.Desktop.Features.Catalog.Products.Editor
             }
         }
 
+        public async void Receive(EditProductMessage message)
+        {
+            await InitializeEdit(message.Value);
+        }
+
         [RelayCommand]
         public async Task Save()
         {
@@ -116,12 +125,25 @@ namespace PosClient.Desktop.Features.Catalog.Products.Editor
 
             IsLoading = true;
 
-            var result = await _apiClient.PostAsync("api/products", CurrentProduct);
-            if (result.IsSuccess)
+            var isNew = IsNew;
+            if (isNew)
             {
-                _snackbarService.Show("Success", "Product Saved!", ControlAppearance.Success, null, TimeSpan.FromSeconds(5));
-                IsLoading = false;
-                NavigateBack();
+                var result = await _apiClient.PostAsync("api/products", CurrentProduct);
+                if (result.IsSuccess)
+                {
+                    _snackbarService.Show("Success", "Product Saved!", ControlAppearance.Success, null, TimeSpan.FromSeconds(5));
+                    await InitializeEdit(CurrentProduct.Id);
+                }
+            }
+
+            else
+            {
+                var result = await _apiClient.PutAsync($"api/products/{CurrentProduct.Id}", CurrentProduct);
+                if (result.IsSuccess)
+                {
+                    _snackbarService.Show("Success", "Product Upadated!", ControlAppearance.Success, null, TimeSpan.FromSeconds(5));
+                    NavigateBack();
+                }
             }
 
             IsLoading = false;

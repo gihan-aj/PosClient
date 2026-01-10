@@ -1,12 +1,17 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using PosClient.Desktop.Features.Catalog.Categories;
 using PosClient.Desktop.Features.Catalog.Products.Editor;
+using PosClient.Desktop.Features.Catalog.Products.Messages;
 using PosClient.Desktop.Infrastructure.Network;
 using PosClient.Desktop.Shared;
 using PosClient.Desktop.Shared.Utilities;
 using Wpf.Ui;
 using Wpf.Ui.Abstractions.Controls;
+using Wpf.Ui.Controls;
+using Wpf.Ui.Extensions;
 
 namespace PosClient.Desktop.Features.Catalog.Products
 {
@@ -14,6 +19,8 @@ namespace PosClient.Desktop.Features.Catalog.Products
     {
         private readonly IApiClient _apiClient;
         private readonly INavigationService _navigationService;
+        private readonly IContentDialogService _contentDialogService;
+        private readonly ISnackbarService _snackbarService;
 
         // 1. The State
         [ObservableProperty]
@@ -59,13 +66,18 @@ namespace PosClient.Desktop.Features.Catalog.Products
             new StatusFilterOption { Label = "Inactive Only" , Value = false }
         };
 
-        public ProductsViewModel(IApiClient apiClient, INavigationService navigationService)
+        public ProductsViewModel(
+            IApiClient apiClient,
+            INavigationService navigationService,
+            IContentDialogService contentDialogService,
+            ISnackbarService snackbarService)
         {
             _apiClient = apiClient;
             _navigationService = navigationService;
 
             LoadCategoriesCommand.Execute(null);
-
+            _contentDialogService = contentDialogService;
+            _snackbarService = snackbarService;
         }
 
         public async Task OnNavigatedToAsync()
@@ -198,7 +210,72 @@ namespace PosClient.Desktop.Features.Catalog.Products
         }
 
         [RelayCommand]
-        public void EditProduct(Product product) { }
+        public void EditProduct(ProductSummary product) 
+        {
+            if (product == null)
+                return;
+
+            _navigationService.Navigate(typeof(ProductEditorPage));
+
+            WeakReferenceMessenger.Default.Send(new EditProductMessage(product.Id));
+        }
+
+        [RelayCommand]
+        public async Task DeleteProduct(ProductSummary product)
+        {
+            var confirm = await _contentDialogService.ShowSimpleDialogAsync(new SimpleContentDialogCreateOptions
+            {
+                Title = "Delete Product?",
+                Content = "This might affect product varients and orders.",
+                PrimaryButtonText = "Delete",
+                CloseButtonText = "Cancel"
+            });
+
+            if (confirm == ContentDialogResult.Primary)
+            {
+                var result = await _apiClient.DeleteAsync($"api/products/{product.Id}");
+                if (result.IsSuccess)
+                {
+                    _snackbarService.Show("Success", "Product Deleted!", ControlAppearance.Success, null, TimeSpan.FromSeconds(5));
+                    await LoadData();
+                }
+            }
+        }
+
+        [RelayCommand]
+        public async Task ToggleStatus(ProductSummary product)
+        {
+            if (product.IsActive)
+            {
+                var confirm = await _contentDialogService.ShowSimpleDialogAsync(new SimpleContentDialogCreateOptions
+                {
+                    Title = "Deactivate Product?",
+                    Content = "This might affect product varients.",
+                    PrimaryButtonText = "Deactivate",
+                    CloseButtonText = "Cancel"
+                });
+
+                if (confirm == ContentDialogResult.Primary)
+                {
+                    var result = await _apiClient.PostAsync($"api/products/{product.Id}/deactivate", null!);
+                    if (result.IsSuccess)
+                    {
+                        _snackbarService.Show("Success", "Product Deactivated!", ControlAppearance.Success, null, TimeSpan.FromSeconds(5));
+                        await LoadData();
+                    }
+                }
+            }
+            else
+            {
+                
+                var result = await _apiClient.PostAsync($"api/products/{product.Id}/activate", null!);
+                if (result.IsSuccess)
+                {
+                    _snackbarService.Show("Success", "Product Activated!", ControlAppearance.Success, null, TimeSpan.FromSeconds(5));
+                    await LoadData();
+                }
+            }
+        }
 
         public async Task SortData(string sortBy, string sortOrder)
         {

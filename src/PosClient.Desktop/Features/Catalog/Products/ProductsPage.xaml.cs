@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
 using Wpf.Ui.Abstractions.Controls;
 
 namespace PosClient.Desktop.Features.Catalog.Products
@@ -41,6 +42,15 @@ namespace PosClient.Desktop.Features.Catalog.Products
             var sortBy = e.Column.SortMemberPath;
 
             await ViewModel.SortData(sortBy, sortOrder);
+        }
+
+        private void OpenMenu_Click(object sender, RoutedEventArgs e)
+        {
+            if(sender is Button btn && btn.ContextMenu != null)
+            {
+                btn.ContextMenu.PlacementTarget = btn;
+                btn.ContextMenu.IsOpen = true;
+            }
         }
     }
 }

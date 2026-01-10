@@ -243,7 +243,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="Status" Width="100" SortMemberPath="IsActive">
+                <DataGridTemplateColumn Header="Status" Width="Auto" SortMemberPath="IsActive">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Border CornerRadius="4" Padding="8,2" HorizontalAlignment="Left" Margin="10,0,0,0">
@@ -268,8 +268,89 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ui:Button Icon="{ui:SymbolIcon MoreVertical24}" 
-                                   Appearance="Transparent"
-                                   ToolTip="Actions" Margin="10,0,0,0"/>
+                                       Appearance="Transparent"
+                                       ToolTip="Actions" Margin="10,0,0,0"
+                                       Click="OpenMenu_Click"
+                                       Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Page}}">
+
+                                <ui:Button.ContextMenu>
+                                    <ContextMenu>
+                                        
+                                        <MenuItem Header="Edit Details">
+                                            <MenuItem.Icon>
+                                                <ui:SymbolIcon Symbol="Edit24" FontSize="16"/>
+                                            </MenuItem.Icon>
+
+                                            <MenuItem.Command>
+                                                <Binding Path="PlacementTarget.Tag.ViewModel.EditProductCommand"
+                                                         RelativeSource="{RelativeSource AncestorType=ContextMenu}"/>
+                                            </MenuItem.Command>
+
+                                            <MenuItem.CommandParameter>
+                                                <Binding Path="PlacementTarget.DataContext"
+                                                         RelativeSource="{RelativeSource AncestorType=ContextMenu}"/>
+                                            </MenuItem.CommandParameter>
+                                        </MenuItem>
+
+                                        <Separator/>
+
+                                        <MenuItem>
+                                            <MenuItem.Command>
+                                                <Binding Path="PlacementTarget.Tag.ViewModel.ToggleStatusCommand"
+                                                         RelativeSource="{RelativeSource AncestorType=ContextMenu}"/>
+                                            </MenuItem.Command>
+
+                                            <MenuItem.CommandParameter>
+                                                <Binding Path="PlacementTarget.DataContext"
+                                                         RelativeSource="{RelativeSource AncestorType=ContextMenu}"/>
+                                            </MenuItem.CommandParameter>
+
+                                            <MenuItem.Style>
+                                                <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+                                                    <Setter Property="Header" Value="Deactivate"/>
+                                                    <Setter Property="Icon">
+                                                        <Setter.Value>
+                                                            <ui:SymbolIcon Symbol="Prohibited24" FontSize="16" Foreground="Orange"/>
+                                                        </Setter.Value>
+                                                    </Setter>
+
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Path=CommandParameter.IsActive, RelativeSource={RelativeSource Self}}" Value="False">
+                                                            <Setter Property="Header" Value="Activate"/>
+                                                            <Setter Property="Icon">
+                                                                <Setter.Value>
+                                                                    <ui:SymbolIcon Symbol="CheckmarkCircle24" FontSize="16" Foreground="Green"/>
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </MenuItem.Style>
+                                        </MenuItem>
+                                        
+                                        <Separator/>
+
+                                        <MenuItem Header="Delete"
+                                                  Foreground="Red">
+                                            <MenuItem.Icon>
+                                                <ui:SymbolIcon Symbol="Delete24" FontSize="16" Foreground="Red"/>
+                                            </MenuItem.Icon>
+
+                                            <MenuItem.Command>
+                                                <Binding Path="PlacementTarget.Tag.ViewModel.DeleteProductCommand" 
+                                                         RelativeSource="{RelativeSource AncestorType=ContextMenu}"/>
+                                            </MenuItem.Command>
+
+                                            <MenuItem.CommandParameter>
+                                                <Binding Path="PlacementTarget.DataContext" 
+                                                         RelativeSource="{RelativeSource AncestorType=ContextMenu}"/>
+                                            </MenuItem.CommandParameter>
+                                        </MenuItem>
+                                        
+                                    </ContextMenu>
+                                </ui:Button.ContextMenu>
+                                
+                            </ui:Button>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
