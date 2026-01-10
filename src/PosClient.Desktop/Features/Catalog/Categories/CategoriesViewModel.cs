@@ -27,6 +27,9 @@ namespace PosClient.Desktop.Features.Catalog.Categories
         [ObservableProperty]
         private bool _isLoadingDetails;
 
+        [ObservableProperty]
+        private bool _isEmptyResult;
+
         // Populate parent dropdown
         [ObservableProperty]
         private ObservableCollection<Category> _flatCategories = new();
@@ -43,6 +46,7 @@ namespace PosClient.Desktop.Features.Catalog.Categories
         public async Task LoadData()
         {
             IsLoading = true;
+            IsEmptyResult = false;
             CategoryTree.Clear();
             FlatCategories.Clear();
 
@@ -68,6 +72,7 @@ namespace PosClient.Desktop.Features.Catalog.Categories
             // Create a category to bind with the form
             //CreateNew();
             SelectedCategory = null;
+            IsEmptyResult = !CategoryTree.Any();
             IsLoading = false;
         }
 

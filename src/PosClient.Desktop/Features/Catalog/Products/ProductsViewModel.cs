@@ -66,6 +66,9 @@ namespace PosClient.Desktop.Features.Catalog.Products
             new StatusFilterOption { Label = "Inactive Only" , Value = false }
         };
 
+        [ObservableProperty]
+        private bool _isEmptyResults;
+
         public ProductsViewModel(
             IApiClient apiClient,
             INavigationService navigationService,
@@ -94,6 +97,7 @@ namespace PosClient.Desktop.Features.Catalog.Products
         public async Task LoadData()
         {
             IsLoading = true;
+            IsEmptyResults = false;
 
             string queryString = QueryStringHelper.ToQueryString(Request);
             string url = $"api/products{queryString}";
@@ -109,9 +113,14 @@ namespace PosClient.Desktop.Features.Catalog.Products
                 TotalPages = (int)Math.Ceiling((double)TotalCount / Request.PageSize);
                 HasNextPage = data.HasNextPage;
                 HasPreviousPage = data.Page > 1;
+                IsEmptyResults = !data.Items.Any();
+            }
+            else
+            {
+                IsEmptyResults = true;
             }
 
-            IsLoading = false;
+                IsLoading = false;
         }
 
         [RelayCommand]
