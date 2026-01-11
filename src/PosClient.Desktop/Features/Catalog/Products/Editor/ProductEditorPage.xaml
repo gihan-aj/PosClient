@@ -3,8 +3,9 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:PosClient.Desktop.Features.Catalog.Products.Editor"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:local="clr-namespace:PosClient.Desktop.Features.Catalog.Products.Editor"
+      xmlns:tabs="clr-namespace:PosClient.Desktop.Features.Catalog.Products.Editor.Tabs"
       d:DataContext="{d:DesignInstance local:ProductEditorViewModel, IsDesignTimeCreatable=False}"
       ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
       ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
@@ -154,8 +155,7 @@
                      IsEnabled="{Binding ViewModel.IsNew, Converter={StaticResource BoolToInverseConverter}}"
                      Background="{DynamicResource ControlFillColorDefaultBrush}">
                 <Grid>
-                    <TextBlock Text="Variant Matrix coming in Phase 3..." 
-                               HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Gray"/>
+                    <tabs:VariantsTab />
                 </Grid>
             </TabItem>
 

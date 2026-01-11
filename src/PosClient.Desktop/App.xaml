@@ -18,6 +18,7 @@
             <converters:IsNotNullConverter x:Key="IsNotNullConverter" />
             <converters:StringToListConverter x:Key="StringToListConverter"/>
             <converters:BoolToInverseConverter x:Key="BoolToInverseConverter"/>
+            <converters:InverseItemsExistsToVisibilty x:Key="InverseItemsExistsToVisibilty" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

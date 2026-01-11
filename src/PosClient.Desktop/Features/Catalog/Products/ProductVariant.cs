@@ -14,7 +14,7 @@ namespace PosClient.Desktop.Features.Catalog.Products
 
         [ObservableProperty]
         [property: JsonPropertyName("sku")]
-        private string _sku = string.Empty;
+        private string? _sku;
 
         [ObservableProperty]
         [property: JsonPropertyName("size")]
