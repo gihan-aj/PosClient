@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace PosClient.Desktop.Features.Catalog.Products
+namespace PosClient.Desktop.Features.Catalog.Products.Editor
 {
     public partial class ProductImage : ObservableObject
     {

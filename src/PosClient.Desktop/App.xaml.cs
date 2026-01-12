@@ -10,10 +10,13 @@ using Microsoft.Extensions.Options;
 using PosClient.Desktop.Features.Catalog.Categories;
 using PosClient.Desktop.Features.Catalog.Products;
 using PosClient.Desktop.Features.Catalog.Products.Editor;
+using PosClient.Desktop.Features.Catalog.Products.List;
 using PosClient.Desktop.Features.Dashboard;
 using PosClient.Desktop.Features.Settings;
+using PosClient.Desktop.Infrastructure;
 using PosClient.Desktop.Infrastructure.Configuration;
 using PosClient.Desktop.Infrastructure.Network;
+using PosClient.Desktop.Shared;
 using PosClient.Desktop.Shell;
 using PosClient.Desktop.Shell.Services;
 using Wpf.Ui;
@@ -63,9 +66,11 @@ namespace PosClient.Desktop
 
                 // Snackbar
                 services.AddSingleton<ISnackbarService, SnackbarService>();
+                services.AddSingleton<INotificationService, WpfUiNotificationService>();
 
                 // Dialog
                 services.AddSingleton<IContentDialogService, ContentDialogService>();
+                services.AddSingleton<IDialogService, WpfUiContentDialogService>();
 
                 // Main window with navigation
                 services.AddSingleton<INavigationWindow, MainWindow>();
@@ -77,8 +82,8 @@ namespace PosClient.Desktop
                 services.AddTransient<CategoriesPage>();
                 services.AddTransient<CategoriesViewModel>();
 
-                services.AddTransient<ProductsPage>();
-                services.AddTransient<ProductsViewModel>();
+                services.AddTransient<ProductListPage>();
+                services.AddTransient<ProductListViewModel>();
                 services.AddTransient<ProductEditorPage>();
                 services.AddTransient<ProductEditorViewModel>();
 

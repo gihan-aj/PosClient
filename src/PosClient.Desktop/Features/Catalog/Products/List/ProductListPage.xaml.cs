@@ -2,23 +2,23 @@
 using System.Windows.Controls;
 using Wpf.Ui.Abstractions.Controls;
 
-namespace PosClient.Desktop.Features.Catalog.Products
+namespace PosClient.Desktop.Features.Catalog.Products.List
 {
     /// <summary>
-    /// Interaction logic for ProductsPage.xaml
+    /// Interaction logic for ProductListPage.xaml
     /// </summary>
-    public partial class ProductsPage : INavigableView<ProductsViewModel>
+    public partial class ProductListPage : INavigableView<ProductListViewModel>
     {
-        public ProductsViewModel ViewModel { get; }
-        public ProductsPage(ProductsViewModel viewModel)
+        public ProductListPage(ProductListViewModel viewModel)
         {
+            InitializeComponent();
             ViewModel = viewModel;
             DataContext = this;
-
-            InitializeComponent();
         }
 
-        private async void DataGrid_Sorting(object sender, DataGridSortingEventArgs e) 
+        public ProductListViewModel ViewModel { get; }
+
+        private async void DataGrid_Sorting(object sender, DataGridSortingEventArgs e)
         {
             // Stop the default client-side sorting
             e.Handled = true;
@@ -26,11 +26,11 @@ namespace PosClient.Desktop.Features.Catalog.Products
             // Determine the new direction
             var column = e.Column;
             var direction = (column.SortDirection != System.ComponentModel.ListSortDirection.Ascending)
-                ? System.ComponentModel.ListSortDirection.Ascending 
+                ? System.ComponentModel.ListSortDirection.Ascending
                 : System.ComponentModel.ListSortDirection.Descending;
 
             // Update the UI arrow
-            foreach(var col in ((DataGrid)sender).Columns)
+            foreach (var col in ((DataGrid)sender).Columns)
             {
                 col.SortDirection = null;
             }
@@ -46,7 +46,7 @@ namespace PosClient.Desktop.Features.Catalog.Products
 
         private void OpenMenu_Click(object sender, RoutedEventArgs e)
         {
-            if(sender is Button btn && btn.ContextMenu != null)
+            if (sender is Button btn && btn.ContextMenu != null)
             {
                 btn.ContextMenu.PlacementTarget = btn;
                 btn.ContextMenu.IsOpen = true;

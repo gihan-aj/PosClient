@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using PosClient.Desktop.Infrastructure.Network;
 using PosClient.Desktop.Shared;
 using Wpf.Ui;
 using Wpf.Ui.Controls;

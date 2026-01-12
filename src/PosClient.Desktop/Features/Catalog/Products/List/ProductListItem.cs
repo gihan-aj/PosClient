@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace PosClient.Desktop.Features.Catalog.Products
+namespace PosClient.Desktop.Features.Catalog.Products.List
 {
-    public class ProductSummary
+    public class ProductListItem
     {
         [JsonPropertyName("id")]
         public Guid Id { get; set; }
@@ -52,6 +52,5 @@ namespace PosClient.Desktop.Features.Catalog.Products
                 return "#00CC66"; // Green (healthy)
             }
         }
-
     }
 }

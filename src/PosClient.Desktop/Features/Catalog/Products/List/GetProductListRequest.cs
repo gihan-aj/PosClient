@@ -1,8 +1,8 @@
 ﻿using PosClient.Desktop.Shared;
 
-namespace PosClient.Desktop.Features.Catalog.Products
+namespace PosClient.Desktop.Features.Catalog.Products.List
 {
-    public class GetProductsRequest : PagedRequest
+    public class GetProductListRequest : PagedRequest
     {
         public Guid? CategoryId { get; set; } = null;
 

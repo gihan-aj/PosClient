@@ -1,6 +1,4 @@
-﻿using PosClient.Desktop.Shared;
-
-namespace PosClient.Desktop.Infrastructure.Network
+﻿namespace PosClient.Desktop.Shared
 {
     public interface IApiClient
     {

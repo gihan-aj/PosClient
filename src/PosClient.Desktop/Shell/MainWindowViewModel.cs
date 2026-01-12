@@ -63,7 +63,7 @@ namespace PosClient.Desktop.Shell
             {
                 Content = "Products",
                 Icon = new SymbolIcon { Symbol = SymbolRegular.ShoppingBag24 },
-                TargetPageType = typeof(Features.Catalog.Products.ProductsPage)
+                TargetPageType = typeof(Features.Catalog.Products.List.ProductListPage)
             });
 
             _menuItems.Add(catalog);

@@ -148,19 +148,18 @@
                         </Grid>
                     </ScrollViewer>
                 </Grid>
-                
+
             </TabItem>
 
             <TabItem Header="Variants"
-                     IsEnabled="{Binding ViewModel.IsNew, Converter={StaticResource BoolToInverseConverter}}"
                      Background="{DynamicResource ControlFillColorDefaultBrush}">
                 <Grid>
                     <tabs:VariantsTab />
                 </Grid>
             </TabItem>
-
+            <!--IsEnabled="{Binding ViewModel.IsNew, Converter={StaticResource BoolToInverseConverter}}"-->
             <TabItem Header="Images"
-                     IsEnabled="{Binding ViewModel.IsNew, Converter={StaticResource BoolToInverseConverter}}"
+                     
                      Background="{DynamicResource ControlFillColorDefaultBrush}">
                 <Grid>
                     <TextBlock Text="Image Uploader coming in Phase 4..." 

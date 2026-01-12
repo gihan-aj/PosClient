@@ -1,7 +1,5 @@
-﻿using Wpf.Ui;
+﻿using PosClient.Desktop.Shared;
 using Wpf.Ui.Abstractions.Controls;
-using Wpf.Ui.Controls;
-using Wpf.Ui.Extensions;
 
 namespace PosClient.Desktop.Features.Catalog.Products.Editor
 {
@@ -10,40 +8,33 @@ namespace PosClient.Desktop.Features.Catalog.Products.Editor
     /// </summary>
     public partial class ProductEditorPage : INavigableView<ProductEditorViewModel>
     {
-        private readonly IContentDialogService _contentDialogService;
-
-        public ProductEditorPage(ProductEditorViewModel vireModel, IContentDialogService contentDialogService)
+        private readonly IDialogService _dialogService;
+        public ProductEditorPage(ProductEditorViewModel viewModel, IDialogService dialogService)
         {
-            ViewModel = vireModel;
-            DataContext = this;
             InitializeComponent();
-            _contentDialogService = contentDialogService;
+            ViewModel = viewModel;
+            DataContext = this;
+            _dialogService = dialogService;
         }
 
-        public ProductEditorViewModel ViewModel { get; set; }
+        public ProductEditorViewModel ViewModel { get; }
 
         public async Task<bool> OnNavigatingFrom()
         {
-            if (ViewModel.IsBaseProductDirty || ViewModel.IsVariantsDirty || ViewModel.IsImagesDirty)
+            if (ViewModel.IsProductDirty)
             {
-                var confirm = await _contentDialogService.ShowSimpleDialogAsync(new SimpleContentDialogCreateOptions
-                {
-                    Title = "Unsaved Changes",
-                    Content = "You have unsaved changes. Are you sure you want to leave?",
-                    PrimaryButtonText = "Leave",
-                    CloseButtonText = "Stay"
-                });
+                var confirm = await _dialogService.ShowConfirmationAsync(
+                    "Unsaved Changes",
+                    "You have unsaved changes. Are you sure you want to leave?",
+                    "Leave",
+                    "Stay");
 
-                if (confirm == ContentDialogResult.Primary)
-                {
+                if (confirm)
                     return true;
-                }
                 else
-                {
                     return false;
-                }
             }
-
+            
             return true;
         }
 

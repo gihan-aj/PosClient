@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using PosClient.Desktop.Shared;
 
-namespace PosClient.Desktop.Features.Catalog.Products
+namespace PosClient.Desktop.Features.Catalog.Products.Editor
 {
     public partial class Product : ObservableObject
     {
@@ -45,7 +45,7 @@ namespace PosClient.Desktop.Features.Catalog.Products
         [ObservableProperty]
         [JsonPropertyName("basePrice")]
         public decimal _basePrice;
-        
+
         [ObservableProperty]
         [JsonPropertyName("isActive")]
         public bool _isActive;
@@ -57,7 +57,7 @@ namespace PosClient.Desktop.Features.Catalog.Products
         // Nested Relationships
         [ObservableProperty]
         [property: JsonPropertyName("variants")]
-        private ObservableCollection<ProductVariantSummary> _variants = new();
+        private ObservableCollection<ProductVariant> _variants = new();
 
         [ObservableProperty]
         [property: JsonPropertyName("images")]
