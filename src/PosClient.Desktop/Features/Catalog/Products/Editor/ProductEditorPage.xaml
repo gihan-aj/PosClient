@@ -162,8 +162,7 @@
                      
                      Background="{DynamicResource ControlFillColorDefaultBrush}">
                 <Grid>
-                    <TextBlock Text="Image Uploader coming in Phase 4..." 
-                                HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Gray"/>
+                    <tabs:ImagesTab/>
                 </Grid>
             </TabItem>
 

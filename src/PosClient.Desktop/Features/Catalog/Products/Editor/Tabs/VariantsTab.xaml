@@ -7,7 +7,7 @@
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid Margin="0, 20">
+    <Grid Margin="0, 20,0,0">
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -23,7 +23,7 @@
 
             <StackPanel>
                 <ui:TextBlock Text="Product Variants" FontSize="18" FontWeight="SemiBold"/>
-                <ui:TextBlock Text="Manage SKU, pricing, and stock for each variantion." 
+                <ui:TextBlock Text="Manage SKU, pricing, and stock for each variation." 
                                   Foreground="Gray" FontSize="12" Margin="0,5,0,0"/>
             </StackPanel>
 
@@ -89,6 +89,19 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ui:NumberBox Value="{Binding Price, UpdateSourceTrigger=PropertyChanged}"
+                              PlaceholderText="0.00"
+                              BorderThickness="0"
+                              Background="Transparent"
+                              VerticalAlignment="Center"
+                              Margin="5,0"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                
+                <DataGridTemplateColumn Header="Cost" MinWidth="100">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ui:NumberBox Value="{Binding Cost, UpdateSourceTrigger=PropertyChanged}"
                               PlaceholderText="0.00"
                               BorderThickness="0"
                               Background="Transparent"

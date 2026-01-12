@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.IO;
 using System.Text.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -21,6 +22,8 @@ namespace PosClient.Desktop.Features.Catalog.Products.Editor
 
         private string _originalProductDetailsJson = string.Empty;
 
+        private string _storageFolder = string.Empty;
+
         public ProductEditorViewModel(
             IApiClient apiClient,
             INavigationService navigationService,
@@ -33,6 +36,14 @@ namespace PosClient.Desktop.Features.Catalog.Products.Editor
             _dialogService = dialogService;
 
             WeakReferenceMessenger.Default.Register<EditProductMessage>(this);
+
+            _storageFolder = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "PosClient",
+                "ProductImages");
+
+            if (Directory.Exists(_storageFolder))
+                Directory.CreateDirectory(_storageFolder);
         }
 
         [ObservableProperty]
@@ -155,11 +166,20 @@ namespace PosClient.Desktop.Features.Catalog.Products.Editor
         }
 
         [RelayCommand]
-        public void RemoveVariant(ProductVariant variant)
+        public async Task RemoveVariant(ProductVariant variant)
         {
             if (CurrentProduct != null && variant != null)
             {
-                CurrentProduct.Variants.Remove(variant);
+                var confirm = await _dialogService.ShowConfirmationAsync(
+                "Delete Variant?",
+                "Are you sure you want to delete this product variant?",
+                "Delete",
+                "Cancel");
+
+                if (confirm)
+                {
+                    CurrentProduct.Variants.Remove(variant);
+                }
             }
         }
 
@@ -167,6 +187,68 @@ namespace PosClient.Desktop.Features.Catalog.Products.Editor
         public async Task OpenGenerator()
         {
 
+        }
+
+        [RelayCommand]
+        public async Task UploadImage()
+        {
+            var openFileDialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "Image files (*.png;*.jpeg;*.jpg)|*.png;*.jpeg;*.jpg",
+                Multiselect = true
+            };
+
+            if (openFileDialog.ShowDialog() != true)
+                return;
+
+            if (CurrentProduct == null)
+            {
+                _notificationService.ShowError("Please create or load a product before uploading images.", "No Product");
+                return;
+            }
+
+            foreach (var file in openFileDialog.FileNames)
+            {
+                try
+                {
+                    if(!Directory.Exists(_storageFolder))
+                        Directory.CreateDirectory(_storageFolder);
+
+                    var extension = Path.GetExtension(file);
+                    var newFileName = $"{CurrentProduct!.Id}_{Guid.NewGuid()}{extension}";
+                    var destinationPath = Path.Combine(_storageFolder, newFileName);
+
+                    var bytes = await File.ReadAllBytesAsync(file);
+                    await File.WriteAllBytesAsync(destinationPath, bytes);
+
+                    var image = new ProductImage
+                    {
+                        Id = Guid.Empty,
+                        ImageUrl = destinationPath,
+                        IsPrimary = CurrentProduct.Images.Count == 0
+                    };
+
+                    CurrentProduct.Images.Add(image);
+                }
+                catch
+                {
+                    _notificationService.ShowError($"Failed to upload {Path.GetFileName(file)}", "Image Upload Failed!");
+                }
+            }
+        }
+
+        [RelayCommand]
+        public async Task SetPrimaryImage(ProductImage image)
+        {
+            if (image.IsPrimary)
+                return;
+        }
+
+        [RelayCommand]
+        public void DeleteImage(ProductImage image)
+        {
+            if(CurrentProduct != null)
+                CurrentProduct.Images.Remove(image);
         }
 
         [RelayCommand]
