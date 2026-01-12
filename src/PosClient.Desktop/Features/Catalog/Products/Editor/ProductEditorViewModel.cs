@@ -234,94 +234,101 @@ namespace PosClient.Desktop.Features.Catalog.Products.Editor
 
             else
             {
-                if (IsBaseProductDirty)
+                var result = await _apiClient.PutAsync($"api/products/{CurrentProduct.Id}", CurrentProduct);
+                if (result.IsSuccess)
                 {
-                    var result = await _apiClient.PutAsync($"api/products/{CurrentProduct.Id}", CurrentProduct);
-                    if (result.IsSuccess)
-                    {
-                        _snackbarService.Show("Success", "Product updated!", ControlAppearance.Success, null, TimeSpan.FromSeconds(5));
-                    }
+                    _snackbarService.Show("Success", "Product updated!", ControlAppearance.Success, null, TimeSpan.FromSeconds(5));
+                    NavigateBack();
                 }
 
-                if (IsVariantsDirty)
-                {
-                    foreach(var id in _deletedVariantIds)
-                    {
-                        var url = $"api/products/{CurrentProduct.Id}/variants/{id}";
-                        var result = await _apiClient.DeleteAsync(url);
-                        if (result.IsSuccess)
-                        {
-                            _snackbarService.Show("Success", "Product variant deleted!", ControlAppearance.Success, null, TimeSpan.FromSeconds(5));
-                        }
-                    }
+                //if (IsBaseProductDirty)
+                //{
+                //    var result = await _apiClient.PutAsync($"api/products/{CurrentProduct.Id}", CurrentProduct);
+                //    if (result.IsSuccess)
+                //    {
+                //        _snackbarService.Show("Success", "Product updated!", ControlAppearance.Success, null, TimeSpan.FromSeconds(5));
+                //    }
+                //}
 
-                    var currentVariants = CurrentProduct.Variants;
-                    var originalVariants = JsonSerializer.Deserialize<List<ProductVariantSummary>>(_originalVariantsJson);
+                //if (IsVariantsDirty)
+                //{
+                //    foreach(var id in _deletedVariantIds)
+                //    {
+                //        var url = $"api/products/{CurrentProduct.Id}/variants/{id}";
+                //        var result = await _apiClient.DeleteAsync(url);
+                //        if (result.IsSuccess)
+                //        {
+                //            _snackbarService.Show("Success", "Product variant deleted!", ControlAppearance.Success, null, TimeSpan.FromSeconds(5));
+                //        }
+                //    }
 
-                    foreach(var variant in currentVariants)
-                    {
-                        if(variant.Id == Guid.Empty)
-                        {
-                            var request = new CreateProductVariantRequest
-                            {
-                                ProductId = CurrentProduct.Id,
-                                Size = variant.Size,
-                                Color = variant.Color,
-                                Price = variant.Price,
-                                Cost = variant.Cost,
-                                StockQuantity = variant.StockQuantity,
-                                SkuOverride = variant.Sku
-                            };
+                //    var currentVariants = CurrentProduct.Variants;
+                //    var originalVariants = JsonSerializer.Deserialize<List<ProductVariantSummary>>(_originalVariantsJson);
 
-                            var result = await _apiClient.PostAsync($"api/products/{CurrentProduct.Id}/variants", request);
-                            if (result.IsSuccess)
-                            {
-                                _snackbarService.Show("Success", "Product variant added!", ControlAppearance.Success, null, TimeSpan.FromSeconds(5));
-                            }
-                        }
-                        else
-                        {
-                            var currentVariantJson = JsonSerializer.Serialize(variant);
-                            var originalVariantJson = JsonSerializer.Serialize(originalVariants?.Find(v => v.Id == variant.Id));
-                            if (currentVariantJson != originalVariantJson)
-                            {
-                                var request = new UpdateProductVariantRequest
-                                {
-                                    ProductId = CurrentProduct.Id,
-                                    VariantId = variant.Id,
-                                    Size = variant.Size,
-                                    Color = variant.Color,
-                                    Price = variant.Price,
-                                    Cost = variant.Cost,
-                                    StockQuantity = variant.StockQuantity,
-                                    Sku = variant.Sku ?? string.Empty
-                                };
-                                var result = await _apiClient.PutAsync($"api/products/{CurrentProduct.Id}/variants/{variant.Id}", request);
-                                if (result.IsSuccess)
-                                {
-                                    _snackbarService.Show("Success", "Product variant updated!", ControlAppearance.Success, null, TimeSpan.FromSeconds(5));
-                                }
-                            }
-                        }
+                //    foreach(var variant in currentVariants)
+                //    {
+                //        if(variant.Id == Guid.Empty)
+                //        {
+                //            var request = new CreateProductVariantRequest
+                //            {
+                //                ProductId = CurrentProduct.Id,
+                //                Size = variant.Size,
+                //                Color = variant.Color,
+                //                Price = variant.Price,
+                //                Cost = variant.Cost,
+                //                StockQuantity = variant.StockQuantity,
+                //                SkuOverride = variant.Sku
+                //            };
+
+                //            var result = await _apiClient.PostAsync($"api/products/{CurrentProduct.Id}/variants", request);
+                //            if (result.IsSuccess)
+                //            {
+                //                _snackbarService.Show("Success", "Product variant added!", ControlAppearance.Success, null, TimeSpan.FromSeconds(5));
+                //            }
+                //        }
+                //        else
+                //        {
+                //            var currentVariantJson = JsonSerializer.Serialize(variant);
+                //            var originalVariantJson = JsonSerializer.Serialize(originalVariants?.Find(v => v.Id == variant.Id));
+                //            if (currentVariantJson != originalVariantJson)
+                //            {
+                //                var request = new UpdateProductVariantRequest
+                //                {
+                //                    ProductId = CurrentProduct.Id,
+                //                    VariantId = variant.Id,
+                //                    Size = variant.Size,
+                //                    Color = variant.Color,
+                //                    Price = variant.Price,
+                //                    Cost = variant.Cost,
+                //                    StockQuantity = variant.StockQuantity,
+                //                    Sku = variant.Sku ?? string.Empty
+                //                };
+                //                var result = await _apiClient.PutAsync($"api/products/{CurrentProduct.Id}/variants/{variant.Id}", request);
+                //                if (result.IsSuccess)
+                //                {
+                //                    _snackbarService.Show("Success", "Product variant updated!", ControlAppearance.Success, null, TimeSpan.FromSeconds(5));
+                //                }
+                //            }
+                //        }
                         
-                    }
+                //    }
 
-                }
-                if (IsImagesDirty)
-                {
-                    foreach(var id in _deletedImageIds)
-                    {
-                        var url = $"api/products/{CurrentProduct.Id}/image/{id}";
-                        var result = await _apiClient.DeleteAsync(url);
-                        if (result.IsSuccess)
-                        {
-                            _snackbarService.Show("Success", "Product image deleted!", ControlAppearance.Success, null, TimeSpan.FromSeconds(5));
-                        }
-                    }
-                }
+                //}
+                //if (IsImagesDirty)
+                //{
+                //    foreach(var id in _deletedImageIds)
+                //    {
+                //        var url = $"api/products/{CurrentProduct.Id}/image/{id}";
+                //        var result = await _apiClient.DeleteAsync(url);
+                //        if (result.IsSuccess)
+                //        {
+                //            _snackbarService.Show("Success", "Product image deleted!", ControlAppearance.Success, null, TimeSpan.FromSeconds(5));
+                //        }
+                //    }
+                //}
 
-                if(IsBaseProductDirty || IsVariantsDirty || IsImagesDirty)
-                    await InitializeEdit(CurrentProduct.Id);
+                //if(IsBaseProductDirty || IsVariantsDirty || IsImagesDirty)
+                //    await InitializeEdit(CurrentProduct.Id);
             }
 
             IsLoading = false;
