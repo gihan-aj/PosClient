@@ -42,7 +42,7 @@ namespace PosClient.Desktop.Features.Catalog.Products.Editor
 
         [ObservableProperty]
         [property: JsonPropertyName("isActive")]
-        private bool _isAcive;
+        private bool _isActive;
 
         [ObservableProperty]
         [property: JsonPropertyName("isAvailable")]

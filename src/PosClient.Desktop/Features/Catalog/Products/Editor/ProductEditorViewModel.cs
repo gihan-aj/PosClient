@@ -164,8 +164,53 @@ namespace PosClient.Desktop.Features.Catalog.Products.Editor
                 Color = string.Empty,
                 Price = CurrentProduct.BasePrice,
                 StockQuantity = 0,
-                IsAcive = true
+                IsActive = true
             });
+        }
+
+        [RelayCommand]
+        public async Task ToggleVariantStatus(ProductVariant variant)
+        {
+            if (CurrentProduct == null || variant == null)
+                return;
+
+            if (variant.IsActive)
+            {
+                var confirm = await _dialogService.ShowConfirmationAsync(
+                               "Deactivate Variant?",
+                               "Are you sure you want to deactivate this product variant?",
+                               "Deactivate",
+                               "Cancel");
+
+                if (confirm)
+                {
+                    var result = await _apiClient.PostAsync($"api/products/{CurrentProduct.Id}/variants/{variant.Id}/deactivate", null!);
+                    if (result.IsSuccess)
+                    {
+                        variant.IsActive = !variant.IsActive;
+                        _notificationService.ShowSuccess("Product variant deactivated successfully.", "Success!");
+                    }
+                }
+            }
+            else
+            {
+                var confirm = await _dialogService.ShowConfirmationAsync(
+                               "Activate Variant?",
+                               "Are you sure you want to activate this product variant?",
+                               "Activate",
+                               "Cancel");
+
+                if (confirm)
+                {
+                    var result = await _apiClient.PostAsync($"api/products/{CurrentProduct.Id}/variants/{variant.Id}/activate", null!);
+                    if (result.IsSuccess)
+                    {
+                        variant.IsActive = !variant.IsActive;
+                        _notificationService.ShowSuccess("Product variant activated successfully.", "Success!");
+                    }
+                }
+            }
+            
         }
 
         [RelayCommand]
@@ -181,6 +226,7 @@ namespace PosClient.Desktop.Features.Catalog.Products.Editor
 
                 if (confirm)
                 {
+                    
                     CurrentProduct.Variants.Remove(variant);
                 }
             }

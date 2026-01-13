@@ -7,6 +7,7 @@
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+
     <Grid Margin="0, 20,0,0">
 
         <Grid.RowDefinitions>
@@ -39,6 +40,7 @@
         </Grid>
 
         <ui:DataGrid Grid.Row="1"
+                     HorizontalScrollBarVisibility="Auto"
                      ItemsSource="{Binding ViewModel.CurrentProduct.Variants}"
                      AutoGenerateColumns="False"
                      CanUserAddRows="False"
@@ -46,15 +48,16 @@
 
             <ui:DataGrid.Columns>
 
-                <DataGridTemplateColumn Header="SKU" MinWidth="150" Width="*">
+                <DataGridTemplateColumn Header="SKU" 
+                                        MinWidth="150" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ui:TextBox Text="{Binding Sku, UpdateSourceTrigger=PropertyChanged}"
-                            PlaceholderText="(Auto-generate)"
-                            BorderThickness="0" 
-                            Background="Transparent"
-                            VerticalAlignment="Center"
-                            Margin="5,0"/>
+                                        PlaceholderText="(Auto-generate)"
+                                        BorderThickness="0" 
+                                        Background="Transparent"
+                                        VerticalAlignment="Center"
+                                        Margin="0,0"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -63,11 +66,11 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ui:TextBox Text="{Binding Size, UpdateSourceTrigger=PropertyChanged}"
-                            PlaceholderText="e.g. XL"
-                            BorderThickness="0" 
-                            Background="Transparent"
-                            VerticalAlignment="Center"
-                            Margin="5,0"/>
+                                        PlaceholderText="e.g. XL"
+                                        BorderThickness="0" 
+                                        Background="Transparent"
+                                        VerticalAlignment="Center"
+                                        Margin="5,0"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -76,64 +79,133 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ui:TextBox Text="{Binding Color, UpdateSourceTrigger=PropertyChanged}"
-                            PlaceholderText="e.g. Red"
-                            BorderThickness="0" 
-                            Background="Transparent"
-                            VerticalAlignment="Center"
-                            Margin="5,0"/>
+                                        PlaceholderText="e.g. Red"
+                                        BorderThickness="0" 
+                                        Background="Transparent"
+                                        VerticalAlignment="Center"
+                                        Margin="5,0"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="Price" MinWidth="100">
+                <DataGridTemplateColumn Header="Price" MinWidth="150" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ui:NumberBox Value="{Binding Price, UpdateSourceTrigger=PropertyChanged}"
-                              PlaceholderText="0.00"
-                              BorderThickness="0"
-                              Background="Transparent"
-                              VerticalAlignment="Center"
-                              Margin="5,0"/>
+                                          PlaceholderText="0.00"
+                                          BorderThickness="0"
+                                          Background="Transparent"
+                                          VerticalAlignment="Center"
+                                          Margin="5,0"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                
-                <DataGridTemplateColumn Header="Cost" MinWidth="100">
+
+                <DataGridTemplateColumn Header="Cost" MinWidth="150" Width="Auto">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ui:NumberBox Value="{Binding Cost, UpdateSourceTrigger=PropertyChanged}"
-                              PlaceholderText="0.00"
-                              BorderThickness="0"
-                              Background="Transparent"
-                              VerticalAlignment="Center"
-                              Margin="5,0"/>
+                                          PlaceholderText="0.00"
+                                          BorderThickness="0"
+                                          Background="Transparent"
+                                          VerticalAlignment="Center"
+                                          Margin="5,0"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="Stock" MinWidth="100">
+                <DataGridTemplateColumn Header="Stock" MinWidth="150" Width="Auto">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ui:NumberBox Value="{Binding StockQuantity, UpdateSourceTrigger=PropertyChanged}"
-                              PlaceholderText="0"
-                              MaxDecimalPlaces="0"
-                              BorderThickness="0"
-                              Background="Transparent"
-                              VerticalAlignment="Center"
-                              Margin="5,0"/>
+                                          PlaceholderText="0"
+                                          MaxDecimalPlaces="0"
+                                          BorderThickness="0"
+                                          Background="Transparent"
+                                          VerticalAlignment="Center"
+                                          Margin="5,0"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Width="Auto">
+                <DataGridTemplateColumn Header="Status" MinWidth="50" Width="*" >
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <ui:Button Icon="{ui:SymbolIcon Delete24}"
-                           Appearance="Transparent" Foreground="Red"
-                           ToolTip="Remove Variant"
-                           Command="{Binding DataContext.ViewModel.RemoveVariantCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                           CommandParameter="{Binding}"
-                           Margin="5,0"/>
+                            <Border CornerRadius="4" Padding="8,2" HorizontalAlignment="Left" Margin="10,0,0,0">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="#10FF0000"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                                <Setter Property="Background" Value="#1000FF00"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <TextBlock Text="{Binding IsActive, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Active|Inactive'}" 
+                                   FontSize="12"/>
+                            </Border>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="Actions" MinWidth="80" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <ui:Button Appearance="Transparent"
+                                           ToolTip="Deactivate"
+                                           Command="{Binding DataContext.ViewModel.ToggleVariantStatusCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                           CommandParameter="{Binding}"
+                                           Margin="5,0">
+                                    <ui:Button.Style>
+                                        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+                                                    <ui:SymbolIcon Symbol="Prohibited24" FontSize="16" Foreground="Orange"/>
+                                                </Setter.Value>
+                                            </Setter>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ui:Button.Style>
+                                </ui:Button>
+
+                                <!-- Activate Button (shown when IsActive = False) -->
+                                <ui:Button Appearance="Transparent"
+                                           ToolTip="Activate"
+                                           Command="{Binding DataContext.ViewModel.ToggleVariantStatusCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                           CommandParameter="{Binding}"
+                                           Margin="5,0">
+                                    <ui:Button.Style>
+                                        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+                                                    <ui:SymbolIcon Symbol="CheckmarkCircle24" FontSize="16" Foreground="Green"/>
+                                                </Setter.Value>
+                                            </Setter>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsActive}" Value="False">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ui:Button.Style>
+                                </ui:Button>
+
+                                <ui:Button Icon="{ui:SymbolIcon Delete24}"
+                                        Appearance="Transparent" Foreground="Red"
+                                        ToolTip="Remove Variant"
+                                        Command="{Binding DataContext.ViewModel.RemoveVariantCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}"
+                                        Margin="5,0"/>
+                            </StackPanel>
+                            
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
