@@ -1,6 +1,9 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO;
 using System.Text.Json;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -207,6 +210,9 @@ namespace PosClient.Desktop.Features.Catalog.Products.Editor
                 return;
             }
 
+            const int maxWidth = 1024;
+            const int maxHeight = 1024;
+
             foreach (var file in openFileDialog.FileNames)
             {
                 try
@@ -218,8 +224,48 @@ namespace PosClient.Desktop.Features.Catalog.Products.Editor
                     var newFileName = $"{CurrentProduct!.Id}_{Guid.NewGuid()}{extension}";
                     var destinationPath = Path.Combine(_storageFolder, newFileName);
 
-                    var bytes = await File.ReadAllBytesAsync(file);
-                    await File.WriteAllBytesAsync(destinationPath, bytes);
+                    // Load source into BitmapImage from file bytes so stream can be closed
+                    byte[] bytes = await File.ReadAllBytesAsync(file);
+                    using var ms = new MemoryStream(bytes);
+                    var bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmap.StreamSource = ms;
+                    bitmap.UriSource = null;
+                    bitmap.EndInit();
+                    bitmap.Freeze();
+
+                    // compute scale (do not upscale)
+                    double scale = Math.Min((double)maxWidth / bitmap.PixelWidth , (double)maxHeight / bitmap.PixelHeight);
+                    if (scale > 1d) scale = 1d;
+
+                    BitmapSource outputBitmap;
+                    if(Math.Abs(scale - 1d) < 0.0001)
+                    {
+                        outputBitmap = bitmap;
+                    }
+                    else
+                    {
+                        var transform = new ScaleTransform(scale, scale);
+                        var tb = new TransformedBitmap(bitmap, transform);
+                        tb.Freeze();
+                        outputBitmap = tb;
+                    }
+
+                    // choose encoder based on extension
+                    BitmapEncoder encoder;
+                    if (string.Equals(extension, ".png", StringComparison.OrdinalIgnoreCase))
+                        encoder = new PngBitmapEncoder();
+                    else
+                        encoder = new JpegBitmapEncoder() { QualityLevel = 85 };
+
+                    encoder.Frames.Add(BitmapFrame.Create(outputBitmap));
+
+                    // save resized image to destinationPath
+                    using(var outFs = File.Open(destinationPath, FileMode.Create, FileAccess.Write))
+                    {
+                        encoder.Save(outFs);
+                    }
 
                     var image = new ProductImage
                     {
@@ -240,15 +286,57 @@ namespace PosClient.Desktop.Features.Catalog.Products.Editor
         [RelayCommand]
         public async Task SetPrimaryImage(ProductImage image)
         {
-            if (image.IsPrimary)
+            if (CurrentProduct == null || image.IsPrimary)
                 return;
+
+            var confirm = await _dialogService.ShowConfirmationAsync(
+                "Set Primary Image?",
+                "Are you sure you want to set this image as primary?",
+                "Set Primary",
+                "Cancel");
+
+            if (confirm)
+            {
+                var url = $"api/products/{CurrentProduct.Id}/image/{image.Id}/primary";
+                var result = await _apiClient.PutAsync(url, null!);
+                if (result.IsSuccess)
+                {
+                    _notificationService.ShowSuccess("Image is set as primary", "Success!");
+                    await InitializeEdit(CurrentProduct.Id);
+                }
+            }      
         }
 
         [RelayCommand]
-        public void DeleteImage(ProductImage image)
+        public async Task DeleteImage(ProductImage image)
         {
-            if(CurrentProduct != null)
-                CurrentProduct.Images.Remove(image);
+            if (CurrentProduct == null || image == null)
+                return;
+
+            CurrentProduct.Images.Remove(image);
+
+            // attempt to delete physical file (only if stored under the storage folder)
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(image.ImageUrl))
+                {
+                    var filePath = image.ImageUrl;
+                    // ensure we do not delete outside the storage folder accidentally
+                    var normalizedStorage = Path.GetFullPath(_storageFolder).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+                    var normalizedFile = Path.GetFullPath(filePath);
+
+                    if (normalizedFile.StartsWith(normalizedStorage, StringComparison.OrdinalIgnoreCase) && File.Exists(normalizedFile))
+                    {
+                        File.Delete(normalizedFile);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // report but don't block UI
+                _notificationService.ShowError($"Failed to delete image file from storage: {ex.Message}", "Delete Failed");
+            }
+
         }
 
         [RelayCommand]
@@ -262,12 +350,12 @@ namespace PosClient.Desktop.Features.Catalog.Products.Editor
 
             if (string.IsNullOrWhiteSpace(CurrentProduct.Name))
             {
-                _notificationService.ShowError("Missing Info", "Product Name is required");
+                _notificationService.ShowError("Product Name is required", "Missing Info!");
                 return;
             }
             if (CurrentProduct.BasePrice <= 0)
             {
-                _notificationService.ShowError("Missing Info", "Price should be non-zero positive value");
+                _notificationService.ShowError( "Price should be non-zero positive value", "Missing Info!");
                 return;
             }
 
@@ -278,7 +366,7 @@ namespace PosClient.Desktop.Features.Catalog.Products.Editor
                 var result = await _apiClient.PostAsync<CreateResponse>("api/products", CurrentProduct);
                 if (result.IsSuccess)
                 {
-                    _notificationService.ShowSuccess("Success!", "Product saved.");
+                    _notificationService.ShowSuccess( "Product saved.", "Success!");
                     if (result.Data != null)
                         await InitializeEdit(result.Data.Id);
                     else
@@ -290,7 +378,7 @@ namespace PosClient.Desktop.Features.Catalog.Products.Editor
                 var result = await _apiClient.PutAsync($"api/products/{CurrentProduct.Id}", CurrentProduct);
                 if (result.IsSuccess)
                 {
-                    _notificationService.ShowSuccess("Success!", "Product updated");
+                    _notificationService.ShowSuccess( "Product updated", "Success!");
                     await InitializeEdit(CurrentProduct.Id);
                 }
             }

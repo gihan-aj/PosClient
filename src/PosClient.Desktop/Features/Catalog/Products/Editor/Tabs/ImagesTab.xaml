@@ -50,20 +50,20 @@
                 <DataTemplate>
                     <ui:Card Margin="5" Padding="0" Width="150" Height="200">
                         <Grid>
-                            
+
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
                             <ui:Image Grid.Row="0"
-                                      Source="{Binding ImageUrl}"
+                                      Source="{Binding ImageUrl, Converter={StaticResource ImagePathToBitmapConverter}}"
                                       Stretch="UniformToFill"/>
 
                             <ui:SymbolIcon Symbol="Star24" Filled="True"
-                                           Foreground="Gold"
-                                           Visibility="{Binding IsPrimary, Converter={StaticResource BoolToVisConverter}}"
-                                           HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5"/>
+                                        Foreground="Gold"
+                                        Visibility="{Binding IsPrimary, Converter={StaticResource BoolToVisConverter}}"
+                                        HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5"/>
 
                             <StackPanel Grid.Row="1"
                                         Orientation="Horizontal"

@@ -39,14 +39,14 @@
         </Grid>
 
         <ui:DataGrid Grid.Row="1"
-                         ItemsSource="{Binding ViewModel.CurrentProduct.Variants}"
-                         AutoGenerateColumns="False"
-                         CanUserAddRows="False"
-                         BorderThickness="1" BorderBrush="{DynamicResource SurfaceStrokeColorDefaultBrush}">
+                     ItemsSource="{Binding ViewModel.CurrentProduct.Variants}"
+                     AutoGenerateColumns="False"
+                     CanUserAddRows="False"
+                     BorderThickness="1" BorderBrush="{DynamicResource SurfaceStrokeColorDefaultBrush}">
 
             <ui:DataGrid.Columns>
 
-                <DataGridTemplateColumn Header="SKU" MinWidth="150">
+                <DataGridTemplateColumn Header="SKU" MinWidth="150" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ui:TextBox Text="{Binding Sku, UpdateSourceTrigger=PropertyChanged}"
@@ -59,7 +59,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="Size" MinWidth="80">
+                <DataGridTemplateColumn Header="Size" MinWidth="80"  Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ui:TextBox Text="{Binding Size, UpdateSourceTrigger=PropertyChanged}"
@@ -72,7 +72,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="Color" MinWidth="100">
+                <DataGridTemplateColumn Header="Color" MinWidth="100"  Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ui:TextBox Text="{Binding Color, UpdateSourceTrigger=PropertyChanged}"

@@ -19,6 +19,8 @@
             <converters:StringToListConverter x:Key="StringToListConverter"/>
             <converters:BoolToInverseConverter x:Key="BoolToInverseConverter"/>
             <converters:InverseItemsExistsToVisibilty x:Key="InverseItemsExistsToVisibilty" />
+            <converters:ImagePathToBitmapConverter x:Key="ImagePathToBitmapConverter"/>
+            <BitmapImage x:Key="PlaceholderImage" UriSource="/Assets/placeholder.png" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>
