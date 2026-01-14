@@ -241,9 +241,12 @@ namespace PosClient.Desktop.Features.Catalog.Products.Editor
             if (CurrentProduct == null)
                 return;
 
-            var dlg = new QuickVariantGeneratorDialog();
+            var presenter = _contentDialogService.GetDialogHost();
+
+            var dlg = new QuickVariantGeneratorDialog(presenter);
 
             var result = await _contentDialogService.ShowAsync(dlg, CancellationToken.None);
+
             if (result == Wpf.Ui.Controls.ContentDialogResult.Primary)
             {
                 var options = dlg.GetResult(CurrentProduct.BasePrice);

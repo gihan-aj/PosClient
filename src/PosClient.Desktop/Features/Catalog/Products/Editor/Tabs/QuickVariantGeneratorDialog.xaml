@@ -1,20 +1,19 @@
 ﻿<ui:ContentDialog x:Class="PosClient.Desktop.Features.Catalog.Products.Editor.Tabs.QuickVariantGeneratorDialog"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-             xmlns:local="clr-namespace:PosClient.Desktop.Features.Catalog.Products.Editor.Tabs"
-             mc:Ignorable="d"
-             Title="Quick Add Variants"
-             PrimaryButtonText="Create Variants"
-             SecondaryButtonText="Cancel"
-             d:DesignHeight="450" d:DesignWidth="800">
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="12">
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                 Title="Quick Add Variants"
+                 PrimaryButtonText="Create Variants"
+                 CloseButtonText="Cancel"
+                 DefaultButton="Primary"
+                 
+                 >
 
-            <TextBlock Text="Select Sizes:" FontWeight="SemiBold"/>
-            <WrapPanel>
+    <!-- We use the internal WPF-UI padding to ensure it looks like a standard dialog -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,10,0,0">
+        <StackPanel Margin="12">
+            <TextBlock Text="Select Sizes:" FontWeight="SemiBold" Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}"/>
+            <WrapPanel Margin="0,8">
                 <CheckBox x:Name="ChkSizeS" Content="S" Margin="0,0,8,8" IsChecked="True"/>
                 <CheckBox x:Name="ChkSizeM" Content="M" Margin="0,0,8,8" IsChecked="True"/>
                 <CheckBox x:Name="ChkSizeL" Content="L" Margin="0,0,8,8" IsChecked="True"/>
@@ -22,28 +21,35 @@
                 <CheckBox x:Name="ChkSizeXXL" Content="XXL" Margin="0,0,8,8"/>
             </WrapPanel>
 
-            <TextBlock Text="Select Colors:" FontWeight="SemiBold" Margin="0,6,0,0"/>
-            <WrapPanel>
+            <TextBlock Text="Select Colors:" FontWeight="SemiBold" Margin="0,6,0,0" Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}"/>
+            <WrapPanel Margin="0,8">
                 <CheckBox x:Name="ChkColorBlue" Content="Blue" Margin="0,0,8,8" IsChecked="True"/>
                 <CheckBox x:Name="ChkColorRed" Content="Red" Margin="0,0,8,8" IsChecked="True"/>
                 <CheckBox x:Name="ChkColorBlack" Content="Black" Margin="0,0,8,8" IsChecked="True"/>
                 <CheckBox x:Name="ChkColorWhite" Content="White" Margin="0,0,8,8"/>
             </WrapPanel>
 
-            <TextBlock Text="{Binding InfoText, RelativeSource={RelativeSource AncestorType=ui:ContentDialog}}" Foreground="Gray"/>
+            <TextBlock Text="Initial Stock Per Variant" FontWeight="SemiBold" Margin="0,6,0,0" Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}"/>
+            <ui:NumberBox x:Name="NumberInitialStock" Value="10" Minimum="0" Margin="0,8" Width="150" HorizontalAlignment="Left"/>
 
-            <TextBlock Text="Initial Stock Per Variant" FontWeight="SemiBold" Margin="0,6,0,0"/>
-            <ui:NumberBox x:Name="NumberInitialStock" Value="10" Minimum="0" Maximum="100000" Width="120"/>
-
-            <TextBlock Text="Price (uses base price)" FontWeight="SemiBold" Margin="0,6,0,0"/>
-            <StackPanel Orientation="Vertical">
-                <RadioButton x:Name="RbUseBasePrice" Content="Same as base" IsChecked="True" Margin="0,2,0,0"/>
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <RadioButton x:Name="RbCustomPrice" Content="Custom per variant" Margin="0,2,8,0"/>
-                    <ui:NumberBox x:Name="NumberCustomPrice" Width="120" Minimum="0" Maximum="100000" IsEnabled="False"/>
+            <TextBlock Text="Pricing Strategy" FontWeight="SemiBold" Margin="0,6,0,0" Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}"/>
+            <StackPanel Orientation="Vertical" Margin="0,8">
+                <RadioButton x:Name="RbUseBasePrice" 
+                             GroupName="PricingGroup"
+                             Content="Use Product Base Price" 
+                             IsChecked="True" 
+                             Margin="0,0,0,5"/>
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton x:Name="RbCustomPrice" 
+                                 GroupName="PricingGroup"
+                                 Content="Custom Price:" 
+                                 VerticalAlignment="Center" 
+                                 Margin="0,0,10,0"/>
+                    <ui:NumberBox x:Name="NumberCustomPrice" 
+                                  Width="150" Minimum="0" 
+                                  IsEnabled="False"/>
                 </StackPanel>
             </StackPanel>
-
         </StackPanel>
     </ScrollViewer>
 </ui:ContentDialog>

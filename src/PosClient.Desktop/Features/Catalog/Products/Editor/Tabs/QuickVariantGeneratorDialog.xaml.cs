@@ -1,4 +1,5 @@
-﻿using Wpf.Ui.Controls;
+﻿using System.Windows.Controls;
+using Wpf.Ui.Controls;
 
 namespace PosClient.Desktop.Features.Catalog.Products.Editor.Tabs
 {
@@ -7,9 +8,13 @@ namespace PosClient.Desktop.Features.Catalog.Products.Editor.Tabs
     /// </summary>
     public partial class QuickVariantGeneratorDialog : ContentDialog
     {
-        public QuickVariantGeneratorDialog()
+        public QuickVariantGeneratorDialog(ContentPresenter? presenter) : base(presenter)
         {
             InitializeComponent();
+
+            // Set the style programmatically to avoid XAML parser issues with StaticResource
+            // This ensures the dialog gets the standard WPF-UI buttons and border
+            SetResourceReference(StyleProperty, typeof(ContentDialog));
 
             // Wire simple UI behavior
             RbCustomPrice.Checked += (s, e) => NumberCustomPrice.IsEnabled = true;
@@ -57,23 +62,6 @@ namespace PosClient.Desktop.Features.Catalog.Products.Editor.Tabs
                 UseBasePrice = useBasePrice,
                 CustomPrice = custom
             };
-        }
-
-        // Helper convenience wrapper so callers (e.g. dialog service) can show this dialog and get strongly-typed result.
-        public static async Task<VariantGenerationResult?> ShowForResultAsync(decimal basePrice)
-        {
-            var dlg = new QuickVariantGeneratorDialog();
-            var result = await dlg.ShowAsync();
-            if (result == ContentDialogResult.Primary)
-            {
-                var built = dlg.BuildResult(basePrice);
-                // if no sizes or no colors selected, return null to signal cancel/no-op
-                if (!built.Sizes.Any() || !built.Colors.Any())
-                    return null;
-                return built;
-            }
-
-            return null;
         }
 
         public VariantGenerationResult? GetResult(decimal basePrice)
