@@ -8,7 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using PosClient.Desktop.Features.Catalog.Categories;
-using PosClient.Desktop.Features.Catalog.Products;
 using PosClient.Desktop.Features.Catalog.Products.Editor;
 using PosClient.Desktop.Features.Catalog.Products.List;
 using PosClient.Desktop.Features.Dashboard;

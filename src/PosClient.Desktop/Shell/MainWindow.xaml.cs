@@ -1,6 +1,8 @@
 ﻿using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using PosClient.Desktop.Shared;
 using Wpf.Ui;
 using Wpf.Ui.Abstractions;
 using Wpf.Ui.Appearance;
@@ -13,7 +15,8 @@ namespace PosClient.Desktop.Shell
     /// </summary>
     public partial class MainWindow : INavigationWindow
     {
-        public MainWindowViewModel ViewModel { get; }
+        private object? _currentPageInstance;
+
         public MainWindow(
             MainWindowViewModel viewModel,
             INavigationViewPageProvider navigationViewPageProvider,
@@ -34,6 +37,49 @@ namespace PosClient.Desktop.Shell
             snackbarService.SetSnackbarPresenter(SnackbarPresenter);
 
             contentDialogService.SetDialogHost(RootContentDialog);
+
+            RootNavigation.Navigating += OnNavigating;
+            RootNavigation.Navigated += OnNavigated;
+        }
+
+        public MainWindowViewModel ViewModel { get; }
+
+        private void OnNavigated(NavigationView sender, NavigatedEventArgs args)
+        {
+            _currentPageInstance = args.Page;
+        }
+
+        private async void OnNavigating(NavigationView sender, NavigatingCancelEventArgs args)
+        {
+            // Check if current page implements IConfirmNavigation interface
+            if (_currentPageInstance is IConfirmNavigation confirmNavigation)
+            {
+                // Cancel the navigation temporarily
+                args.Cancel = true;
+
+                // Ask the ViewModel if we can navigate away
+                var canNavigate = await confirmNavigation.CanNavigateAwayAsync();
+
+                if (canNavigate)
+                {
+                    // User confirmed - unsubscribe temporarily to avoid infinite loop
+                    RootNavigation.Navigating -= OnNavigating;
+
+                    // Retry the navigation - args.Page is already the page instance
+                    if (args.Page is Type pageType)
+                    {
+                        RootNavigation.Navigate(pageType);
+                    }
+                    else
+                    {
+                        // If args.Page is an instance, get its type
+                        RootNavigation.Navigate(args.Page.GetType());
+                    }
+
+                    // Resubscribe
+                    RootNavigation.Navigating += OnNavigating;
+                }
+            }
         }
 
         #region INavigationWindow methods
@@ -56,7 +102,7 @@ namespace PosClient.Desktop.Shell
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
-
+            RootNavigation.Navigating -= OnNavigating;
             // Make sure that closing this window will begin the process of closing the application.
             Application.Current.Shutdown();
         }

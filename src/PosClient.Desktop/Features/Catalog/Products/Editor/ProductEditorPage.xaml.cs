@@ -6,7 +6,7 @@ namespace PosClient.Desktop.Features.Catalog.Products.Editor
     /// <summary>
     /// Interaction logic for ProductEditorPage.xaml
     /// </summary>
-    public partial class ProductEditorPage : INavigableView<ProductEditorViewModel>
+    public partial class ProductEditorPage : INavigableView<ProductEditorViewModel>, IConfirmNavigation
     {
         private readonly IDialogService _dialogService;
         public ProductEditorPage(ProductEditorViewModel viewModel, IDialogService dialogService)
@@ -19,24 +19,26 @@ namespace PosClient.Desktop.Features.Catalog.Products.Editor
 
         public ProductEditorViewModel ViewModel { get; }
 
-        public async Task<bool> OnNavigatingFrom()
+        public async Task<bool> CanNavigateAwayAsync()
         {
-            if (ViewModel.IsProductDirty)
+            if (!ViewModel.IsProductDirty)
+                return true;
+
+            var confirm = await _dialogService.ShowNavigationConfirmationAsync();
+
+            switch (confirm)
             {
-                var confirm = await _dialogService.ShowConfirmationAsync(
-                    "Unsaved Changes",
-                    "You have unsaved changes. Are you sure you want to leave?",
-                    "Leave",
-                    "Stay");
-
-                if (confirm)
+                case Wpf.Ui.Controls.ContentDialogResult.Primary:
+                    await ViewModel.Save();
                     return true;
-                else
-                    return false;
-            }
-            
-            return true;
-        }
 
+                case Wpf.Ui.Controls.ContentDialogResult.Secondary:
+                    return true;
+
+                default:
+                    return false;
+
+            }
+        }
     }
 }

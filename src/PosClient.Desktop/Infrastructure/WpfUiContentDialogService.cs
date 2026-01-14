@@ -42,5 +42,19 @@ namespace PosClient.Desktop.Infrastructure
             // Map the result to a boolean
             return result == ContentDialogResult.Primary;
         }
+
+        public async Task<ContentDialogResult> ShowNavigationConfirmationAsync()
+        {
+            var options = new SimpleContentDialogCreateOptions()
+            {
+                Title = "Unsaved Changes",
+                Content = "You have unsaved changes. Do you want to leave without saving?",
+                PrimaryButtonText = "Save & Leave",
+                SecondaryButtonText = "Leave Without Saving",
+                CloseButtonText = "Stay"
+            };
+
+            return await _contentDialogService.ShowSimpleDialogAsync(options);
+        }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace PosClient.Desktop.Shared
+﻿using Wpf.Ui.Controls;
+
+namespace PosClient.Desktop.Shared
 {
     public interface IDialogService
     {
@@ -7,5 +9,7 @@
 
         // You can add a simple Alert later if needed
         Task ShowAlertAsync(string title, string message, string buttonText = "OK");
+
+        Task<ContentDialogResult> ShowNavigationConfirmationAsync();
     }
 }
