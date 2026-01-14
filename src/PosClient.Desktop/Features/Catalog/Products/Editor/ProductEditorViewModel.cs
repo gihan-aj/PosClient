@@ -6,6 +6,7 @@ using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using PosClient.Desktop.Features.Catalog.Products.Editor.Tabs;
 using PosClient.Desktop.Features.Catalog.Products.List;
 using PosClient.Desktop.Features.Catalog.Products.Messages;
 using PosClient.Desktop.Shared;
@@ -21,6 +22,7 @@ namespace PosClient.Desktop.Features.Catalog.Products.Editor
         private readonly INavigationService _navigationService;
         private readonly INotificationService _notificationService;
         private readonly IDialogService _dialogService;
+        private readonly IContentDialogService _contentDialogService;
 
         private string _originalProductDetailsJson = string.Empty;
 
@@ -30,7 +32,8 @@ namespace PosClient.Desktop.Features.Catalog.Products.Editor
             IApiClient apiClient,
             INavigationService navigationService,
             INotificationService notificationService,
-            IDialogService dialogService)
+            IDialogService dialogService,
+            IContentDialogService contentDialogService)
         {
             _apiClient = apiClient;
             _navigationService = navigationService;
@@ -46,6 +49,7 @@ namespace PosClient.Desktop.Features.Catalog.Products.Editor
 
             if (Directory.Exists(_storageFolder))
                 Directory.CreateDirectory(_storageFolder);
+            _contentDialogService = contentDialogService;
         }
 
         [ObservableProperty]
@@ -234,7 +238,59 @@ namespace PosClient.Desktop.Features.Catalog.Products.Editor
         [RelayCommand]
         public async Task OpenGenerator()
         {
+            if (CurrentProduct == null)
+                return;
 
+            var dlg = new QuickVariantGeneratorDialog();
+
+            var result = await _contentDialogService.ShowAsync(dlg, CancellationToken.None);
+            if (result == Wpf.Ui.Controls.ContentDialogResult.Primary)
+            {
+                var options = dlg.GetResult(CurrentProduct.BasePrice);
+                if (options == null)
+                    return;
+
+                var created = 0;
+
+                foreach (var size in options.Sizes)
+                {
+                    foreach (var color in options.Colors)
+                    {
+                        var exists = CurrentProduct.Variants.Any(
+                            v => string.Equals(v.Size?.Trim(), size.Trim(), StringComparison.OrdinalIgnoreCase) &&
+                            string.Equals(v.Color?.Trim(), color.Trim(), StringComparison.OrdinalIgnoreCase));
+
+                        if (exists)
+                            continue;
+
+                        var price = options.UseBasePrice ? CurrentProduct.BasePrice : (options.CustomPrice ?? CurrentProduct.BasePrice);
+
+                        CurrentProduct.Variants.Add(new ProductVariant
+                        {
+                            Id = Guid.Empty,
+                            ProductName = CurrentProduct.Name ?? string.Empty,
+                            Sku = null,
+                            Size = size,
+                            Color = color,
+                            BasePrice = CurrentProduct.BasePrice,
+                            Price = price,
+                            StockQuantity = options.InitialStock,
+                            IsActive = true
+                        });
+
+                        created++;
+                    }
+                }
+
+                if (created > 0)
+                {
+                    _notificationService.ShowSuccess($"{created} variants created.", "Success!");
+                }
+                else
+                {
+                    _notificationService.ShowWarning("No new variants were created. Selected combinations may already exist.");
+                }
+            }          
         }
 
         [RelayCommand]
