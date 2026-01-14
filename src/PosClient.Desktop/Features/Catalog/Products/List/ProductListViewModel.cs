@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using PosClient.Desktop.Features.Catalog.Products.Editor;
 using PosClient.Desktop.Features.Catalog.Products.Messages;
+using PosClient.Desktop.Features.Catalog.Products.Viewer;
 using PosClient.Desktop.Infrastructure.Network;
 using PosClient.Desktop.Shared;
 using PosClient.Desktop.Shared.Utilities;
@@ -202,6 +203,18 @@ namespace PosClient.Desktop.Features.Catalog.Products.List
         public void NavigateToAdd()
         {
             _navigationService.Navigate(typeof(ProductEditorPage));
+        }
+
+
+        [RelayCommand]
+        internal void ViewProduct(ProductListItem product)
+        {
+            if (product == null)
+                return;
+
+            _navigationService.Navigate(typeof(ProductViewerPage));
+
+            WeakReferenceMessenger.Default.Send(new ViewProductMessage(product.Id));
         }
 
         // Data minupulation

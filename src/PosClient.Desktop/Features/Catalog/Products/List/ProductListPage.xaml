@@ -285,6 +285,24 @@
                                 <ui:Button.ContextMenu>
                                     <ContextMenu>
 
+                                        <MenuItem Header="View Details">
+                                            <MenuItem.Icon>
+                                                <ui:SymbolIcon Symbol="Eye24" FontSize="16"/>
+                                            </MenuItem.Icon>
+
+                                            <MenuItem.Command>
+                                                <Binding Path="PlacementTarget.Tag.ViewModel.ViewProductCommand"
+                                                         RelativeSource="{RelativeSource AncestorType=ContextMenu}"/>
+                                            </MenuItem.Command>
+
+                                            <MenuItem.CommandParameter>
+                                                <Binding Path="PlacementTarget.DataContext"
+                                                         RelativeSource="{RelativeSource AncestorType=ContextMenu}"/>
+                                            </MenuItem.CommandParameter>
+                                        </MenuItem>
+
+                                        <Separator/>
+                                        
                                         <MenuItem Header="Edit Details">
                                             <MenuItem.Icon>
                                                 <ui:SymbolIcon Symbol="Edit24" FontSize="16"/>
