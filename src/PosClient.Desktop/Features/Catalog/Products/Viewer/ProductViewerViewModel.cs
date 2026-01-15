@@ -32,7 +32,7 @@ namespace PosClient.Desktop.Features.Catalog.Products.Viewer
         {
             _apiClient = apiClient;
 
-            WeakReferenceMessenger.Default.Register(this);
+            WeakReferenceMessenger.Default.Register<ViewProductMessage>(this);
             _navigationService = navigationService;
             _notificationService = notificationService;
             _dialogService = dialogService;

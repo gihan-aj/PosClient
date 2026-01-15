@@ -34,7 +34,7 @@
                            Command="{Binding ViewModel.EditProductCommand}"
                            CommandParameter="{Binding ViewModel.Product}"/>
                 
-                <ui:Button Appearance="Danger"
+                <ui:Button Appearance="Caution"
                            Content="Deactivate"
                            Command="{Binding ViewModel.ToggleStatusCommand}"
                            CommandParameter="{Binding ViewModel.Product}"
@@ -42,6 +42,7 @@
                     <ui:Button.Style>
                         <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
                             <Setter Property="Visibility" Value="Collapsed"/>
+                            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryInverseBrush}"/>
                             <Setter Property="Content">
                                 <Setter.Value>
                                     <ui:SymbolIcon Symbol="Power24" FontSize="16"/>
@@ -65,6 +66,7 @@
                     <ui:Button.Style>
                         <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
                             <Setter Property="Visibility" Value="Collapsed"/>
+                            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryInverseBrush}"/>
                             <Setter Property="Content">
                                 <Setter.Value>
                                     <ui:SymbolIcon Symbol="CheckmarkCircle24" FontSize="16"/>
@@ -82,41 +84,89 @@
 
         </Grid>
 
-        <ui:Card Grid.Row="1" >
-            <Grid>
+        <Border Grid.Row="1"
+                Background="{DynamicResource ControlFillColorDefaultBrush}" 
+                CornerRadius="8" 
+                BorderThickness="1">
+            <Grid Margin="10,10,0,0">
                 
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="300"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Column="0" Margin="0,0,20,0">
-                    <ui:Card Padding="0" Margin="0,0,10,10" Height="300">
-                        <Image Source="{Binding ViewModel.Product.PrimaryImage.ImageUrl}" Stretch="UniformToFill"/>
-                    </ui:Card>
+                <StackPanel Grid.Column="0" Margin="0,0,0,0">
+                    <Border CornerRadius="4" 
+                            Height="320" 
 
-                    <ItemsControl ItemsSource="{Binding ViewModel.Product.SecondaryImages}">
+                            BorderBrush="{ui:ThemeResource SurfaceStrokeColorDefaultBrush}"
+                            BorderThickness="1"
+                            ClipToBounds="True">
+                        <!--<Image Source="{Binding ViewModel.Product.PrimaryImage.ImageUrl, Converter={StaticResource ImagePathToBitmapConverter}}" 
+                               Stretch="UniformToFill"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"/>-->
+                        <Border.Background>
+                            <ImageBrush Stretch="UniformToFill">
+                                <ImageBrush.ImageSource>
+                                    <Binding Path="ViewModel.Product.PrimaryImageUrl" Converter="{StaticResource ImagePathToBitmapConverter}"/>
+                                </ImageBrush.ImageSource>
+                            </ImageBrush>
+                        </Border.Background>
+                    </Border>
+
+                    <ItemsControl ItemsSource="{Binding ViewModel.Product.SecondaryImageUrls}" Margin="0,12,0,0">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <WrapPanel/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
-
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <ui:Card Padding="0" Margin="0,0,8,0" Width="60" Height="60">
-                                    <Image Source="{Binding ImageUrl}" Stretch="UniformToFill"/>
-                                </ui:Card>
+                                <Border CornerRadius="4" 
+                                        Margin="0,0,8,8" 
+                                        Width="65" 
+                                        Height="65"
+                                        BorderBrush="{ui:ThemeResource SurfaceStrokeColorDefaultBrush}"
+                                        BorderThickness="1"
+                                        ClipToBounds="True">
+                                    <!--<Image Source="{Binding ImageUrl, Converter={StaticResource ImagePathToBitmapConverter}}" 
+                                           Stretch="UniformToFill"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"/>-->
+                                    <Border.Background>
+                                        <ImageBrush Stretch="UniformToFill">
+                                            <ImageBrush.ImageSource>
+                                                <Binding Converter="{StaticResource ImagePathToBitmapConverter}"/>
+                                            </ImageBrush.ImageSource>
+                                        </ImageBrush>
+                                    </Border.Background>
+                                </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </StackPanel>
 
-                <StackPanel Grid.Column="1">
+                <StackPanel Grid.Column="1" Margin="10,0,0,0">
                     <TextBlock Text="{Binding ViewModel.Product.Name}" FontSize="28" FontWeight="Bold"/>
                     <TextBlock Text="{Binding ViewModel.Product.Sku, StringFormat='SKU: {0}'}" Foreground="Gray" Margin="0,2,0,10"/>
 
-                    <ui:Badge Content="Active" Appearance="Success" HorizontalAlignment="Left" Margin="0,0,0,15"/>
+                    <ui:Badge HorizontalAlignment="Left" Margin="0,0,0,15">
+                        <ui:Badge.Style>
+                            <Style TargetType="ui:Badge" BasedOn="{StaticResource {x:Type ui:Badge}}">
+                                <Setter Property="Content" Value="Available"/>
+                                <Setter Property="Appearance" Value="Success"/>
+                                <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryInverseBrush}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ViewModel.Product.IsAvailable}" Value="False">
+                                        <Setter Property="Content" Value="Out of Stock"/>
+                                        <Setter Property="Appearance" Value="Danger"/>
+                                        <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryInverseBrush}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:Badge.Style>
+                    </ui:Badge>
 
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -126,7 +176,7 @@
 
                         <StackPanel Grid.Column="0" Margin="0,0,40,0">
                             <TextBlock Text="Category" FontWeight="SemiBold" Foreground="Gray"/>
-                            <TextBlock Text="{Binding ViewModel.Product.CategoryName}" Margin="0,0,0,10"/>
+                            <TextBlock Text="{Binding ViewModel.Product.CategoryPath}" Margin="0,0,0,10"/>
 
                             <TextBlock Text="Brand" FontWeight="SemiBold" Foreground="Gray"/>
                             <TextBlock Text="{Binding ViewModel.Product.Brand, TargetNullValue='N/A'}" Margin="0,0,0,10"/>
@@ -137,7 +187,7 @@
 
                         <StackPanel Grid.Column="1">
                             <TextBlock Text="Base Price" FontWeight="SemiBold" Foreground="Gray"/>
-                            <TextBlock Text="{Binding ViewModel.Product.BasePrice, StringFormat='{}{0:C}'}" FontSize="18" FontWeight="Bold" />
+                            <TextBlock Text="{Binding ViewModel.Product.BasePrice, StringFormat='Rs. {0:N2}'}" FontSize="18" FontWeight="Bold" />
 
                             <TextBlock Text="Tags" FontWeight="SemiBold" Foreground="Gray" Margin="0,10,0,5"/>
                             <ItemsControl ItemsSource="{Binding ViewModel.Product.Tags}">
@@ -166,7 +216,93 @@
                 </StackPanel>
 
             </Grid> 
-        </ui:Card>
+        </Border>
+
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <DockPanel Grid.Row="0" Margin="0,20,0,10">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Variants" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding ViewModel.Product.VariantSummaryText}" Foreground="Gray" Margin="10,0,0,0" VerticalAlignment="Center"/>
+                </StackPanel>
+                <!--<ui:Button Content="Add Variant" Icon="{ui:SymbolIcon Add24}" HorizontalAlignment="Right" Command="{Binding AddVariantCommand}"/>-->
+            </DockPanel>
+
+            <ui:DataGrid Grid.Row="1" 
+                         ItemsSource="{Binding ViewModel.Product.Variants}" 
+                         AutoGenerateColumns="False"
+                         IsReadOnly="True"
+                         SelectionMode="Extended">
+                <ui:DataGrid.Columns>
+                    <DataGridTextColumn Header="SKU" Binding="{Binding Sku}" Width="*"/>
+                    <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="100"/>
+                    <DataGridTextColumn Header="Color" Binding="{Binding Color}" Width="100"/>
+                    <DataGridTextColumn Header="Price" Binding="{Binding Price, StringFormat='Rs. {0:N2}'}" Width="100"/>
+                    <DataGridTemplateColumn Header="Stock" Width="120">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Ellipse Width="8" Height="8" Margin="10,0,8,0">
+                                        <Ellipse.Style>
+                                            <Style TargetType="Ellipse">
+                                                <Setter Property="Fill" Value="Green"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsAvailable}" Value="False">
+                                                        <Setter Property="Fill" Value="Red"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Ellipse.Style>
+                                    </Ellipse>
+                                    <TextBlock Text="{Binding StockQuantity}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="Status" Width="Auto">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border CornerRadius="4" Padding="8,2" HorizontalAlignment="Left" Margin="10,0,0,0">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="#10FF0000"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                                    <Setter Property="Background" Value="#1000FF00"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <TextBlock Text="{Binding IsActive, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Active|Inactive'}" 
+                                               FontSize="12"/>
+                                </Border>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                </ui:DataGrid.Columns>
+            </ui:DataGrid>
+
+            <Border Grid.Row="1" 
+                    IsHitTestVisible="False"
+                    Background="{DynamicResource ControlFillColorDefaultBrush}" 
+                    Visibility="{Binding ViewModel.Product.Variants.Count, Converter={StaticResource InverseItemsExistsToVisibilty}}">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <ui:SymbolIcon Symbol="BoxDismiss24" FontSize="40" Foreground="Gray" Margin="0,10,0,10"/>
+                    <TextBlock Text="No active variants."
+                               HorizontalAlignment="Center"
+                               Foreground="Gray"/>
+                    <TextBlock Text="Add or activate any deactivated variants to show here."
+                               HorizontalAlignment="Center"
+                               Foreground="Gray" FontSize="12"/>
+                </StackPanel>
+            </Border>
+        </Grid>
         
     </Grid>
 </Page>

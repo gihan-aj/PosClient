@@ -17,6 +17,9 @@ namespace PosClient.Desktop.Features.Catalog.Products.Viewer
         [JsonPropertyName("categoryName")]
         public string CategoryName { get; set; } = string.Empty;
 
+        [JsonPropertyName("categoryPath")]
+        public string CategoryPath { get; set; } = string.Empty;
+
         [JsonPropertyName("description")]
         public string? Description { get; set; }
 
@@ -41,16 +44,25 @@ namespace PosClient.Desktop.Features.Catalog.Products.Viewer
         [JsonPropertyName("tags")]
         public List<string> Tags { get; set; } = new();
 
-        [JsonPropertyName("variants")]
-        public List<ProductVariantDetails> Variants { get; set; } = new();
-
         [JsonPropertyName("images")]
         public List<ProductImageDetails> Images { get; set; } = new();
 
-        [JsonIgnore]
-        public ProductImageDetails? PrimaryImage { get => Images.Find(i => i.IsPrimary) ?? Images[0] ?? null; }
+        [JsonPropertyName("primaryImageUrl")]
+        public string? PrimaryImageUrl { get; set; }
+
+        [JsonPropertyName("secondaryImageUrls")]
+        public List<string> SecondaryImageUrls { get; set; } = new();
+
+        [JsonPropertyName("isAvailable")]
+        public bool IsAvailable { get; set; }
+
+        [JsonPropertyName("variants")]
+        public List<ProductVariantDetails> Variants { get; set; } = new();
 
         [JsonIgnore]
-        public List<ProductImageDetails> SecondaryImages { get => Images.Where(i => !i.IsPrimary).ToList(); }
+        public List<ProductVariantDetails> ActiveVariants { get => Variants.Where(v => v.IsActive).ToList(); }
+
+        [JsonIgnore]
+        public string VariantSummaryText { get => $"(Active variants: {ActiveVariants.Count} total, {ActiveVariants.Sum(v => v.StockQuantity)} units in stock)"; }   
     }
 }

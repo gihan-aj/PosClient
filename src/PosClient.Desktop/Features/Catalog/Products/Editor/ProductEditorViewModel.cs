@@ -149,8 +149,11 @@ namespace PosClient.Desktop.Features.Catalog.Products.Editor
         [RelayCommand]
         public void NavigateBack()
         {
-            // Go back to the list
+            var productId = CurrentProduct?.Id ?? Guid.Empty;
+
             _navigationService.GoBack();
+
+            WeakReferenceMessenger.Default.Send(new ViewProductMessage(productId));
         }
 
         [RelayCommand]
