@@ -1,17 +1,14 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.Messaging;
-using PosClient.Desktop.Features.Catalog.Products.Editor;
-using PosClient.Desktop.Features.Catalog.Products.Messages;
-using PosClient.Desktop.Features.Catalog.Products.Viewer;
+using PosClient.Desktop.Features.Inventory.Products.State;
 using PosClient.Desktop.Infrastructure.Network;
 using PosClient.Desktop.Shared;
 using PosClient.Desktop.Shared.Utilities;
 using Wpf.Ui;
 using Wpf.Ui.Abstractions.Controls;
 
-namespace PosClient.Desktop.Features.Catalog.Products.List
+namespace PosClient.Desktop.Features.Inventory.Products.List
 {
     public partial class ProductListViewModel : ObservableObject, INavigationAware
     {
@@ -19,18 +16,7 @@ namespace PosClient.Desktop.Features.Catalog.Products.List
         private readonly INavigationService _navigationService;
         private readonly INotificationService _notificationService;
         private readonly IDialogService _dialogService;
-
-        public ProductListViewModel(
-            IApiClient apiClient,
-            INavigationService navigationService,
-            INotificationService notificationService,
-            IDialogService dialogService)
-        {
-            _apiClient = apiClient;
-            _navigationService = navigationService;
-            _notificationService = notificationService;
-            _dialogService = dialogService;
-        }
+        private readonly IProductStateService _productStateService;
 
         // The State
         [ObservableProperty]
@@ -49,7 +35,7 @@ namespace PosClient.Desktop.Features.Catalog.Products.List
         [ObservableProperty] private bool _hasNextPage;
         [ObservableProperty] private bool _hasPreviousPage;
 
-        public ObservableCollection<int> PageSizeOptions { get; } = new() { 5,10, 20, 50, 100 };
+        public ObservableCollection<int> PageSizeOptions { get; } = new() { 5, 10, 20, 50, 100 };
 
         // Loading
         [ObservableProperty]
@@ -78,6 +64,31 @@ namespace PosClient.Desktop.Features.Catalog.Products.List
             new StatusFilterOption { Label = "Active Only" , Value = true },
             new StatusFilterOption { Label = "Inactive Only" , Value = false }
         };
+
+        public ProductListViewModel(IApiClient apiClient,
+            INavigationService navigationService,
+            INotificationService notificationService,
+            IDialogService dialogService,
+            IProductStateService productStateService)
+        {
+            _apiClient = apiClient;
+            _navigationService = navigationService;
+            _notificationService = notificationService;
+            _dialogService = dialogService;
+            _productStateService = productStateService;
+        }
+
+        public async Task OnNavigatedFromAsync()
+        {
+            
+        }
+
+        public async Task OnNavigatedToAsync()
+        {
+            _productStateService.ClearState();
+            await LoadData();
+            await LoadCategories();
+        }
 
         // Load data
         [RelayCommand]
@@ -202,19 +213,8 @@ namespace PosClient.Desktop.Features.Catalog.Products.List
         [RelayCommand]
         public void NavigateToAdd()
         {
-            _navigationService.Navigate(typeof(ProductEditorPage));
-        }
-
-
-        [RelayCommand]
-        internal void ViewProduct(ProductListItem product)
-        {
-            if (product == null)
-                return;
-
-            _navigationService.Navigate(typeof(ProductViewerPage));
-
-            WeakReferenceMessenger.Default.Send(new ViewProductMessage(product.Id));
+            _productStateService.SetProductForCreation();
+            //_navigationService.Navigate(typeof(ProductEditorPage));
         }
 
         // Data minupulation
@@ -224,9 +224,8 @@ namespace PosClient.Desktop.Features.Catalog.Products.List
             if (product == null)
                 return;
 
-            _navigationService.Navigate(typeof(ProductEditorPage));
-
-            WeakReferenceMessenger.Default.Send(new EditProductMessage(product.Id));
+            _productStateService.SetProductForEdit(product.Id);
+            //_navigationService.Navigate(typeof(ProductEditorPage));
         }
 
         [RelayCommand]
@@ -243,7 +242,7 @@ namespace PosClient.Desktop.Features.Catalog.Products.List
                 var result = await _apiClient.DeleteAsync($"api/products/{product.Id}");
                 if (result.IsSuccess)
                 {
-                    _notificationService.ShowSuccess("Success!", "Product deleted.");
+                    _notificationService.ShowSuccess("Product deleted.");
                     await LoadData();
                 }
             }
@@ -265,7 +264,7 @@ namespace PosClient.Desktop.Features.Catalog.Products.List
                     var result = await _apiClient.PostAsync($"api/products/{product.Id}/deactivate", null!);
                     if (result.IsSuccess)
                     {
-                        _notificationService.ShowSuccess("Success!", "Product deactivated.");
+                        _notificationService.ShowSuccess("Product deactivated.");
                         await LoadData();
                     }
                 }
@@ -275,21 +274,10 @@ namespace PosClient.Desktop.Features.Catalog.Products.List
                 var result = await _apiClient.PostAsync($"api/products/{product.Id}/activate", null!);
                 if (result.IsSuccess)
                 {
-                    _notificationService.ShowSuccess("Success!", "Product activated.");
+                    _notificationService.ShowSuccess("Product activated.");
                     await LoadData();
                 }
             }
-        }
-
-        // Navigation
-        public async Task OnNavigatedToAsync()
-        {
-            await LoadDataCommand.ExecuteAsync(null);
-        }
-
-        public Task OnNavigatedFromAsync()
-        {
-            return Task.CompletedTask;
         }
     }
 }

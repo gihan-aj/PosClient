@@ -8,10 +8,12 @@
              Startup="OnStartup">
     <Application.Resources>
         <ResourceDictionary>
+            <!-- WPF-UI theme + controls -->
             <ResourceDictionary.MergedDictionaries>
                 <ui:ThemesDictionary Theme="Light" />
                 <ui:ControlsDictionary />
             </ResourceDictionary.MergedDictionaries>
+            <!-- Converters -->
             <converters:BoolToStringConverter x:Key="BoolToStringConverter" />
             <BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
             <converters:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisConverter" />
@@ -20,7 +22,23 @@
             <converters:BoolToInverseConverter x:Key="BoolToInverseConverter"/>
             <converters:InverseItemsExistsToVisibilty x:Key="InverseItemsExistsToVisibilty" />
             <converters:ImagePathToBitmapConverter x:Key="ImagePathToBitmapConverter"/>
+            <!-- Images -->
             <BitmapImage x:Key="PlaceholderImage" UriSource="/Assets/placeholder.png" />
+
+            <Style x:Key="GridHeaderLeft"
+                   TargetType="DataGridColumnHeader">
+                <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            </Style>
+
+            <Style x:Key="GridHeaderCenter"
+                   TargetType="DataGridColumnHeader">
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="GridHeaderRight"
+                   TargetType="DataGridColumnHeader">
+                <Setter Property="HorizontalContentAlignment" Value="Right"/>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

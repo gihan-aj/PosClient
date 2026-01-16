@@ -67,6 +67,28 @@ namespace PosClient.Desktop.Shell
             });
 
             _menuItems.Add(catalog);
+
+            var inventory = new NavigationViewItem()
+            {
+                Content = "Inventory",
+                Icon = new SymbolIcon { Symbol = SymbolRegular.BoxMultiple24 }
+            };
+
+            inventory.MenuItems.Add(new NavigationViewItem()
+            {
+                Content = "Categories",
+                Icon = new SymbolIcon { Symbol = SymbolRegular.DataHistogram24 },
+                TargetPageType = typeof(Features.Catalog.Categories.CategoriesPage)
+            });
+
+            inventory.MenuItems.Add(new NavigationViewItem()
+            {
+                Content = "Products",
+                Icon = new SymbolIcon { Symbol = SymbolRegular.ShoppingBag24 },
+                TargetPageType = typeof(Features.Inventory.Products.List.ProductListPage)
+            });
+
+            _menuItems.Add(inventory);
         }
     }
 }

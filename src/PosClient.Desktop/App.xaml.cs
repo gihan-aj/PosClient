@@ -12,6 +12,7 @@ using PosClient.Desktop.Features.Catalog.Products.Editor;
 using PosClient.Desktop.Features.Catalog.Products.List;
 using PosClient.Desktop.Features.Catalog.Products.Viewer;
 using PosClient.Desktop.Features.Dashboard;
+using PosClient.Desktop.Features.Inventory.Products.State;
 using PosClient.Desktop.Features.Settings;
 using PosClient.Desktop.Infrastructure;
 using PosClient.Desktop.Infrastructure.Configuration;
@@ -88,6 +89,10 @@ namespace PosClient.Desktop
                 services.AddTransient<ProductEditorViewModel>();
                 services.AddTransient<ProductViewerPage>();
                 services.AddTransient<ProductViewerViewModel>();
+
+                services.AddTransient<Features.Inventory.Products.List.ProductListPage>();
+                services.AddTransient<Features.Inventory.Products.List.ProductListViewModel>();
+                services.AddSingleton<IProductStateService, ProductStateService>();
 
                 services.AddSingleton<SettingsPage>();
                 services.AddSingleton<SettingsViewModel>();

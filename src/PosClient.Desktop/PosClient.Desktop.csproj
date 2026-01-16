@@ -37,4 +37,8 @@
 		<Content Include="pos-client-icon.ico" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Features\Inventory\Products\Editor\" />
+	</ItemGroup>
+
 </Project>
