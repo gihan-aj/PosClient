@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using PosClient.Desktop.Features.Inventory.Products.Editor;
 using PosClient.Desktop.Features.Inventory.Products.State;
 using PosClient.Desktop.Infrastructure.Network;
 using PosClient.Desktop.Shared;
@@ -214,7 +215,7 @@ namespace PosClient.Desktop.Features.Inventory.Products.List
         public void NavigateToAdd()
         {
             _productStateService.SetProductForCreation();
-            //_navigationService.Navigate(typeof(ProductEditorPage));
+            _navigationService.Navigate(typeof(ProductEditorPage));
         }
 
         // Data minupulation
@@ -225,7 +226,7 @@ namespace PosClient.Desktop.Features.Inventory.Products.List
                 return;
 
             _productStateService.SetProductForEdit(product.Id);
-            //_navigationService.Navigate(typeof(ProductEditorPage));
+            _navigationService.Navigate(typeof(ProductEditorPage));
         }
 
         [RelayCommand]

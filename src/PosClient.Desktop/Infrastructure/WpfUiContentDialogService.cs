@@ -50,7 +50,7 @@ namespace PosClient.Desktop.Infrastructure
                 Title = "Unsaved Changes",
                 Content = "You have unsaved changes. Do you want to leave without saving?",
                 PrimaryButtonText = "Save & Leave",
-                SecondaryButtonText = "Leave Without Saving",
+                SecondaryButtonText = "Leave",
                 CloseButtonText = "Stay"
             };
 

@@ -191,6 +191,10 @@
                      CanUserAddRows="False"
                      SelectionMode="Single"
                      Sorting="DataGrid_Sorting"
+                     ScrollViewer.CanContentScroll="False"
+                     EnableColumnVirtualization="False"
+                     VirtualizingPanel.IsVirtualizing="True"
+                     VirtualizingPanel.VirtualizationMode="Recycling"
                      BorderThickness="1"
                      BorderBrush="{DynamicResource SurfaceStrokeColorDefaultBrush}"
                      ColumnHeaderHeight="40"
@@ -301,7 +305,7 @@
                                            Appearance="Transparent" Margin="5,0"
                                            ToolTip="Edit"
                                            FontSize="16"
-                                           Command="{Binding ViewModel.EditCommand, RelativeSource={RelativeSource AncestorType=ui:DataGrid}}"
+                                           Command="{Binding DataContext.ViewModel.EditProductCommand, RelativeSource={RelativeSource AncestorType=ui:DataGrid}}"
                                            CommandParameter="{Binding}"/>
 
                                 <ui:Button Appearance="Transparent"
