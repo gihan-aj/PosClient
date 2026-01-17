@@ -54,16 +54,9 @@ namespace PosClient.Desktop.Shell
 
             catalog.MenuItems.Add(new NavigationViewItem()
             {
-                Content = "Categories",
-                Icon = new SymbolIcon { Symbol = SymbolRegular.DataHistogram24 },
-                TargetPageType = typeof(Features.Catalog.Categories.CategoriesPage)
-            });
-
-            catalog.MenuItems.Add(new NavigationViewItem()
-            {
                 Content = "Products",
                 Icon = new SymbolIcon { Symbol = SymbolRegular.ShoppingBag24 },
-                TargetPageType = typeof(Features.Catalog.Products.List.ProductListPage)
+                TargetPageType = typeof(Features.Catalog.Products.Browser.ProductBrowserPage)
             });
 
             _menuItems.Add(catalog);

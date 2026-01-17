@@ -1,15 +1,12 @@
-﻿using System.Configuration;
-using System.Data;
-using System.IO;
+﻿using System.IO;
 using System.Windows;
 using System.Windows.Threading;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using PosClient.Desktop.Features.Catalog.Categories;
-using PosClient.Desktop.Features.Catalog.Products.Editor;
-using PosClient.Desktop.Features.Catalog.Products.List;
+using PosClient.Desktop.Features.Catalog.Products.Browser;
+using PosClient.Desktop.Features.Catalog.Products.State;
 using PosClient.Desktop.Features.Catalog.Products.Viewer;
 using PosClient.Desktop.Features.Dashboard;
 using PosClient.Desktop.Features.Inventory.Products.State;
@@ -80,13 +77,9 @@ namespace PosClient.Desktop
                 services.AddSingleton<DashboardPage>();
                 services.AddSingleton<DashboardViewModel>();
 
-                services.AddTransient<CategoriesPage>();
-                services.AddTransient<CategoriesViewModel>();
-
-                services.AddTransient<ProductListPage>();
-                services.AddTransient<ProductListViewModel>();
-                services.AddTransient<ProductEditorPage>();
-                services.AddTransient<ProductEditorViewModel>();
+                services.AddSingleton<IProductBrowserStateService, ProductBrowserStateService>();
+                services.AddTransient<ProductBrowserPage>();
+                services.AddSingleton<ProductBrowserViewModel>();
                 services.AddTransient<ProductViewerPage>();
                 services.AddTransient<ProductViewerViewModel>();
 

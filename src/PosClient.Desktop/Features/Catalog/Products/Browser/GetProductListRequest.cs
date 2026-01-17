@@ -1,6 +1,6 @@
 ﻿using PosClient.Desktop.Shared;
 
-namespace PosClient.Desktop.Features.Catalog.Products.List
+namespace PosClient.Desktop.Features.Catalog.Products.Browser
 {
     public class GetProductListRequest : PagedRequest
     {
@@ -10,6 +10,6 @@ namespace PosClient.Desktop.Features.Catalog.Products.List
 
         public string? SearchIn { get; init; } = null;
 
-        public bool? IsActive { get; set; } = null;
+        public bool IsActive { get; set; } = true;
     }
 }

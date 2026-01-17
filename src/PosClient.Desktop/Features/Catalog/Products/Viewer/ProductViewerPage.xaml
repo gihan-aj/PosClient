@@ -27,7 +27,7 @@
                        Command="{Binding ViewModel.NavigateBackCommand}"
                        ToolTip="Back to List" Margin="0,0,15,0"/>
 
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <!--<StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <ui:Button Content="Edit Product"
                            Icon="{ui:SymbolIcon Edit24}"
                            Appearance="Primary"
@@ -57,7 +57,7 @@
                     </ui:Button.Style>
                 </ui:Button>
 
-                <!-- Activate Button (shown when IsActive = False) -->
+
                 <ui:Button Appearance="Success"
                            Content="Activate"
                            Command="{Binding ViewModel.ToggleStatusCommand}"
@@ -80,7 +80,7 @@
                         </Style>
                     </ui:Button.Style>
                 </ui:Button>
-            </StackPanel>
+            </StackPanel>-->
 
         </Grid>
 
@@ -98,7 +98,6 @@
                 <StackPanel Grid.Column="0" Margin="0,0,0,0">
                     <Border CornerRadius="4" 
                             Height="320" 
-
                             BorderBrush="{ui:ThemeResource SurfaceStrokeColorDefaultBrush}"
                             BorderThickness="1"
                             ClipToBounds="True">
@@ -233,14 +232,14 @@
             </DockPanel>
 
             <ui:DataGrid Grid.Row="1" 
-                         ItemsSource="{Binding ViewModel.Product.Variants}" 
+                         ItemsSource="{Binding ViewModel.Product.ActiveVariants}" 
                          AutoGenerateColumns="False"
                          IsReadOnly="True"
                          SelectionMode="Extended">
                 <ui:DataGrid.Columns>
                     <DataGridTextColumn Header="SKU" Binding="{Binding Sku}" Width="*"/>
-                    <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="100"/>
-                    <DataGridTextColumn Header="Color" Binding="{Binding Color}" Width="100"/>
+                    <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="*"/>
+                    <DataGridTextColumn Header="Color" Binding="{Binding Color}" Width="*"/>
                     <DataGridTextColumn Header="Price" Binding="{Binding Price, StringFormat='Rs. {0:N2}'}" Width="100"/>
                     <DataGridTemplateColumn Header="Stock" Width="120">
                         <DataGridTemplateColumn.CellTemplate>
@@ -249,10 +248,10 @@
                                     <Ellipse Width="8" Height="8" Margin="10,0,8,0">
                                         <Ellipse.Style>
                                             <Style TargetType="Ellipse">
-                                                <Setter Property="Fill" Value="Green"/>
+                                                <Setter Property="Fill" Value="ForestGreen"/>
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding IsAvailable}" Value="False">
-                                                        <Setter Property="Fill" Value="Red"/>
+                                                        <Setter Property="Fill" Value="IndianRed"/>
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
@@ -260,27 +259,6 @@
                                     </Ellipse>
                                     <TextBlock Text="{Binding StockQuantity}"/>
                                 </StackPanel>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-
-                    <DataGridTemplateColumn Header="Status" Width="Auto">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <Border CornerRadius="4" Padding="8,2" HorizontalAlignment="Left" Margin="10,0,0,0">
-                                    <Border.Style>
-                                        <Style TargetType="Border">
-                                            <Setter Property="Background" Value="#10FF0000"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsActive}" Value="True">
-                                                    <Setter Property="Background" Value="#1000FF00"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Border.Style>
-                                    <TextBlock Text="{Binding IsActive, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Active|Inactive'}" 
-                                               FontSize="12"/>
-                                </Border>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>

@@ -1,18 +1,18 @@
-﻿<Page x:Class="PosClient.Desktop.Features.Inventory.Products.List.ProductListPage"
+﻿<Page x:Class="PosClient.Desktop.Features.Catalog.Products.Browser.ProductBrowserPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-      xmlns:local="clr-namespace:PosClient.Desktop.Features.Inventory.Products.List"
-      mc:Ignorable="d" 
+      xmlns:local="clr-namespace:PosClient.Desktop.Features.Catalog.Products.Browser"
+      mc:Ignorable="d"
       ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
       ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-      d:DataContext="{d:DesignInstance local:ProductListViewModel, IsDesignTimeCreatable=False}"
+      d:DataContext="{d:DesignInstance local:ProductBrowserViewModel, IsDesignTimeCreatable=False}"
       d:DesignHeight="450" d:DesignWidth="800"
       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-      Title="ProductListPage">
+      Title="ProductBrowserPage">
 
     <Grid Margin="20">
 
@@ -32,11 +32,10 @@
 
             <TextBlock Grid.Column="0" Text="Products" FontSize="24" FontWeight="SemiBold"/>
 
-            <ui:Button Grid.Column="1"
-                       Content="New Product"
-                       Icon="{ui:SymbolIcon Add24}"
-                       Appearance="Primary"
-                       Command="{Binding ViewModel.NavigateToAddCommand}"/>
+            <!--<ui:Button Grid.Column="1"
+               Content="New Order"
+               Icon="{ui:SymbolIcon Add24}"
+               Appearance="Primary"/>-->
 
         </Grid>
 
@@ -49,7 +48,7 @@
             </Grid.RowDefinitions>
 
             <Grid Grid.Row="0">
-                
+
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="400"/>
@@ -158,21 +157,6 @@
                           IsEnabled="{Binding ViewModel.Request.CategoryId, Converter={StaticResource IsNotNullConverter}}"
                           VerticalAlignment="Center"/>
 
-                <ComboBox Grid.Column="3"
-                          Width="140"
-                          ItemsSource="{Binding ViewModel.StatusOptions}"
-                          DisplayMemberPath="Label"
-                          SelectedValuePath="Value"
-                          SelectedValue="{Binding ViewModel.Request.IsActive}"
-                          Margin="10,0,0,0">
-
-                    <b:Interaction.Triggers>
-                        <b:EventTrigger EventName="SelectionChanged">
-                            <b:InvokeCommandAction Command="{Binding ViewModel.SearchCommand}"/>
-                        </b:EventTrigger>
-                    </b:Interaction.Triggers>
-                </ComboBox>
-
                 <ui:Button Grid.Column="4"
                            Height="36"
                            Content="Reset Filters"
@@ -203,11 +187,11 @@
             <ui:DataGrid.Columns>
 
                 <DataGridTemplateColumn Header="Image"
-                                        Width="80">
+                                Width="80">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Border Width="80" Height="80" CornerRadius="4"
-                                    HorizontalAlignment="Center">
+                            HorizontalAlignment="Center">
                                 <Border.Background>
                                     <ImageBrush Stretch="UniformToFill">
                                         <ImageBrush.ImageSource>
@@ -218,7 +202,7 @@
                             </Border>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
-                    
+
                 </DataGridTemplateColumn>
 
                 <DataGridTemplateColumn Header="Product" 
@@ -245,112 +229,32 @@
                         <DataTemplate>
                             <StackPanel VerticalAlignment="Center" Margin="13,0,0,0">
                                 <TextBlock Text="{Binding ActiveStock}" 
-                                           FontWeight="Bold"
-                                           FontSize="14"/>
+                                   FontWeight="Bold"
+                                   FontSize="14"/>
                                 <TextBlock Text="{Binding ActiveVariantCount, StringFormat='{}{0} variants'}" 
-                                           FontSize="11" Foreground="Gray"/>
+                                   FontSize="11" Foreground="Gray"/>
                                 <Border Background="{Binding StockStatusBar}" 
-                                        Height="4" CornerRadius="2" Width="40" Margin="0,4,0,0" 
-                                        HorizontalAlignment="Left"/>
+                                Height="4" CornerRadius="2" Width="40" Margin="0,4,0,0" 
+                                HorizontalAlignment="Left"/>
                             </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                
-                <DataGridTemplateColumn Header="Total Stock"
-                                        Width="Auto" MinWidth="100">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <StackPanel VerticalAlignment="Center" Margin="13,0,0,0">
-                                <TextBlock Text="{Binding TotalStock}" 
-                                           FontWeight="Bold"
-                                           FontSize="14"/>
-                                <TextBlock Text="{Binding VariantCount, StringFormat='{}{0} variants'}" 
-                                           FontSize="11" Foreground="Gray"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-
-                <DataGridTemplateColumn Header="Status" Width="Auto" SortMemberPath="IsActive">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Border CornerRadius="4" Padding="8,2" HorizontalAlignment="Left" Margin="10,0,0,0">
-                                <Border.Style>
-                                    <Style TargetType="Border">
-                                        <Setter Property="Background" Value="#10FF0000"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsActive}" Value="True">
-                                                <Setter Property="Background" Value="#1000FF00"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Border.Style>
-                                <TextBlock Text="{Binding IsActive, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Active|Inactive'}" 
-                       FontSize="12"/>
-                            </Border>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
                 <DataGridTemplateColumn 
-                                        Width="Auto" MinWidth="100">
+                                Width="Auto" MinWidth="100">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel HorizontalAlignment="Left" 
-                                        VerticalAlignment="Center" 
-                                        Orientation="Horizontal" Margin="13,0,0,0">
-                                
-                                <ui:Button Icon="{ui:SymbolIcon Edit24}"
-                                           Appearance="Transparent" Margin="5,0"
-                                           ToolTip="Edit"
-                                           FontSize="16"
-                                           Command="{Binding DataContext.ViewModel.EditProductCommand, RelativeSource={RelativeSource AncestorType=ui:DataGrid}}"
-                                           CommandParameter="{Binding}"/>
+                                VerticalAlignment="Center" 
+                                Orientation="Horizontal" Margin="13,0,0,0">
 
-                                <ui:Button Appearance="Transparent"
-                                           ToolTip="Deactivate"
-                                           Command="{Binding DataContext.ViewModel.ToggleStatusCommand, RelativeSource={RelativeSource AncestorType=ui:DataGrid}}"
-                                           CommandParameter="{Binding}"
-                                           Margin="5,5">
-                                    <ui:Button.Style>
-                                        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                            <Setter Property="Content">
-                                                <Setter.Value>
-                                                    <ui:SymbolIcon Symbol="Prohibited24" FontSize="16" Foreground="Orange"/>
-                                                </Setter.Value>
-                                            </Setter>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsActive}" Value="True">
-                                                    <Setter Property="Visibility" Value="Visible"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </ui:Button.Style>
-                                </ui:Button>
-
-                                <ui:Button Appearance="Transparent"
-                                           ToolTip="Activate"
-                                           Command="{Binding DataContext.ViewModel.ToggleStatusCommand, RelativeSource={RelativeSource AncestorType=ui:DataGrid}}"
-                                           CommandParameter="{Binding}"
-                                           Margin="5,5">
-                                    <ui:Button.Style>
-                                        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                            <Setter Property="Content">
-                                                <Setter.Value>
-                                                    <ui:SymbolIcon Symbol="CheckmarkCircle24" FontSize="16" Foreground="ForestGreen"/>
-                                                </Setter.Value>
-                                            </Setter>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsActive}" Value="False">
-                                                    <Setter Property="Visibility" Value="Visible"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </ui:Button.Style>
-                                </ui:Button>
+                                <ui:Button Icon="{ui:SymbolIcon Eye24}"
+                                   Appearance="Transparent" Margin="5,0"
+                                   ToolTip="View"
+                                   FontSize="16"
+                                   Command="{Binding DataContext.ViewModel.ViewProductCommand, RelativeSource={RelativeSource AncestorType=ui:DataGrid}}"
+                                   CommandParameter="{Binding}"/>
 
                             </StackPanel>
                         </DataTemplate>
@@ -358,7 +262,7 @@
                 </DataGridTemplateColumn>
 
             </ui:DataGrid.Columns>
-            
+
         </ui:DataGrid>
 
         <Grid Grid.Row="2" 
@@ -395,10 +299,10 @@
                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
 
                     <!--<ui:Button Content="Clear Filters" 
-               Appearance="Secondary"
-               Icon="{ui:SymbolIcon Dismiss24}"
-               Command="{Binding ViewModel.ClearFiltersCommand}"
-               HorizontalAlignment="Center"/>-->
+       Appearance="Secondary"
+       Icon="{ui:SymbolIcon Dismiss24}"
+       Command="{Binding ViewModel.ClearFiltersCommand}"
+       HorizontalAlignment="Center"/>-->
                 </StackPanel>
 
             </Border>

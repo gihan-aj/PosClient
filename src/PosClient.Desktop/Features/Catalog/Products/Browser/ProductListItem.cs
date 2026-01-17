@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace PosClient.Desktop.Features.Catalog.Products.List
+namespace PosClient.Desktop.Features.Catalog.Products.Browser
 {
     public class ProductListItem
     {
@@ -19,11 +19,11 @@ namespace PosClient.Desktop.Features.Catalog.Products.List
         [JsonPropertyName("basePrice")]
         public decimal BasePrice { get; set; }
 
-        [JsonPropertyName("totalStock")]
-        public int TotalStock { get; set; }
+        [JsonPropertyName("activeStock")]
+        public int ActiveStock { get; set; }
 
-        [JsonPropertyName("variantCount")]
-        public int VariantCount { get; set; }
+        [JsonPropertyName("activeVariantCount")]
+        public int ActiveVariantCount { get; set; }
 
         [JsonPropertyName("primaryImageUrl")]
         public string? PrimaryImageUrl { get; set; }
@@ -39,12 +39,12 @@ namespace PosClient.Desktop.Features.Catalog.Products.List
             {
                 const int lowThreshold = 5;
                 const int mediumThreshold = 20;
-                if (TotalStock <= lowThreshold)
+                if (ActiveStock <= lowThreshold)
                 {
                     return "#FF4D4F"; // Red (low)
                 }
 
-                if (TotalStock <= mediumThreshold)
+                if (ActiveStock <= mediumThreshold)
                 {
                     return "#FFA500"; // Orange (medium)
                 }

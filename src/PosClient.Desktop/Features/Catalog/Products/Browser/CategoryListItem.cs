@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace PosClient.Desktop.Features.Catalog.Products.List
+namespace PosClient.Desktop.Features.Catalog.Products.Browser
 {
     public class CategoryListItem
     {

@@ -2,8 +2,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using PosClient.Desktop.Features.Catalog.Products.Editor;
 using PosClient.Desktop.Features.Catalog.Products.Messages;
+using PosClient.Desktop.Features.Catalog.Products.State;
 using PosClient.Desktop.Features.Catalog.Products.Viewer;
 using PosClient.Desktop.Infrastructure.Network;
 using PosClient.Desktop.Shared;
@@ -11,26 +11,13 @@ using PosClient.Desktop.Shared.Utilities;
 using Wpf.Ui;
 using Wpf.Ui.Abstractions.Controls;
 
-namespace PosClient.Desktop.Features.Catalog.Products.List
+namespace PosClient.Desktop.Features.Catalog.Products.Browser
 {
-    public partial class ProductListViewModel : ObservableObject, INavigationAware
+    public partial class ProductBrowserViewModel : ObservableObject, INavigationAware
     {
         private readonly IApiClient _apiClient;
         private readonly INavigationService _navigationService;
-        private readonly INotificationService _notificationService;
-        private readonly IDialogService _dialogService;
-
-        public ProductListViewModel(
-            IApiClient apiClient,
-            INavigationService navigationService,
-            INotificationService notificationService,
-            IDialogService dialogService)
-        {
-            _apiClient = apiClient;
-            _navigationService = navigationService;
-            _notificationService = notificationService;
-            _dialogService = dialogService;
-        }
+        private readonly IProductBrowserStateService _productBrowserStateService;
 
         // The State
         [ObservableProperty]
@@ -49,7 +36,7 @@ namespace PosClient.Desktop.Features.Catalog.Products.List
         [ObservableProperty] private bool _hasNextPage;
         [ObservableProperty] private bool _hasPreviousPage;
 
-        public ObservableCollection<int> PageSizeOptions { get; } = new() { 5,10, 20, 50, 100 };
+        public ObservableCollection<int> PageSizeOptions { get; } = new() { 5, 10, 20, 50, 100 };
 
         // Loading
         [ObservableProperty]
@@ -71,13 +58,26 @@ namespace PosClient.Desktop.Features.Catalog.Products.List
         [ObservableProperty]
         private string _selectedStatus = "All";
 
-        [ObservableProperty]
-        private ObservableCollection<StatusFilterOption> _statusOptions = new()
+        public ProductBrowserViewModel(
+            IApiClient apiClient, 
+            INavigationService navigationService, 
+            IProductBrowserStateService productBrowserStateService)
         {
-            new StatusFilterOption { Label = "All Status" , Value = null },
-            new StatusFilterOption { Label = "Active Only" , Value = true },
-            new StatusFilterOption { Label = "Inactive Only" , Value = false }
-        };
+            _apiClient = apiClient;
+            _navigationService = navigationService;
+            _productBrowserStateService = productBrowserStateService;
+        }
+
+        public async Task OnNavigatedFromAsync()
+        {
+
+        }
+
+        public async Task OnNavigatedToAsync()
+        {
+            await LoadData();
+            await LoadCategories();
+        }
 
         // Load data
         [RelayCommand]
@@ -200,96 +200,14 @@ namespace PosClient.Desktop.Features.Catalog.Products.List
         }
 
         [RelayCommand]
-        public void NavigateToAdd()
-        {
-            _navigationService.Navigate(typeof(ProductEditorPage));
-        }
-
-
-        [RelayCommand]
         internal void ViewProduct(ProductListItem product)
         {
             if (product == null)
                 return;
 
+            _productBrowserStateService.SetProductForView(product.Id);
+
             _navigationService.Navigate(typeof(ProductViewerPage));
-
-            WeakReferenceMessenger.Default.Send(new ViewProductMessage(product.Id));
-        }
-
-        // Data minupulation
-        [RelayCommand]
-        internal void EditProduct(ProductListItem product)
-        {
-            if (product == null)
-                return;
-
-            _navigationService.Navigate(typeof(ProductEditorPage));
-
-            WeakReferenceMessenger.Default.Send(new EditProductMessage(product.Id));
-        }
-
-        [RelayCommand]
-        internal async Task DeleteProduct(ProductListItem product)
-        {
-            var confirm = await _dialogService.ShowConfirmationAsync(
-                "Delete Product?",
-                "Are you sure you want to delete this product?",
-                "Delete",
-                "Cancel");
-
-            if (confirm)
-            {
-                var result = await _apiClient.DeleteAsync($"api/products/{product.Id}");
-                if (result.IsSuccess)
-                {
-                    _notificationService.ShowSuccess("Success!", "Product deleted.");
-                    await LoadData();
-                }
-            }
-        }
-
-        [RelayCommand]
-        internal async Task ToggleStatus(ProductListItem product)
-        {
-            if (product.IsActive)
-            {
-                var confirm = await _dialogService.ShowConfirmationAsync(
-                "Deactivate Product?",
-                "Are you sure you want to deactivate this product and its variants?",
-                "Deactivate",
-                "Cancel");
-
-                if (confirm)
-                {
-                    var result = await _apiClient.PostAsync($"api/products/{product.Id}/deactivate", null!);
-                    if (result.IsSuccess)
-                    {
-                        _notificationService.ShowSuccess("Success!", "Product deactivated.");
-                        await LoadData();
-                    }
-                }
-            }
-            else
-            {
-                var result = await _apiClient.PostAsync($"api/products/{product.Id}/activate", null!);
-                if (result.IsSuccess)
-                {
-                    _notificationService.ShowSuccess("Success!", "Product activated.");
-                    await LoadData();
-                }
-            }
-        }
-
-        // Navigation
-        public async Task OnNavigatedToAsync()
-        {
-            await LoadDataCommand.ExecuteAsync(null);
-        }
-
-        public Task OnNavigatedFromAsync()
-        {
-            return Task.CompletedTask;
         }
     }
 }
