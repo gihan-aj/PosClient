@@ -78,7 +78,7 @@ namespace PosClient.Desktop.Shell
             {
                 Content = "Categories",
                 Icon = new SymbolIcon { Symbol = SymbolRegular.DataHistogram24 },
-                TargetPageType = typeof(Features.Catalog.Categories.CategoriesPage)
+                TargetPageType = typeof(Features.Inventory.Categories.CategoriesPage)
             });
 
             inventory.MenuItems.Add(new NavigationViewItem()

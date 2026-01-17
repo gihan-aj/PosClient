@@ -96,6 +96,9 @@ namespace PosClient.Desktop
                 services.AddTransient<Features.Inventory.Products.Editor.ProductEditorPage>();
                 services.AddTransient<Features.Inventory.Products.Editor.ProductEditorViewModel>();
 
+                services.AddTransient<Features.Inventory.Categories.CategoriesPage>();
+                services.AddTransient<Features.Inventory.Categories.CategoriesViewModel>();
+
                 services.AddSingleton<SettingsPage>();
                 services.AddSingleton<SettingsViewModel>();
             })
