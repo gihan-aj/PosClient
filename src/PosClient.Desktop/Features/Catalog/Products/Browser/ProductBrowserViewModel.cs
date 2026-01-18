@@ -1,8 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.Messaging;
-using PosClient.Desktop.Features.Catalog.Products.Messages;
 using PosClient.Desktop.Features.Catalog.Products.State;
 using PosClient.Desktop.Features.Catalog.Products.Viewer;
 using PosClient.Desktop.Infrastructure.Network;

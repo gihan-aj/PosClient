@@ -54,8 +54,15 @@
 
         <TabControl  Grid.Row="1" Margin="20,0,20,20" Padding="0" >
 
-            <TabItem Header="Basic Info"
-                 Background="{DynamicResource ControlFillColorDefaultBrush}">
+            <TabItem Background="{DynamicResource ApplicationBackgroundBrush}">
+
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal" Width="120">
+                        <ui:SymbolIcon Margin="0,0,6,0" Symbol="BookInformation24" />
+                        <TextBlock Text="Basic Info" />
+                    </StackPanel>
+                </TabItem.Header>
+
                 <Grid>
                     <ScrollViewer VerticalScrollBarVisibility="Auto" 
                               HorizontalScrollBarVisibility="Disabled"
@@ -151,16 +158,29 @@
 
             </TabItem>
 
-            <TabItem Header="Variants"
-                 Background="{DynamicResource ControlFillColorDefaultBrush}">
+            <TabItem Background="{DynamicResource ApplicationBackgroundBrush}">
+                
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal" Width="120">
+                        <ui:SymbolIcon Margin="0,0,6,0" Symbol="BranchFork24" />
+                        <TextBlock Text="Variants" />
+                    </StackPanel>
+                </TabItem.Header>
+                
                 <Grid>
                     <tabs:VariantsTab />
                 </Grid>
             </TabItem>
             <!--IsEnabled="{Binding ViewModel.IsNew, Converter={StaticResource BoolToInverseConverter}}"-->
-            <TabItem Header="Images"
-                 
-                 Background="{DynamicResource ControlFillColorDefaultBrush}">
+            <TabItem Background="{DynamicResource ApplicationBackgroundBrush}">
+
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal" Width="120">
+                        <ui:SymbolIcon Margin="0,0,6,0" Symbol="ImageMultiple24" />
+                        <TextBlock Text="Images" />
+                    </StackPanel>
+                </TabItem.Header>
+
                 <Grid>
                     <tabs:ImagesTab/>
                 </Grid>

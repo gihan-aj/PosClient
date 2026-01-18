@@ -1,9 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.Messaging;
 using PosClient.Desktop.Features.Catalog.Products.Browser;
-using PosClient.Desktop.Features.Catalog.Products.Editor;
-using PosClient.Desktop.Features.Catalog.Products.Messages;
 using PosClient.Desktop.Features.Catalog.Products.State;
 using PosClient.Desktop.Shared;
 using Wpf.Ui;
