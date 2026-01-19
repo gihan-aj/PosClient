@@ -49,7 +49,7 @@
             </Grid.RowDefinitions>
 
             <Grid Grid.Row="0">
-                
+
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="400"/>
@@ -191,10 +191,6 @@
                      CanUserAddRows="False"
                      SelectionMode="Single"
                      Sorting="DataGrid_Sorting"
-                     ScrollViewer.CanContentScroll="False"
-                     EnableColumnVirtualization="False"
-                     VirtualizingPanel.IsVirtualizing="True"
-                     VirtualizingPanel.VirtualizationMode="Recycling"
                      BorderThickness="1"
                      BorderBrush="{DynamicResource SurfaceStrokeColorDefaultBrush}"
                      ColumnHeaderHeight="40"
@@ -218,7 +214,7 @@
                             </Border>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
-                    
+
                 </DataGridTemplateColumn>
 
                 <DataGridTemplateColumn Header="Product" 
@@ -256,7 +252,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                
+
                 <DataGridTemplateColumn Header="Total Stock"
                                         Width="Auto" MinWidth="100">
                     <DataGridTemplateColumn.CellTemplate>
@@ -300,7 +296,7 @@
                             <StackPanel HorizontalAlignment="Left" 
                                         VerticalAlignment="Center" 
                                         Orientation="Horizontal" Margin="13,0,0,0">
-                                
+
                                 <ui:Button Icon="{ui:SymbolIcon Edit24}"
                                            Appearance="Transparent" Margin="5,0"
                                            ToolTip="Edit"
@@ -358,7 +354,7 @@
                 </DataGridTemplateColumn>
 
             </ui:DataGrid.Columns>
-            
+
         </ui:DataGrid>
 
         <Grid Grid.Row="2" 

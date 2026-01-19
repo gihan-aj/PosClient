@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Configuration;
 using PosClient.Desktop.Features.Dashboard;
+using PosClient.Desktop.Features.Orders.List;
 using Wpf.Ui.Controls;
 
 namespace PosClient.Desktop.Shell
@@ -49,13 +50,13 @@ namespace PosClient.Desktop.Shell
             var catalog = new NavigationViewItem()
             {
                 Content = "Catalog",
-                Icon = new SymbolIcon { Symbol = SymbolRegular.DataHistogram24 }
+                Icon = new SymbolIcon { Symbol = SymbolRegular.ShoppingBag24 }
             };
 
             catalog.MenuItems.Add(new NavigationViewItem()
             {
                 Content = "Products",
-                Icon = new SymbolIcon { Symbol = SymbolRegular.ShoppingBag24 },
+                Icon = new SymbolIcon { Symbol = SymbolRegular.Archive24 },
                 TargetPageType = typeof(Features.Catalog.Products.Browser.ProductBrowserPage)
             });
 
@@ -82,6 +83,15 @@ namespace PosClient.Desktop.Shell
             });
 
             _menuItems.Add(inventory);
+
+            var orders = new NavigationViewItem()
+            {
+                Content = "Orders",
+                Icon = new SymbolIcon { Symbol = SymbolRegular.Receipt24 },
+                TargetPageType = typeof(OrderListPage)
+            };
+
+            _menuItems.Add(orders);
         }
     }
 }

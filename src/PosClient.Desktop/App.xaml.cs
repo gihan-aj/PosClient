@@ -10,6 +10,8 @@ using PosClient.Desktop.Features.Catalog.Products.State;
 using PosClient.Desktop.Features.Catalog.Products.Viewer;
 using PosClient.Desktop.Features.Dashboard;
 using PosClient.Desktop.Features.Inventory.Products.State;
+using PosClient.Desktop.Features.Orders.List;
+using PosClient.Desktop.Features.Orders.State;
 using PosClient.Desktop.Features.Settings;
 using PosClient.Desktop.Infrastructure;
 using PosClient.Desktop.Infrastructure.Configuration;
@@ -91,6 +93,10 @@ namespace PosClient.Desktop
 
                 services.AddTransient<Features.Inventory.Categories.CategoriesPage>();
                 services.AddTransient<Features.Inventory.Categories.CategoriesViewModel>();
+
+                services.AddSingleton<IOrderStateService, OrderStateService>();
+                services.AddTransient<OrderListPage>();
+                services.AddTransient<OrderListViewModel>();
 
                 services.AddSingleton<SettingsPage>();
                 services.AddSingleton<SettingsViewModel>();

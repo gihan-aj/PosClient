@@ -25,19 +25,17 @@
             <!-- Images -->
             <BitmapImage x:Key="PlaceholderImage" UriSource="/Assets/placeholder.png" />
 
-            <Style x:Key="GridHeaderLeft"
-                   TargetType="DataGridColumnHeader">
-                <Setter Property="HorizontalContentAlignment" Value="Left"/>
-            </Style>
-
-            <Style x:Key="GridHeaderCenter"
-                   TargetType="DataGridColumnHeader">
-                <Setter Property="HorizontalContentAlignment" Value="Center"/>
-            </Style>
-
-            <Style x:Key="GridHeaderRight"
-                   TargetType="DataGridColumnHeader">
-                <Setter Property="HorizontalContentAlignment" Value="Right"/>
+            <Style TargetType="{x:Type DatePickerTextBox}">
+                <Setter Property="Control.Template">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <TextBox x:Name="PART_TextBox" 
+                             Text="{Binding Path=SelectedDate, 
+                                            StringFormat='dd/MM/yyyy', 
+                                            RelativeSource={RelativeSource AncestorType={x:Type DatePicker}}}" />
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
             </Style>
         </ResourceDictionary>
     </Application.Resources>
