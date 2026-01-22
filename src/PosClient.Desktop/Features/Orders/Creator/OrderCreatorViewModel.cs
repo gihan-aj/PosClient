@@ -2,7 +2,9 @@
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using PosClient.Desktop.Infrastructure.Network;
 using PosClient.Desktop.Shared;
+using PosClient.Desktop.Shared.Utilities;
 
 namespace PosClient.Desktop.Features.Orders.Creator
 {
@@ -60,6 +62,7 @@ namespace PosClient.Desktop.Features.Orders.Creator
             if (string.IsNullOrEmpty(value))
             {
                 SearchResults.Clear();
+                SelectedCustomer = null;
                 ShowNoResults = false;
                 return;
             }
@@ -124,43 +127,52 @@ namespace PosClient.Desktop.Features.Orders.Creator
                     _currentPage++;
                 }
 
-                //var request = new GetCustomerListRequest();
-                //request.Page = _currentPage;
-                //request.PageSize = 10;
-                //request.Search = query;
-                //var queryString = QueryStringHelper.ToQueryString(request);
-                //var url = $"api/customers${queryString}";
-                //var response = await _apiClient.GetAsync<PaginatedResult<CustomerDetails>>(url);
-                //if (response.IsSuccess && response.Data != null)
-                //{
-                //    var result = response.Data;
-                //    if (result.Items.Count == 0 && isNewSearch)
-                //        ShowNoRsults = true;
+                var request = new GetCustomerListRequest();
+                request.Page = _currentPage;
+                request.PageSize = 10;
+                request.Search = query;
+                var queryString = QueryStringHelper.ToQueryString(request);
+                var url = $"api/customers{queryString}";
+                var response = await _apiClient.GetAsync<PaginatedResult<CustomerDetails>>(url);
+                if (response.IsSuccess && response.Data != null)
+                {
+                    var result = response.Data;
+                    if (result.Items.Count == 0 && isNewSearch)
+                    {
+                        SearchResults.Clear();
+                        ShowNoResults = true;
+                    }
+                        
 
-                //    if (result.Items.Count < 10)
-                //        _hasMoreItems = true;
+                    if (result.Items.Count < 10)
+                        _hasMoreItems = true;
 
-                //    foreach(var c in result.Items)
-                //        SearchResults.Add(c);
-                //}
-
-                // SIMULATED DATABASE CALL
-                // In reality, you'd call: _customerService.Search(query, page: _currentPage);
-                await Task.Delay(1500); // Simulate network lag
-                var results = MockDatabaseQuery(query, _currentPage);
-
-                if (results.Count == 0 && isNewSearch)
+                    foreach (var c in result.Items)
+                        SearchResults.Add(c);
+                }
+                else
                 {
                     SearchResults.Clear();
                     ShowNoResults = true;
                 }
 
-                if (results.Count < 10) _hasMoreItems = false; // Assuming page size 10
+                // SIMULATED DATABASE CALL
+                // In reality, you'd call: _customerService.Search(query, page: _currentPage);
+                //await Task.Delay(1500); // Simulate network lag
+                //var results = MockDatabaseQuery(query, _currentPage);
 
-                foreach (var c in results)
-                {
-                    SearchResults.Add(c);
-                }
+                //if (results.Count == 0 && isNewSearch)
+                //{
+                //    SearchResults.Clear();
+                //    ShowNoResults = true;
+                //}
+
+                //if (results.Count < 10) _hasMoreItems = false; // Assuming page size 10
+
+                //foreach (var c in results)
+                //{
+                //    SearchResults.Add(c);
+                //}
             }
             finally 
             { 

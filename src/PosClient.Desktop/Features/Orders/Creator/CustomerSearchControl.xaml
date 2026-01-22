@@ -41,16 +41,15 @@
 
                 <Grid>
                     <!-- 3. The Results List -->
-                    <ListView x:Name="ResultsList"
-                              Background="Transparent"
-                              Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                    <ui:ListView x:Name="ResultsList"
+
                               ItemsSource="{Binding SearchResults}"
                               SelectedItem="{Binding SelectedCustomer}"
                               ScrollViewer.ScrollChanged="ResultsList_ScrollChanged"
                               SelectionChanged="ResultsList_SelectionChanged"
                               BorderThickness="0">
 
-                        <ListView.ItemTemplate>
+                        <ui:ListView.ItemTemplate>
                             <DataTemplate>
                                 
                                 <Grid Margin="0,4">
@@ -72,12 +71,12 @@
                                 </Grid>
                                 
                             </DataTemplate>
-                        </ListView.ItemTemplate>
+                        </ui:ListView.ItemTemplate>
                         
-                    </ListView>
+                    </ui:ListView>
 
                     <!-- No Results Message -->
-                    <TextBlock Text="No customers found."
+                    <ui:TextBlock Text="No customers found."
                                Visibility="{Binding ShowNoResults, Converter={StaticResource BoolToVisConverter}}"
                                HorizontalAlignment="Center" VerticalAlignment="Center"
                                Opacity="0.6"
