@@ -10,7 +10,7 @@ namespace PosClient.Desktop.Features.Orders.Creator
         public OrderCreatorPage(OrderCreatorViewModel viewModel)
         {
             ViewModel = viewModel;
-            DataContext = this;
+            DataContext = viewModel;
             InitializeComponent();
         }
 

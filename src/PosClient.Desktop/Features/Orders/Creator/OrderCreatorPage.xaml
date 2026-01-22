@@ -39,12 +39,12 @@
             <StackPanel Grid.Column="1" Orientation="Horizontal">
                 <ui:Button Content="Cancel" 
                            Appearance="Secondary" 
-                           Command="{Binding ViewModel.CancelCommand}" 
+                           Command="{Binding CancelCommand}" 
                            Width="80" Margin="0,0,10,0"/>
                 <ui:Button Content="Save Order" 
                            Appearance="Primary" 
                            Icon="{ui:SymbolIcon Save24}" 
-                           Command="{Binding ViewModel.SaveOrderCommand}" 
+                           Command="{Binding SaveOrderCommand}" 
                            Width="120"/>
             </StackPanel>
 
@@ -52,26 +52,188 @@
 
         <!-- MAIN CONTENT -->
         <Grid Grid.Row="1">
-
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*"/>
-                <!-- Left: Customer (33%) -->
-                <ColumnDefinition Width="15"/>
+                <ColumnDefinition Width="1*" MaxWidth="400"/>
+                <!-- Customer Column (Fixed width or percentage) -->
+                <ColumnDefinition Width="24"/>
                 <!-- Gutter -->
                 <ColumnDefinition Width="2*"/>
-                <!-- Right: Items & Details (66%) -->
+                <!-- Details Column -->
             </Grid.ColumnDefinitions>
 
-            <!-- LEFT COLUMN: Customer & Delivery -->
-            <ui:Card VerticalAlignment="Top" Grid.Column="0">
+            <!-- LEFT COLUMN -->
+            <StackPanel Grid.Column="0">
 
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <ui:SymbolIcon Symbol="Person24" FontSize="16" FontWeight="SemiBold" Margin="0,0,10,0"/>
-                    <TextBlock Text="Customer Information" FontWeight="SemiBold" VerticalAlignment="Center" />
-                </StackPanel>
+                <!-- Customer Card (Custom Border Implementation) -->
+                <Border Background="{DynamicResource ControlFillColorDefaultBrush}" 
+                        BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}" 
+                        BorderThickness="1" 
+                        CornerRadius="8" 
+                        Padding="16" Margin="0,0,0,0">
+                    <StackPanel>
+                        <!-- Header -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,10,10">
+                            <ui:SymbolIcon Symbol="Person24" FontSize="20" Margin="0,0,10,0"/>
+                            <TextBlock Text="Customer Information" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
 
-            </ui:Card>
+                        <!-- OUR CUSTOM SEARCH CONTROL -->
+                        <local:CustomerSearchControl Margin="0,0,0,10"/>
 
+                        <!-- Selected Customer View -->
+                        <Border Background="{DynamicResource ControlFillColorSecondaryBrush}" 
+                                CornerRadius="4" Padding="12" Margin="0,0,0,10"
+                                Visibility="{Binding SelectedCustomer, Converter={StaticResource NullToVisibilityConverter}, FallbackValue=Collapsed}">
+                            <StackPanel>
+                                <TextBlock Text="{Binding SelectedCustomer.Name}" FontWeight="SemiBold" Margin="0,0,0,3"/>
+                                <TextBlock Text="{Binding SelectedCustomer.PhoneNumber}" Opacity="0.7" Margin="0,0,0,3"/>
+                                <TextBlock Text="{Binding SelectedCustomer.Address}" Opacity="0.7" TextWrapping="Wrap" Margin="0,0,0,10"/>
+
+                                <ui:HyperlinkButton Content="View History" Margin="-5,5,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <ui:Button Content="New Customer" 
+                                   Icon="{ui:SymbolIcon Add24}" 
+                                   Appearance="Secondary" 
+                                   HorizontalAlignment="Stretch" 
+                                   Visibility="{Binding SelectedCustomer, Converter={StaticResource InverseNullToVisibilityConverter}, FallbackValue=Collapsed}"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Delivery Card (Custom Border Implementation) -->
+                <Border Background="{DynamicResource ControlFillColorDefaultBrush}" 
+                        BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}" 
+                        BorderThickness="1" 
+                        CornerRadius="8" 
+                        Padding="16" Margin="0,0,16,0">
+                    <StackPanel>
+                        <!-- Header -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,10,4">
+                            <ui:SymbolIcon Symbol="VehicleTruckProfile24" FontSize="20" Margin="0,0,10,0"/>
+                            <TextBlock Text="Delivery Details" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
+
+                        <CheckBox Content="Same as customer address" IsChecked="True"/>
+
+                        <ui:TextBlock Text="Courier Service" Appearance="Secondary" Margin="0,0,10,0"/>
+                        <ComboBox SelectedIndex="0">
+                            <ComboBoxItem Content="Pick Up"/>
+                            <ComboBoxItem Content="Local Courier"/>
+                            <ComboBoxItem Content="DHL Express"/>
+                        </ComboBox>
+
+                        <ui:TextBlock Text="Tracking Number" Appearance="Secondary"/>
+                        <ui:TextBox PlaceholderText="e.g. TRK-990022"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <!-- RIGHT COLUMN -->
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Order Meta Data (Top) -->
+                <ui:CardControl Grid.Row="0" Margin="0,0,0,16">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel>
+                            <ui:TextBlock Text="Order #" Appearance="Secondary"/>
+                            <TextBlock Text="ORD-2024-001" FontWeight="Bold" FontSize="16"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1">
+                            <ui:TextBlock Text="Order Date" Appearance="Secondary"/>
+                            <TextBlock Text="Jan 22, 2026" FontWeight="SemiBold"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <ui:TextBlock Text="Payment Status" Appearance="Secondary"/>
+                            <ComboBox SelectedIndex="0" MinWidth="120">
+                                <ComboBoxItem Content="Pending"/>
+                                <ComboBoxItem Content="Paid"/>
+                                <ComboBoxItem Content="Partial"/>
+                            </ComboBox>
+                        </StackPanel>
+                    </Grid>
+                </ui:CardControl>
+
+                <!-- Order Items (Middle - Expands) -->
+                <ui:CardControl Grid.Row="1" Header="Order Items" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <ui:Button Grid.Row="0" HorizontalAlignment="Right" Icon="{ui:SymbolIcon Add24}" Content="Add Item" Margin="0,0,0,12"/>
+
+                        <!-- Note: DataGrid needs actual OrderItems binding later -->
+                        <DataGrid Grid.Row="1" 
+                                  AutoGenerateColumns="False" 
+                                  CanUserAddRows="False"
+                                  HeadersVisibility="Column"
+                                  GridLinesVisibility="Horizontal">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Product" Width="*" Binding="{Binding ProductName}"/>
+                                <DataGridTextColumn Header="Variant" Width="120" Binding="{Binding Variant}"/>
+                                <DataGridTextColumn Header="Price" Width="100" Binding="{Binding Price}"/>
+                                <DataGridTemplateColumn Header="Qty" Width="80">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ui:NumberBox Value="{Binding Quantity}" Minimum="1" SmallChange="1"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Header="Total" Width="100" Binding="{Binding Total}"/>
+                                <DataGridTemplateColumn Width="50">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ui:Button Icon="{ui:SymbolIcon Delete24}" Appearance="Transparent"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <!-- Financial Totals -->
+                        <StackPanel Grid.Row="2" HorizontalAlignment="Right" Width="250" Margin="0,16,0,0">
+                            <Grid Margin="0,2">
+                                <TextBlock Text="Subtotal" />
+                                <TextBlock Text="$0.00" HorizontalAlignment="Right"/>
+                            </Grid>
+                            <Grid Margin="0,2">
+                                <TextBlock Text="Discount" />
+                                <TextBlock Text="-$0.00" HorizontalAlignment="Right" Foreground="#E04F5F"/>
+                            </Grid>
+                            <Separator Margin="0,8"/>
+                            <Grid>
+                                <TextBlock Text="Total" FontWeight="Bold" FontSize="18"/>
+                                <TextBlock Text="$0.00" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18" Foreground="{DynamicResource SystemAccentColorBrush}"/>
+                            </Grid>
+                        </StackPanel>
+                    </Grid>
+                </ui:CardControl>
+
+                <!-- Notes (Bottom) -->
+                <ui:CardControl Grid.Row="2" Header="Notes" Margin="0,16,0,0">
+                    <ui:TextBox PlaceholderText="Customer special requests..." 
+                                AcceptsReturn="True" 
+                                Height="80" 
+                                TextWrapping="Wrap"/>
+                </ui:CardControl>
+
+            </Grid>
         </Grid>
 
     </Grid>

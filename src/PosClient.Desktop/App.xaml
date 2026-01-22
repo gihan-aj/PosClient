@@ -24,6 +24,8 @@
             <converters:ImagePathToBitmapConverter x:Key="ImagePathToBitmapConverter"/>
             <converters:NullToBoolConverter x:Key="NullToBoolConverter"/>
             <converters:InvertedBoolConverter x:Key="InvertedBoolConverter"/>
+            <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+            <converters:InverseNullToVisibilityConverter x:Key="InverseNullToVisibilityConverter"/>
             <!-- Images -->
             <BitmapImage x:Key="PlaceholderImage" UriSource="/Assets/placeholder.png" />
 
