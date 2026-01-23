@@ -22,7 +22,7 @@ namespace PosClient.Desktop.Features.Orders.Creator
             _notificationService = notificationService;
         }
 
-        // --- State ---
+        // --- CUSTOMER ---
         [ObservableProperty] 
         string _searchText = "";
 
@@ -42,6 +42,66 @@ namespace PosClient.Desktop.Features.Orders.Creator
         private CancellationTokenSource? _searchCts;
 
         private bool _isSelecting = false;
+
+        // -- DELIVERY DETAILS --
+        [ObservableProperty]
+        private bool _isDeliverySameAsCustomer = true;
+
+        [ObservableProperty]
+        private string? _deliveryAddress;
+
+        [ObservableProperty]
+        private string? _deliveryCity;
+
+        [ObservableProperty]
+        private string? _deliveryCountry;
+
+        [ObservableProperty]
+        private string? _deliveryPostalCode;
+
+        [ObservableProperty]
+        private string? _deliveryRegion;
+
+        [ObservableProperty]
+        private int _selectedCourierIndex = 0;
+
+        [ObservableProperty]
+        private string? _trackingNumber;
+
+        // -- ORDER META DATA --
+        [ObservableProperty]
+        private string _orderNumber;
+
+        [ObservableProperty]
+        private DateTime _orderDate = DateTime.Now;
+
+        [ObservableProperty]
+        private PaymentStatus _selectedPaymentStatus = PaymentStatus.Unpaid;
+
+        [ObservableProperty]
+        private OrderStatus _selectedOrderStatus = OrderStatus.Pending;
+
+        // Helper lists for ComboBox binding
+        public IEnumerable<PaymentStatus> PaymentStatuses => Enum.GetValues<PaymentStatus>();
+        public IEnumerable<OrderStatus> OrderStatuses => Enum.GetValues<OrderStatus>();
+
+        // --- ORDER ITEMS & TOTALS ---
+
+        // The collection bound to the DataGrid
+        public ObservableCollection<OrderItemDetails> OrderItems { get; } = new();
+
+        [ObservableProperty]
+        private decimal _subtotal;
+
+        [ObservableProperty]
+        private decimal _discount;
+
+        [ObservableProperty]
+        private decimal _totalAmount;
+
+        // -- NOTES --
+        [ObservableProperty]
+        private string? _notes;
 
         // --- Events ---
         // This is called automatically by CommunityToolkit when SearchText changes
@@ -85,6 +145,8 @@ namespace PosClient.Desktop.Features.Orders.Creator
                 _isSelecting = true; // Raise flag
                 SearchText = value.Name; // Update text
                 _isSelecting = false; // Lower flag
+
+                Notes = value.Notes;
 
                 // Note: The UI (CustomerSearchControl) handles closing the popup.
             }
