@@ -95,6 +95,7 @@
                         </Border>
 
                         <ui:Button Content="New Customer" 
+                                   Command="{Binding OpenNewCustomerDialogCommand}"
                                    Icon="{ui:SymbolIcon Add24}" 
                                    Appearance="Secondary" 
                                    HorizontalAlignment="Stretch" 

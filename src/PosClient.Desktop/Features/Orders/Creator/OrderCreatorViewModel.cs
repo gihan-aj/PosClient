@@ -5,27 +5,21 @@ using CommunityToolkit.Mvvm.Input;
 using PosClient.Desktop.Infrastructure.Network;
 using PosClient.Desktop.Shared;
 using PosClient.Desktop.Shared.Utilities;
+using Wpf.Ui;
 
 namespace PosClient.Desktop.Features.Orders.Creator
 {
     public partial class OrderCreatorViewModel : ObservableObject, ICanLoadMore
     {
         private readonly IApiClient _apiClient;
+        private readonly INotificationService _notificationService;
+        private readonly IContentDialogService _contentDialogService;
 
-        public OrderCreatorViewModel(IApiClient apiClient)
+        public OrderCreatorViewModel(IApiClient apiClient, IContentDialogService contentDialogService, INotificationService notificationService)
         {
             _apiClient = apiClient;
-
-            for (int i = 0; i < 50; i++)
-            {
-                _mockDatabase.Add(new CustomerDetails
-                {
-                    Id = Guid.NewGuid(),
-                    Name = i % 2 == 0 ? $"John Doe {i}" : $"Jane Smith {i}",
-                    PhoneNumber = $"077-12345{i:00}",
-                    Address = $"{i} Main St, Colombo"
-                });
-            }
+            _contentDialogService = contentDialogService;
+            _notificationService = notificationService;
         }
 
         // --- State ---
@@ -48,8 +42,6 @@ namespace PosClient.Desktop.Features.Orders.Creator
         private CancellationTokenSource? _searchCts;
 
         private bool _isSelecting = false;
-
-        private readonly List<CustomerDetails> _mockDatabase = new();
 
         // --- Events ---
         // This is called automatically by CommunityToolkit when SearchText changes
@@ -155,24 +147,6 @@ namespace PosClient.Desktop.Features.Orders.Creator
                     SearchResults.Clear();
                     ShowNoResults = true;
                 }
-
-                // SIMULATED DATABASE CALL
-                // In reality, you'd call: _customerService.Search(query, page: _currentPage);
-                //await Task.Delay(1500); // Simulate network lag
-                //var results = MockDatabaseQuery(query, _currentPage);
-
-                //if (results.Count == 0 && isNewSearch)
-                //{
-                //    SearchResults.Clear();
-                //    ShowNoResults = true;
-                //}
-
-                //if (results.Count < 10) _hasMoreItems = false; // Assuming page size 10
-
-                //foreach (var c in results)
-                //{
-                //    SearchResults.Add(c);
-                //}
             }
             finally 
             { 
@@ -180,18 +154,23 @@ namespace PosClient.Desktop.Features.Orders.Creator
             }
         }
 
-        // --- Mock Data ---
-        private List<CustomerDetails> MockDatabaseQuery(string query, int page)
+        [RelayCommand]
+        private async Task OpenNewCustomerDialog()
         {
-            // Filter the existing static list
-            var filtered = _mockDatabase
-                .Where(c => c.Name.Contains(query, StringComparison.OrdinalIgnoreCase) ||
-                            c.PhoneNumber.Contains(query))
-                .ToList();
+            var presenter = _contentDialogService.GetDialogHost();
 
-            // Pagination logic
-            return filtered.Skip((page - 1) * 10).Take(10).ToList();
+            var dialogVm = new CreateCustomerViewModel(_apiClient,_notificationService);
+
+            dialogVm.OnCustomerCreated += (newCustomer) =>
+            {
+                SearchResults.Clear();
+                SearchResults.Add(newCustomer);
+                SelectedCustomer = newCustomer;
+            };
+
+            var dialog = new CreateCustomerDialog(dialogVm, presenter);
+
+            await _contentDialogService.ShowAsync(dialog, CancellationToken.None);
         }
-
     }
 }
