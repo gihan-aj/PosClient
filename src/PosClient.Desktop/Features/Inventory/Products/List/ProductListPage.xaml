@@ -184,179 +184,181 @@
 
         </Grid>
 
-        <ui:DataGrid Grid.Row="2"
-                     ItemsSource="{Binding ViewModel.Products}"
-                     AutoGenerateColumns="False"
-                     HeadersVisibility="Column"
-                     CanUserAddRows="False"
-                     SelectionMode="Single"
-                     Sorting="DataGrid_Sorting"
-                     BorderThickness="1"
-                     BorderBrush="{DynamicResource SurfaceStrokeColorDefaultBrush}"
-                     ColumnHeaderHeight="40"
-                     GridLinesVisibility="None">
+        <StackPanel Grid.Row="2" >
+            <ui:DataGrid ItemsSource="{Binding ViewModel.Products}"
+                         AutoGenerateColumns="False"
+                         HeadersVisibility="Column"
+                         CanUserAddRows="False"
+                         SelectionMode="Single"
+                         Sorting="DataGrid_Sorting"
+                         BorderThickness="1"
+                         BorderBrush="{DynamicResource SurfaceStrokeColorDefaultBrush}"
+                         ColumnHeaderHeight="40"
+                         GridLinesVisibility="None"
+                         Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=StackPanel}}"
+                         VerticalScrollBarVisibility="Auto"
+                         HorizontalScrollBarVisibility="Auto">
 
-            <ui:DataGrid.Columns>
+                <ui:DataGrid.Columns>
 
-                <DataGridTemplateColumn Header="Image"
-                                        Width="80">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Border Width="80" Height="80" CornerRadius="4"
-                                    HorizontalAlignment="Center">
-                                <Border.Background>
-                                    <ImageBrush Stretch="UniformToFill">
-                                        <ImageBrush.ImageSource>
-                                            <Binding Path="PrimaryImageUrl" Converter="{StaticResource ImagePathToBitmapConverter}"/>
-                                        </ImageBrush.ImageSource>
-                                    </ImageBrush>
-                                </Border.Background>
-                            </Border>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn Header="Image"
+                                            Width="80">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border Width="80" Height="80" CornerRadius="4"
+                                        HorizontalAlignment="Center">
+                                    <Border.Background>
+                                        <ImageBrush Stretch="UniformToFill">
+                                            <ImageBrush.ImageSource>
+                                                <Binding Path="PrimaryImageUrl" Converter="{StaticResource ImagePathToBitmapConverter}"/>
+                                            </ImageBrush.ImageSource>
+                                        </ImageBrush>
+                                    </Border.Background>
+                                </Border>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
 
-                </DataGridTemplateColumn>
+                    </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="Product" 
-                                        Width="*" MinWidth="180"
-                                        SortMemberPath="Name">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <StackPanel VerticalAlignment="Center" Margin="13,0,0,0">
-                                <TextBlock Text="{Binding Name}" FontWeight="Medium"/>
-                                <TextBlock Text="{Binding Sku}" FontSize="11" Foreground="Gray"/>
-                                <TextBlock Text="{Binding CategoryName}" FontSize="11" Foreground="Gray"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Product" 
+                                            Width="*" MinWidth="180"
+                                            SortMemberPath="Name">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel VerticalAlignment="Center" Margin="13,0,0,0">
+                                    <TextBlock Text="{Binding Name}" FontWeight="Medium"/>
+                                    <TextBlock Text="{Binding Sku}" FontSize="11" Foreground="Gray"/>
+                                    <TextBlock Text="{Binding CategoryName}" FontSize="11" Foreground="Gray"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
 
-                <DataGridTextColumn Header="Base Price" 
-                                    Binding="{Binding BasePrice, StringFormat='Rs. {0:N2}'}" 
-                                    MinWidth="100" Width="Auto"/>
+                    <DataGridTextColumn Header="Base Price" 
+                                        Binding="{Binding BasePrice, StringFormat='Rs. {0:N2}'}" 
+                                        MinWidth="100" Width="Auto"/>
 
-                <DataGridTemplateColumn Header="Available Stock"
-                                        Width="Auto" MinWidth="100">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <StackPanel VerticalAlignment="Center" Margin="13,0,0,0">
-                                <TextBlock Text="{Binding ActiveStock}" 
-                                           FontWeight="Bold"
-                                           FontSize="14"/>
-                                <TextBlock Text="{Binding ActiveVariantCount, StringFormat='{}{0} variants'}" 
-                                           FontSize="11" Foreground="Gray"/>
-                                <Border Background="{Binding StockStatusBar}" 
-                                        Height="4" CornerRadius="2" Width="40" Margin="0,4,0,0" 
-                                        HorizontalAlignment="Left"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Available Stock"
+                                            Width="Auto" MinWidth="100">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel VerticalAlignment="Center" Margin="13,0,0,0">
+                                    <TextBlock Text="{Binding ActiveStock}" 
+                                               FontWeight="Bold"
+                                               FontSize="14"/>
+                                    <TextBlock Text="{Binding ActiveVariantCount, StringFormat='{}{0} variants'}" 
+                                               FontSize="11" Foreground="Gray"/>
+                                    <Border Background="{Binding StockStatusBar}" 
+                                            Height="4" CornerRadius="2" Width="40" Margin="0,4,0,0" 
+                                            HorizontalAlignment="Left"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="Total Stock"
-                                        Width="Auto" MinWidth="100">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <StackPanel VerticalAlignment="Center" Margin="13,0,0,0">
-                                <TextBlock Text="{Binding TotalStock}" 
-                                           FontWeight="Bold"
-                                           FontSize="14"/>
-                                <TextBlock Text="{Binding VariantCount, StringFormat='{}{0} variants'}" 
-                                           FontSize="11" Foreground="Gray"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Total Stock"
+                                            Width="Auto" MinWidth="100">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel VerticalAlignment="Center" Margin="13,0,0,0">
+                                    <TextBlock Text="{Binding TotalStock}" 
+                                               FontWeight="Bold"
+                                               FontSize="14"/>
+                                    <TextBlock Text="{Binding VariantCount, StringFormat='{}{0} variants'}" 
+                                               FontSize="11" Foreground="Gray"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="Status" Width="Auto" SortMemberPath="IsActive">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Border CornerRadius="4" Padding="8,2" HorizontalAlignment="Left" Margin="10,0,0,0">
-                                <Border.Style>
-                                    <Style TargetType="Border">
-                                        <Setter Property="Background" Value="#10FF0000"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsActive}" Value="True">
-                                                <Setter Property="Background" Value="#1000FF00"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Border.Style>
-                                <TextBlock Text="{Binding IsActive, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Active|Inactive'}" 
-                       FontSize="12"/>
-                            </Border>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-
-                <DataGridTemplateColumn 
-                                        Width="Auto" MinWidth="100">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <StackPanel HorizontalAlignment="Left" 
-                                        VerticalAlignment="Center" 
-                                        Orientation="Horizontal" Margin="13,0,0,0">
-
-                                <ui:Button Icon="{ui:SymbolIcon Edit24}"
-                                           Appearance="Transparent" Margin="5,0"
-                                           ToolTip="Edit"
-                                           FontSize="16"
-                                           Command="{Binding DataContext.ViewModel.EditProductCommand, RelativeSource={RelativeSource AncestorType=ui:DataGrid}}"
-                                           CommandParameter="{Binding}"/>
-
-                                <ui:Button Appearance="Transparent"
-                                           ToolTip="Deactivate"
-                                           Command="{Binding DataContext.ViewModel.ToggleStatusCommand, RelativeSource={RelativeSource AncestorType=ui:DataGrid}}"
-                                           CommandParameter="{Binding}"
-                                           Margin="5,5">
-                                    <ui:Button.Style>
-                                        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                            <Setter Property="Content">
-                                                <Setter.Value>
-                                                    <ui:SymbolIcon Symbol="Prohibited24" FontSize="16" Foreground="Orange"/>
-                                                </Setter.Value>
-                                            </Setter>
+                    <DataGridTemplateColumn Header="Status" Width="Auto" SortMemberPath="IsActive">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border CornerRadius="4" Padding="8,2" HorizontalAlignment="Left" Margin="10,0,0,0">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="#10FF0000"/>
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding IsActive}" Value="True">
-                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                    <Setter Property="Background" Value="#1000FF00"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
-                                    </ui:Button.Style>
-                                </ui:Button>
+                                    </Border.Style>
+                                    <TextBlock Text="{Binding IsActive, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Active|Inactive'}" 
+                                               FontSize="12"/>
+                                </Border>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
 
-                                <ui:Button Appearance="Transparent"
-                                           ToolTip="Activate"
-                                           Command="{Binding DataContext.ViewModel.ToggleStatusCommand, RelativeSource={RelativeSource AncestorType=ui:DataGrid}}"
-                                           CommandParameter="{Binding}"
-                                           Margin="5,5">
-                                    <ui:Button.Style>
-                                        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                            <Setter Property="Content">
-                                                <Setter.Value>
-                                                    <ui:SymbolIcon Symbol="CheckmarkCircle24" FontSize="16" Foreground="ForestGreen"/>
-                                                </Setter.Value>
-                                            </Setter>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsActive}" Value="False">
-                                                    <Setter Property="Visibility" Value="Visible"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </ui:Button.Style>
-                                </ui:Button>
+                    <DataGridTemplateColumn MinWidth="100">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel HorizontalAlignment="Left" 
+                                            VerticalAlignment="Center" 
+                                            Orientation="Horizontal" Margin="13,0,0,0">
 
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                                    <ui:Button Icon="{ui:SymbolIcon Edit24}"
+                                               Appearance="Transparent" Margin="5,0"
+                                               ToolTip="Edit"
+                                               FontSize="16"
+                                               Command="{Binding DataContext.ViewModel.EditProductCommand, RelativeSource={RelativeSource AncestorType=ui:DataGrid}}"
+                                               CommandParameter="{Binding}"/>
 
-            </ui:DataGrid.Columns>
+                                    <ui:Button Appearance="Transparent"
+                                               ToolTip="Deactivate"
+                                               Command="{Binding DataContext.ViewModel.ToggleStatusCommand, RelativeSource={RelativeSource AncestorType=ui:DataGrid}}"
+                                               CommandParameter="{Binding}"
+                                               Margin="5,5,5,5">
+                                        <ui:Button.Style>
+                                            <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Setter Property="Content">
+                                                    <Setter.Value>
+                                                        <ui:SymbolIcon Symbol="Prohibited24" FontSize="16" Foreground="Orange"/>
+                                                    </Setter.Value>
+                                                </Setter>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ui:Button.Style>
+                                    </ui:Button>
 
-        </ui:DataGrid>
+                                    <ui:Button Appearance="Transparent"
+                                               ToolTip="Activate"
+                                               Command="{Binding DataContext.ViewModel.ToggleStatusCommand, RelativeSource={RelativeSource AncestorType=ui:DataGrid}}"
+                                               CommandParameter="{Binding}"
+                                               Margin="5,5,5,5">
+                                        <ui:Button.Style>
+                                            <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Setter Property="Content">
+                                                    <Setter.Value>
+                                                        <ui:SymbolIcon Symbol="CheckmarkCircle24" FontSize="16" Foreground="ForestGreen"/>
+                                                    </Setter.Value>
+                                                </Setter>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsActive}" Value="False">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ui:Button.Style>
+                                    </ui:Button>
 
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                </ui:DataGrid.Columns>
+
+            </ui:DataGrid>
+        </StackPanel>
         <Grid Grid.Row="2" 
               Background="{DynamicResource ApplicationBackgroundBrush}" 
               Opacity="0.8"

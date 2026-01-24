@@ -168,102 +168,106 @@
 
         </Grid>
 
-        <ui:DataGrid Grid.Row="2"
-                     ItemsSource="{Binding ViewModel.Products}"
-                     AutoGenerateColumns="False"
-                     HeadersVisibility="Column"
-                     CanUserAddRows="False"
-                     SelectionMode="Single"
-                     Sorting="DataGrid_Sorting"
-                     ScrollViewer.CanContentScroll="False"
-                     EnableColumnVirtualization="False"
-                     VirtualizingPanel.IsVirtualizing="True"
-                     VirtualizingPanel.VirtualizationMode="Recycling"
-                     BorderThickness="1"
-                     BorderBrush="{DynamicResource SurfaceStrokeColorDefaultBrush}"
-                     ColumnHeaderHeight="40"
-                     GridLinesVisibility="None">
+        <StackPanel Grid.Row="2">
 
-            <ui:DataGrid.Columns>
+            <ui:DataGrid ItemsSource="{Binding ViewModel.Products}"
+                         AutoGenerateColumns="False"
+                         HeadersVisibility="Column"
+                         CanUserAddRows="False"
+                         SelectionMode="Single"
+                         Sorting="DataGrid_Sorting"
+                         ScrollViewer.CanContentScroll="False"
+                         EnableColumnVirtualization="False"
+                         VirtualizingPanel.IsVirtualizing="True"
+                         VirtualizingPanel.VirtualizationMode="Recycling"
+                         BorderThickness="1"
+                         BorderBrush="{DynamicResource SurfaceStrokeColorDefaultBrush}"
+                         ColumnHeaderHeight="40"
+                         GridLinesVisibility="None"
+                         VerticalScrollBarVisibility="Auto"
+                         Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=StackPanel}}">
 
-                <DataGridTemplateColumn Header="Image"
-                                Width="80">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Border Width="80" Height="80" CornerRadius="4"
-                            HorizontalAlignment="Center">
-                                <Border.Background>
-                                    <ImageBrush Stretch="UniformToFill">
-                                        <ImageBrush.ImageSource>
-                                            <Binding Path="PrimaryImageUrl" Converter="{StaticResource ImagePathToBitmapConverter}"/>
-                                        </ImageBrush.ImageSource>
-                                    </ImageBrush>
-                                </Border.Background>
-                            </Border>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
+                <ui:DataGrid.Columns>
 
-                </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Image"
+                                    Width="80">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border Width="80" Height="80" CornerRadius="4"
+                                HorizontalAlignment="Center">
+                                    <Border.Background>
+                                        <ImageBrush Stretch="UniformToFill">
+                                            <ImageBrush.ImageSource>
+                                                <Binding Path="PrimaryImageUrl" Converter="{StaticResource ImagePathToBitmapConverter}"/>
+                                            </ImageBrush.ImageSource>
+                                        </ImageBrush>
+                                    </Border.Background>
+                                </Border>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
 
-                <DataGridTemplateColumn Header="Product" 
-                                        Width="*" MinWidth="180"
-                                        SortMemberPath="Name">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <StackPanel VerticalAlignment="Center" Margin="13,0,0,0">
-                                <TextBlock Text="{Binding Name}" FontWeight="Medium"/>
-                                <TextBlock Text="{Binding Sku}" FontSize="11" Foreground="Gray"/>
-                                <TextBlock Text="{Binding CategoryName}" FontSize="11" Foreground="Gray"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                    </DataGridTemplateColumn>
 
-                <DataGridTextColumn Header="Base Price" 
-                                    Binding="{Binding BasePrice, StringFormat='Rs. {0:N2}'}" 
-                                    MinWidth="100" Width="Auto"/>
+                    <DataGridTemplateColumn Header="Product" 
+                                            Width="*" MinWidth="180"
+                                            SortMemberPath="Name">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel VerticalAlignment="Center" Margin="13,0,0,0">
+                                    <TextBlock Text="{Binding Name}" FontWeight="Medium"/>
+                                    <TextBlock Text="{Binding Sku}" FontSize="11" Foreground="Gray"/>
+                                    <TextBlock Text="{Binding CategoryName}" FontSize="11" Foreground="Gray"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="Available Stock"
-                                        Width="Auto" MinWidth="100">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <StackPanel VerticalAlignment="Center" Margin="13,0,0,0">
-                                <TextBlock Text="{Binding ActiveStock}" 
-                                   FontWeight="Bold"
-                                   FontSize="14"/>
-                                <TextBlock Text="{Binding ActiveVariantCount, StringFormat='{}{0} variants'}" 
-                                   FontSize="11" Foreground="Gray"/>
-                                <Border Background="{Binding StockStatusBar}" 
-                                Height="4" CornerRadius="2" Width="40" Margin="0,4,0,0" 
-                                HorizontalAlignment="Left"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Base Price" 
+                                        Binding="{Binding BasePrice, StringFormat='Rs. {0:N2}'}" 
+                                        MinWidth="100" Width="Auto"/>
 
-                <DataGridTemplateColumn 
-                                Width="Auto" MinWidth="100">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <StackPanel HorizontalAlignment="Left" 
-                                VerticalAlignment="Center" 
-                                Orientation="Horizontal" Margin="13,0,0,0">
+                    <DataGridTemplateColumn Header="Available Stock"
+                                            Width="Auto" MinWidth="100">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel VerticalAlignment="Center" Margin="13,0,0,0">
+                                    <TextBlock Text="{Binding ActiveStock}" 
+                                       FontWeight="Bold"
+                                       FontSize="14"/>
+                                    <TextBlock Text="{Binding ActiveVariantCount, StringFormat='{}{0} variants'}" 
+                                       FontSize="11" Foreground="Gray"/>
+                                    <Border Background="{Binding StockStatusBar}" 
+                                    Height="4" CornerRadius="2" Width="40" Margin="0,4,0,0" 
+                                    HorizontalAlignment="Left"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
 
-                                <ui:Button Icon="{ui:SymbolIcon Eye24}"
-                                   Appearance="Transparent" Margin="5,0"
-                                   ToolTip="View"
-                                   FontSize="16"
-                                   Command="{Binding DataContext.ViewModel.ViewProductCommand, RelativeSource={RelativeSource AncestorType=ui:DataGrid}}"
-                                   CommandParameter="{Binding}"/>
+                    <DataGridTemplateColumn 
+                                    Width="Auto" MinWidth="100">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel HorizontalAlignment="Left" 
+                                    VerticalAlignment="Center" 
+                                    Orientation="Horizontal" Margin="13,0,0,0">
 
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                                    <ui:Button Icon="{ui:SymbolIcon Eye24}"
+                                       Appearance="Transparent" Margin="5,0"
+                                       ToolTip="View"
+                                       FontSize="16"
+                                       Command="{Binding DataContext.ViewModel.ViewProductCommand, RelativeSource={RelativeSource AncestorType=ui:DataGrid}}"
+                                       CommandParameter="{Binding}"/>
 
-            </ui:DataGrid.Columns>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
 
-        </ui:DataGrid>
+                </ui:DataGrid.Columns>
+
+            </ui:DataGrid>
+        </StackPanel>
 
         <Grid Grid.Row="2" 
               Background="{DynamicResource ApplicationBackgroundBrush}" 

@@ -279,9 +279,41 @@
                         <DataTemplate>
                             <Border CornerRadius="4" 
                                     Padding="8,2" Margin="13,0,0,0"
-                                    HorizontalAlignment="Left" Background="#10888888">
+                                    HorizontalAlignment="Left">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="#15888888"/>
+                                        <Setter Property="TextBlock.Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                        <Style.Triggers>
+                                            <!-- Confirmed (Blue) -->
+                                            <DataTrigger Binding="{Binding Status}" Value="Confirmed">
+                                                <Setter Property="Background" Value="#150078D4"/>
+                                                <Setter Property="TextBlock.Foreground" Value="#FF0078D4"/>
+                                            </DataTrigger>
+
+                                            <!-- Shipped (Purple) -->
+                                            <DataTrigger Binding="{Binding Status}" Value="Shipped">
+                                                <Setter Property="Background" Value="#158764B8"/>
+                                                <Setter Property="TextBlock.Foreground" Value="#FF8764B8"/>
+                                            </DataTrigger>
+
+                                            <!-- Delivered (Green) -->
+                                            <DataTrigger Binding="{Binding Status}" Value="Delivered">
+                                                <Setter Property="Background" Value="#15107C10"/>
+                                                <Setter Property="TextBlock.Foreground" Value="#FF107C10"/>
+                                            </DataTrigger>
+
+                                            <!-- Cancelled (Red) -->
+                                            <DataTrigger Binding="{Binding Status}" Value="Cancelled">
+                                                <Setter Property="Background" Value="#15E81123"/>
+                                                <Setter Property="TextBlock.Foreground" Value="#FFE81123"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                
                                 <TextBlock Text="{Binding Status}" FontSize="12"/>
-                                <!-- You can add DataTriggers here to change background color based on status -->
+                                
                             </Border>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -293,9 +325,35 @@
                         <DataTemplate>
                             <Border CornerRadius="4" 
                                     Padding="8,2" Margin="13,0,0,0"
-                                    HorizontalAlignment="Left" Background="#10888888">
+                                    HorizontalAlignment="Left">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <!-- Default (Unpaid - Red) -->
+                                        <Setter Property="Background" Value="#15E81123"/>
+                                        <Setter Property="TextBlock.Foreground" Value="#FFE81123"/>
+
+                                        <Style.Triggers>
+                                            <!-- Partial (Orange) -->
+                                            <DataTrigger Binding="{Binding PaymentStatus}" Value="Partial">
+                                                <Setter Property="Background" Value="#15FF8C00"/>
+                                                <Setter Property="TextBlock.Foreground" Value="#FFFF8C00"/>
+                                            </DataTrigger>
+
+                                            <!-- Paid (Green) -->
+                                            <DataTrigger Binding="{Binding PaymentStatus}" Value="Paid">
+                                                <Setter Property="Background" Value="#15107C10"/>
+                                                <Setter Property="TextBlock.Foreground" Value="#FF107C10"/>
+                                            </DataTrigger>
+
+                                            <!-- Refunded (Gray) -->
+                                            <DataTrigger Binding="{Binding PaymentStatus}" Value="Refunded">
+                                                <Setter Property="Background" Value="#15888888"/>
+                                                <Setter Property="TextBlock.Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
                                 <TextBlock Text="{Binding PaymentStatus}" FontSize="12"/>
-                                <!-- Add DataTriggers for 'Paid' (Green), 'Unpaid' (Red) -->
                             </Border>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -305,8 +363,8 @@
                 <DataGridTextColumn Header="Items" Binding="{Binding ItemCount}" MinWidth="80" Width="Auto"/>
 
                 <DataGridTextColumn Header="Total" 
-                                    Binding="{Binding TotalAmount, StringFormat='{}{0:N2}'}" 
-                                    Width="Auto" MinWidth="100" FontWeight="SemiBold"/>
+                                    Binding="{Binding TotalAmount, StringFormat='Rs. {0:N2}'}" 
+                                    Width="Auto" MinWidth="120" FontWeight="SemiBold"/>
 
                 <!-- Actions -->
                 <DataGridTemplateColumn Width="Auto" MinWidth="60">
