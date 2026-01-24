@@ -19,29 +19,6 @@ namespace PosClient.Desktop.Features.Orders.Creator
         private readonly IContentDialogService _contentDialogService;
         private readonly IOrderStateService _orderStateService;
 
-        public OrderCreatorViewModel(
-            IApiClient apiClient, 
-            IContentDialogService contentDialogService, 
-            INotificationService notificationService, 
-            IOrderStateService orderStateService)
-        {
-            _apiClient = apiClient;
-            _contentDialogService = contentDialogService;
-            _notificationService = notificationService;
-            _orderStateService = orderStateService;
-
-            _orderStateService.OrderItems.CollectionChanged += OnOrderItemsChanged;
-
-            RecalculateTotals();
-
-            foreach (var item in _orderStateService.OrderItems)
-            {
-                item.PropertyChanged += OnItemPropertyChanged;
-            }
-        }
-
-
-
         // --- CUSTOMER ---
         [ObservableProperty] 
         string _searchText = "";
@@ -107,12 +84,9 @@ namespace PosClient.Desktop.Features.Orders.Creator
 
         // --- ORDER ITEMS & TOTALS ---
 
-        // The collection bound to the DataGrid
         public ObservableCollection<OrderItemDetails> OrderItems => _orderStateService.OrderItems;
 
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(TotalAmount))]
-        private decimal _subtotal;
+        public decimal Subtotal => _orderStateService.Subtotal;
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(TotalAmount))]
@@ -123,6 +97,31 @@ namespace PosClient.Desktop.Features.Orders.Creator
         // -- NOTES --
         [ObservableProperty]
         private string? _notes;
+
+        public OrderCreatorViewModel(
+            IApiClient apiClient,
+            IContentDialogService contentDialogService,
+            INotificationService notificationService,
+            IOrderStateService orderStateService)
+        {
+            _apiClient = apiClient;
+            _contentDialogService = contentDialogService;
+            _notificationService = notificationService;
+            _orderStateService = orderStateService;
+
+            _orderStateService.PropertyChanged += OnOrderStatePropertyChanged;
+        }
+
+        private void OnOrderStatePropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(IOrderStateService.Subtotal))
+            {
+                OnPropertyChanged(nameof(Subtotal));
+
+                // Also update TotalAmount since it depends on Subtotal
+                OnPropertyChanged(nameof(TotalAmount));
+            }
+        }
 
         // --- Events ---
         // This is called automatically by CommunityToolkit when SearchText changes
@@ -274,37 +273,9 @@ namespace PosClient.Desktop.Features.Orders.Creator
             _orderStateService.RemoveItem(item);
         }
 
-        private void OnOrderItemsChanged(object? sender, NotifyCollectionChangedEventArgs e)
-        {
-            // Hook up listeners for NEW items
-            if (e.NewItems != null)
-            {
-                foreach (OrderItemDetails item in e.NewItems)
-                    item.PropertyChanged += OnItemPropertyChanged;
-            }
-
-            // Unhook listeners for REMOVED items (prevent memory leaks)
-            if (e.OldItems != null)
-            {
-                foreach (OrderItemDetails item in e.OldItems)
-                    item.PropertyChanged -= OnItemPropertyChanged;
-            }
-
-            RecalculateTotals();
-        }
-
-        private void OnItemPropertyChanged(object? sender, PropertyChangedEventArgs e)
-        {
-            // Recalculate if a row's Total changes (e.g. Quantity or Price changed)
-            if (e.PropertyName == nameof(OrderItemDetails.Total))
-            {
-                RecalculateTotals();
-            }
-        }
-
-        private void RecalculateTotals()
-        {
-            Subtotal = OrderItems.Sum(x => x.Total);
+        public void Dispose() 
+        { 
+            _orderStateService.PropertyChanged -= OnOrderStatePropertyChanged; 
         }
     }
 }

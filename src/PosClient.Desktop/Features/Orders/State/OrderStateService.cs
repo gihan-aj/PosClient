@@ -45,22 +45,38 @@ namespace PosClient.Desktop.Features.Orders.State
             OrderItems.Clear();
         }
 
-        public void AddItem(OrderItemDetails item)
+        public void AddItem(OrderItemDetails newItem)
         {
-            var existing = OrderItems.FirstOrDefault(x => x.VariantId == item.VariantId);
+            var existing = OrderItems.FirstOrDefault(x => x.VariantId == newItem.VariantId);
             if (existing != null)
             {
-                existing.Quantity += item.Quantity;
+                var newTotal = existing.Quantity + newItem.Quantity;
+                existing.MaxQuantity = newItem.MaxQuantity;
+                if(newTotal > existing.MaxQuantity)
+                {
+                    existing.Quantity = existing.MaxQuantity;
+                }
+                else
+                {
+                    
+                    existing.Quantity = newTotal;
+                }
             }
             else
             {
-                OrderItems.Add(item);
+                if (newItem.Quantity > newItem.MaxQuantity)
+                    newItem.Quantity = newItem.MaxQuantity;
+
+                OrderItems.Add(newItem);
             }
         }
 
         public void RemoveItem(OrderItemDetails item)
         {
-            OrderItems.Remove(item);
+            if (OrderItems.Contains(item))
+            {
+                OrderItems.Remove(item);
+            }
         }
 
         public bool HasItem(Guid variantId)
@@ -90,6 +106,11 @@ namespace PosClient.Desktop.Features.Orders.State
                 e.PropertyName == nameof(OrderItemDetails.Quantity) ||
                 e.PropertyName == nameof(OrderItemDetails.Price))
             {
+                // Additional check: If user manually edited Quantity in the grid, enforce limit here too
+                if (sender is OrderItemDetails item && item.Quantity > item.MaxQuantity)
+                {
+                    item.Quantity = item.MaxQuantity;
+                }
                 RecalculateTotals();
             }
         }

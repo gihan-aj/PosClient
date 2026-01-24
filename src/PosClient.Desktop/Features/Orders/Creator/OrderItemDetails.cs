@@ -17,6 +17,8 @@ namespace PosClient.Desktop.Features.Orders.Creator
         [NotifyPropertyChangedFor(nameof(Total))]
         private int _quantity;
 
+        public int MaxQuantity { get; set; }
+
         public decimal Total => Price * Quantity;
     }
 }

@@ -83,7 +83,8 @@ namespace PosClient.Desktop.Features.Orders.Creator.AddOrderItem
                 ProductName = row.Data.ProductName,
                 Variant = $"{row.Data.Color} - {row.Data.Size}",
                 Price = row.Data.SellingPrice,
-                Quantity = row.QuantityToAdd
+                Quantity = row.QuantityToAdd,
+                MaxQuantity = row.Data.CurrentStock
             };
 
             _orderState.AddItem(orderItem);

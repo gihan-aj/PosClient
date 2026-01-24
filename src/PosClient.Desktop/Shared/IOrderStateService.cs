@@ -1,9 +1,10 @@
 ﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using PosClient.Desktop.Features.Orders.Creator;
 
 namespace PosClient.Desktop.Shared
 {
-    public interface IOrderStateService
+    public interface IOrderStateService : INotifyPropertyChanged
     {
         Guid? SelectedOrderId { get; }
         bool IsCreatingNewOrder { get; }
