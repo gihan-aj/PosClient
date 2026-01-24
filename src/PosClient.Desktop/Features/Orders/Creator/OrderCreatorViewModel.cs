@@ -1,7 +1,10 @@
 ﻿using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using PosClient.Desktop.Features.Orders.Creator.AddOrderItem;
 using PosClient.Desktop.Infrastructure.Network;
 using PosClient.Desktop.Shared;
 using PosClient.Desktop.Shared.Utilities;
@@ -14,13 +17,30 @@ namespace PosClient.Desktop.Features.Orders.Creator
         private readonly IApiClient _apiClient;
         private readonly INotificationService _notificationService;
         private readonly IContentDialogService _contentDialogService;
+        private readonly IOrderStateService _orderStateService;
 
-        public OrderCreatorViewModel(IApiClient apiClient, IContentDialogService contentDialogService, INotificationService notificationService)
+        public OrderCreatorViewModel(
+            IApiClient apiClient, 
+            IContentDialogService contentDialogService, 
+            INotificationService notificationService, 
+            IOrderStateService orderStateService)
         {
             _apiClient = apiClient;
             _contentDialogService = contentDialogService;
             _notificationService = notificationService;
+            _orderStateService = orderStateService;
+
+            _orderStateService.OrderItems.CollectionChanged += OnOrderItemsChanged;
+
+            RecalculateTotals();
+
+            foreach (var item in _orderStateService.OrderItems)
+            {
+                item.PropertyChanged += OnItemPropertyChanged;
+            }
         }
+
+
 
         // --- CUSTOMER ---
         [ObservableProperty] 
@@ -70,7 +90,7 @@ namespace PosClient.Desktop.Features.Orders.Creator
 
         // -- ORDER META DATA --
         [ObservableProperty]
-        private string _orderNumber;
+        private string _orderNumber = $"ORD-{DateTime.UtcNow:yyyyMMdd}-XXX";
 
         [ObservableProperty]
         private DateTime _orderDate = DateTime.Now;
@@ -88,16 +108,17 @@ namespace PosClient.Desktop.Features.Orders.Creator
         // --- ORDER ITEMS & TOTALS ---
 
         // The collection bound to the DataGrid
-        public ObservableCollection<OrderItemDetails> OrderItems { get; } = new();
+        public ObservableCollection<OrderItemDetails> OrderItems => _orderStateService.OrderItems;
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(TotalAmount))]
         private decimal _subtotal;
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(TotalAmount))]
         private decimal _discount;
 
-        [ObservableProperty]
-        private decimal _totalAmount;
+        public decimal TotalAmount => Subtotal - Discount;
 
         // -- NOTES --
         [ObservableProperty]
@@ -233,6 +254,57 @@ namespace PosClient.Desktop.Features.Orders.Creator
             var dialog = new CreateCustomerDialog(dialogVm, presenter);
 
             await _contentDialogService.ShowAsync(dialog, CancellationToken.None);
+        }
+
+        [RelayCommand]
+        private async Task OpenAddOrderItemsDialog()
+        {
+            var presenter = _contentDialogService.GetDialogHost();
+
+            var dialogVm = new AddOrderItemViewModel(_apiClient, _orderStateService, _notificationService);
+
+            var dialog = new AddOrderItemDialog(dialogVm, presenter);
+
+            await _contentDialogService.ShowAsync(dialog, CancellationToken.None);
+        }
+
+        [RelayCommand]
+        private void RemoveItem(OrderItemDetails item)
+        {
+            _orderStateService.RemoveItem(item);
+        }
+
+        private void OnOrderItemsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            // Hook up listeners for NEW items
+            if (e.NewItems != null)
+            {
+                foreach (OrderItemDetails item in e.NewItems)
+                    item.PropertyChanged += OnItemPropertyChanged;
+            }
+
+            // Unhook listeners for REMOVED items (prevent memory leaks)
+            if (e.OldItems != null)
+            {
+                foreach (OrderItemDetails item in e.OldItems)
+                    item.PropertyChanged -= OnItemPropertyChanged;
+            }
+
+            RecalculateTotals();
+        }
+
+        private void OnItemPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            // Recalculate if a row's Total changes (e.g. Quantity or Price changed)
+            if (e.PropertyName == nameof(OrderItemDetails.Total))
+            {
+                RecalculateTotals();
+            }
+        }
+
+        private void RecalculateTotals()
+        {
+            Subtotal = OrderItems.Sum(x => x.Total);
         }
     }
 }

@@ -347,7 +347,10 @@
                                 <TextBlock Text="Order Items" FontWeight="SemiBold" VerticalAlignment="Center"/>
                             </StackPanel>
 
-                            <ui:Button HorizontalAlignment="Right" Icon="{ui:SymbolIcon Add24}" Content="Add Item" Appearance="Primary"/>
+                            <ui:Button HorizontalAlignment="Right" 
+                                       Icon="{ui:SymbolIcon Add24}" 
+                                       Content="Add Item" Appearance="Primary"
+                                       Command="{Binding OpenAddOrderItemsDialogCommand}"/>
                         </Grid>
 
                         <!-- Items Grid -->
@@ -378,7 +381,9 @@
                                 <DataGridTemplateColumn Width="50">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <ui:Button Icon="{ui:SymbolIcon Delete24}" Appearance="Transparent"/>
+                                            <ui:Button Icon="{ui:SymbolIcon Delete24}" Appearance="Transparent"
+                                                       Command="{Binding RemoveItemCommand}"
+                                                       CommandParameter="{Binding}"/>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
