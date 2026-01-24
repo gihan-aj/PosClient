@@ -382,7 +382,7 @@
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <ui:Button Icon="{ui:SymbolIcon Delete24}" Appearance="Transparent"
-                                                       Command="{Binding RemoveItemCommand}"
+                                                       Command="{Binding DataContext.RemoveItemCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                                        CommandParameter="{Binding}"/>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>

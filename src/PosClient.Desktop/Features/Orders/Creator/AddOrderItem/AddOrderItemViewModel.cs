@@ -13,6 +13,10 @@ namespace PosClient.Desktop.Features.Orders.Creator.AddOrderItem
         private readonly IOrderStateService _orderState;
         private readonly INotificationService _notificationService;
 
+        // The State
+        [ObservableProperty]
+        private ProductVariantListRequest _request = new();
+
         [ObservableProperty]
         private string _searchText = "";
 
@@ -24,7 +28,40 @@ namespace PosClient.Desktop.Features.Orders.Creator.AddOrderItem
         [ObservableProperty]
         private bool _isLoading;
 
+        [ObservableProperty]
+        private bool _isEmptyResults = true;
+
         public ObservableCollection<ProductVariantRow> SearchResults { get; } = new();
+
+        // Pagination meta data
+        [ObservableProperty]
+        private int _currentPage = 1;
+
+        partial void OnCurrentPageChanged(int value)
+        {
+            Request.Page = value;
+        }
+
+        [ObservableProperty]
+        private int _pageSize = 20;
+
+        partial void OnPageSizeChanged(int value)
+        {
+            Request.PageSize = value;
+            CurrentPage = 1;
+            // Trigger search automatically? Or wait for "ChangePageSize" command? 
+        }
+
+        [ObservableProperty] 
+        private int _totalCount;
+        [ObservableProperty] 
+        private int _totalPages;
+        [ObservableProperty] 
+        private bool _hasNextPage;
+        [ObservableProperty] 
+        private bool _hasPreviousPage;
+
+        public ObservableCollection<int> PageSizeOptions { get; } = new() { 5, 10, 20, 50, 100 };
 
         public AddOrderItemViewModel(IApiClient apiClient, IOrderStateService orderState, INotificationService notificationService)
         {
@@ -43,25 +80,42 @@ namespace PosClient.Desktop.Features.Orders.Creator.AddOrderItem
 
             try
             {
-                var request = new ProductVariantListRequest
-                {
-                    Page = 1,
-                    PageSize = 50,
-                    Search = SearchText,
-                    SearchIn = SelectedSearchIn == "All" ? null : SelectedSearchIn,
-                };
+                //var request = new ProductVariantListRequest
+                //{
+                //    Page = 1,
+                //    PageSize = 50,
+                //    Search = SearchText,
+                //    SearchIn = SelectedSearchIn == "All" ? null : SelectedSearchIn,
+                //};
+                Request.Search = SearchText;
+                Request.SearchIn = SelectedSearchIn == "All" ? null : SelectedSearchIn;
 
-                var queryString = QueryStringHelper.ToQueryString(request);
+                var queryString = QueryStringHelper.ToQueryString(Request);
                 var url = $"api/products/variants{queryString}";
 
                 var result = await _apiClient.GetAsync<PaginatedResult<ProductVariantListItem>>(url);
                 if(result.IsSuccess && result.Data != null)
                 {
-                    foreach(var item in result.Data.Items)
+                    var data = result.Data;
+                    foreach(var item in data.Items)
                     {
                         bool alreadyAdded = _orderState.HasItem(item.VariantId);
                         SearchResults.Add(new ProductVariantRow(item, alreadyAdded));
                     }
+
+                    TotalCount = data.TotalCount;
+                    TotalPages = (int)Math.Ceiling((double)TotalCount / Request.PageSize);
+                    HasNextPage = data.HasNextPage;
+                    HasPreviousPage = data.Page > 1;
+                    IsEmptyResults = !data.Items.Any();
+                }
+                else
+                {
+                    IsEmptyResults = true;
+                    TotalCount = 0;
+                    TotalPages = 0;
+                    HasNextPage = false;
+                    HasPreviousPage = false;
                 }
             }
             finally
@@ -91,6 +145,72 @@ namespace PosClient.Desktop.Features.Orders.Creator.AddOrderItem
             row.IsInCart = true;
 
             _notificationService.ShowSuccess($"{row.Data.ProductName} added to the cart.", "Product added!");
+        }
+
+        [RelayCommand]
+        public async Task NextPage()
+        {
+            if (!HasNextPage) return;
+            CurrentPage++;
+            await Search();
+        }
+
+        [RelayCommand]
+        public async Task PreviousPage()
+        {
+            if (!HasPreviousPage) return;
+            CurrentPage--;
+            await Search();
+        }
+
+        [RelayCommand]
+        public async Task ApplyFilters()
+        {
+            CurrentPage = 1;
+            await Search();
+        }
+
+        [RelayCommand]
+        public async Task JumpToPage(string pageText)
+        {
+            if (int.TryParse(pageText, out var page))
+            {
+                if (page < 1) page = 1;
+                if (page > TotalPages) page = TotalPages;
+
+                if (CurrentPage != page)
+                {
+                    CurrentPage = page;
+                    await Search();
+                }
+            }
+            else
+            {
+                // If invalid text, revert UI to current page
+                OnPropertyChanged(nameof(CurrentPage));
+            }
+        }
+
+        [RelayCommand]
+        public async Task ChangePageSize()
+        {
+            await Search();
+        }
+
+        [RelayCommand]
+        public async Task ClearFilters()
+        {
+            Request = new ProductVariantListRequest();
+            await Search();
+        }
+
+        public async Task SortData(string sortBy, string sortOrder)
+        {
+            Request.SortBy = sortBy;
+            Request.SortOrder = sortOrder;
+
+            Request.Page = 1;
+            await Search();
         }
     }
 }
