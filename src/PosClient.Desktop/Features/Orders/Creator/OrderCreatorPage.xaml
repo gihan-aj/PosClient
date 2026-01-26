@@ -32,6 +32,7 @@
 
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                 <ui:Button Icon="{ui:SymbolIcon ArrowLeft24}" 
+                           Command="{Binding NavigateBackCommand}"
                            Appearance="Transparent" 
                            Margin="0,0,10,0"/>
                 <TextBlock Text="Create New Order" FontSize="24" FontWeight="SemiBold"/>
@@ -260,6 +261,72 @@
                         
                     </StackPanel>
                 </Border>
+
+                <!-- 3. Payment Details Card (New Location) -->
+                <Border Background="{DynamicResource ControlFillColorDefaultBrush}" 
+                        BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}" 
+                        BorderThickness="1" 
+                        CornerRadius="8" 
+                        Padding="10">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,10,10">
+                            <ui:SymbolIcon Symbol="CreditCardClock24" FontSize="20" Margin="0,0,10,0"/>
+                            <TextBlock Text="Payment Details" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
+
+                        <!-- Read-Only Summary -->
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Paid Amount" Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                <TextBlock Text="{Binding PaidAmount, StringFormat='Rs. {0:N2}'}" FontWeight="SemiBold" FontSize="14"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                                <TextBlock Text="Balance Due" Foreground="{DynamicResource TextFillColorSecondaryBrush}" HorizontalAlignment="Right"/>
+                                <TextBlock Text="{Binding BalanceDue, StringFormat='Rs. {0:N2}'}" 
+                                           FontWeight="Bold" FontSize="14" 
+                                           Foreground="{DynamicResource SystemAccentColorBrush}"
+                                           HorizontalAlignment="Right"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Add Payment Button with Flyout -->
+                        <Grid Margin="0,0,0,10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <ui:Flyout Grid.Row="0" Placement="Bottom">
+                                <StackPanel Width="200">
+                                    <TextBlock Text="Enter Amount" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                    <ui:NumberBox Value="{Binding PaidAmount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                  PlaceholderText="0.00"
+                                                  Minimum="0"
+                                                  SpinButtonPlacementMode="Compact"
+                                                  Margin="0,0,0,8"/>
+                                    <ui:Button Content="Confirm" Appearance="Primary" HorizontalAlignment="Stretch" Click="CloseFlyout_Click"/>
+                                </StackPanel>
+                            </ui:Flyout>
+
+                            <ui:Button Grid.Row="1" 
+                                       Content="Add Initial Payment" 
+                                       Icon="{ui:SymbolIcon Add24}" 
+                                       Appearance="Secondary" HorizontalAlignment="Stretch"/>
+                        </Grid>
+
+                        <!-- Status Indicator -->
+                        <Border Background="{DynamicResource ControlFillColorSecondaryBrush}" CornerRadius="4" Padding="8,4" Margin="0,10,0,0" HorizontalAlignment="Center">
+                            <TextBlock Text="{Binding SelectedPaymentStatus}" FontSize="12" FontWeight="SemiBold"/>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
             </StackPanel>
 
             <!-- RIGHT COLUMN -->
@@ -288,8 +355,7 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="1.5*"/>
                             </Grid.ColumnDefinitions>
 
                             <!-- Order # -->
@@ -304,22 +370,13 @@
                                 <TextBlock Text="{Binding OrderDate, StringFormat='MMM dd, yyyy'}" FontWeight="SemiBold"/>
                             </StackPanel>
 
-                            <!-- Order Status -->
-                            <StackPanel Grid.Column="2" Margin="0,0,10,0">
+                            <!-- Status -->
+                            <StackPanel Grid.Column="2">
                                 <Label Content="Status" Target="{Binding ElementName=StatusCombo}" Padding="0,0,0,4"/>
                                 <ComboBox x:Name="StatusCombo"
                                           ItemsSource="{Binding OrderStatuses}"
                                           SelectedItem="{Binding SelectedOrderStatus, Mode=TwoWay}"
                                           HorizontalAlignment="Stretch"/>
-                            </StackPanel>
-
-                            <!-- Payment Status -->
-                            <StackPanel Grid.Column="3" Margin="0,0,0,0">
-                                <Label Content="Payment" Target="{Binding ElementName=PaymentCombo}" Padding="0,0,0,4"/>
-                                <ComboBox x:Name="PaymentCombo" 
-                                          ItemsSource="{Binding PaymentStatuses}"
-                                          SelectedItem="{Binding SelectedPaymentStatus, Mode=TwoWay}"
-                                          HorizontalAlignment="Stretch" />
                             </StackPanel>
                         </Grid>
                     </StackPanel>
@@ -359,7 +416,6 @@
                                   AutoGenerateColumns="False" 
                                   CanUserAddRows="False"
                                   HeadersVisibility="Column"
-                                  GridLinesVisibility="Horizontal"
                                   BorderThickness="1"
                                   BorderBrush="{DynamicResource ControlElevationBorderBrush}">
                             <DataGrid.Columns>
@@ -378,10 +434,11 @@
 
                                 <DataGridTextColumn Header="Total" Width="100" Binding="{Binding Total, StringFormat='Rs. {0:N2}'}"/>
 
-                                <DataGridTemplateColumn Width="50">
+                                <DataGridTemplateColumn Width="70">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <ui:Button Icon="{ui:SymbolIcon Delete24}" Appearance="Transparent"
+                                                       Foreground="IndianRed"
                                                        Command="{Binding DataContext.RemoveItemCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                                        CommandParameter="{Binding}"/>
                                         </DataTemplate>

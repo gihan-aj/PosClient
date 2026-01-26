@@ -10,6 +10,7 @@ namespace PosClient.Desktop.Shared
         bool IsCreatingNewOrder { get; }
         ObservableCollection<OrderItemDetails> OrderItems { get; }
         decimal Subtotal { get; }
+        decimal ShippingFee { get; set; }
 
         void SetOrderForView(Guid orderId);
         void SetOrderForCreation();

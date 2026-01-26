@@ -43,7 +43,7 @@ namespace PosClient.Desktop.Features.Orders.Creator.AddOrderItem
         }
 
         [ObservableProperty]
-        private int _pageSize = 20;
+        private int _pageSize = 10;
 
         partial void OnPageSizeChanged(int value)
         {

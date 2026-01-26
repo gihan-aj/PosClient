@@ -227,164 +227,167 @@
         </Grid>
 
         <!-- ROW 2: DataGrid -->
-        <ui:DataGrid Grid.Row="2"
-                     ItemsSource="{Binding ViewModel.Orders}"
-                     AutoGenerateColumns="False"
-                     HeadersVisibility="Column"
-                     CanUserAddRows="False"
-                     SelectionMode="Single"
-                     Sorting="DataGrid_Sorting"
-                     ScrollViewer.CanContentScroll="True"
-                     BorderThickness="1"
-                     BorderBrush="{DynamicResource SurfaceStrokeColorDefaultBrush}"
-                     ColumnHeaderHeight="40"
-                     HorizontalScrollBarVisibility="Auto"
-                     VerticalScrollBarVisibility="Auto">
+        <StackPanel Grid.Row="2">
 
-            <ui:DataGrid.Columns>
+            <ui:DataGrid ItemsSource="{Binding ViewModel.Orders}"
+                         AutoGenerateColumns="False"
+                         HeadersVisibility="Column"
+                         CanUserAddRows="False"
+                         SelectionMode="Single"
+                         Sorting="DataGrid_Sorting"
+                         ScrollViewer.CanContentScroll="True"
+                         BorderThickness="1"
+                         BorderBrush="{DynamicResource SurfaceStrokeColorDefaultBrush}"
+                         ColumnHeaderHeight="40"
+                         HorizontalScrollBarVisibility="Auto"
+                         VerticalScrollBarVisibility="Auto"
+                         Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=StackPanel}}">
 
-                <!-- Order Number & Date -->
-                <DataGridTemplateColumn Header="Order" 
-                                        Width="*" MinWidth="150" 
-                                        SortMemberPath="orderNumber">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <StackPanel VerticalAlignment="Center" Margin="13,0,0,0">
-                                <TextBlock Text="{Binding OrderNumber}" FontWeight="Medium"/>
-                                <TextBlock Text="{Binding OrderDate, StringFormat=d}" FontSize="11" Foreground="Gray"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                <ui:DataGrid.Columns>
 
-                <!-- Customer -->
-                <DataGridTemplateColumn Header="Customer" 
-                                        Width="*" MinWidth="150" 
-                                        SortMemberPath="customerName">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <StackPanel VerticalAlignment="Center" Margin="13,0,0,0">
-                                <TextBlock Text="{Binding CustomerName}" FontWeight="SemiBold"/>
-                                <TextBlock Text="{Binding DeliveryCity}" FontSize="11" Foreground="Gray"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                    <!-- Order Number & Date -->
+                    <DataGridTemplateColumn Header="Order" 
+                                            Width="*" MinWidth="150" 
+                                            SortMemberPath="orderNumber">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel VerticalAlignment="Center" Margin="13,0,0,0">
+                                    <TextBlock Text="{Binding OrderNumber}" FontWeight="Medium"/>
+                                    <TextBlock Text="{Binding OrderDate, StringFormat=d}" FontSize="11" Foreground="Gray"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
 
-                <!-- Status Badge -->
-                <DataGridTemplateColumn Header="Status" 
-                                        Width="Auto" MinWidth="100"
-                                        SortMemberPath="status">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Border CornerRadius="4" 
-                                    Padding="8,2" Margin="13,0,0,0"
-                                    HorizontalAlignment="Left">
-                                <Border.Style>
-                                    <Style TargetType="Border">
-                                        <Setter Property="Background" Value="#15888888"/>
-                                        <Setter Property="TextBlock.Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}"/>
-                                        <Style.Triggers>
-                                            <!-- Confirmed (Blue) -->
-                                            <DataTrigger Binding="{Binding Status}" Value="Confirmed">
-                                                <Setter Property="Background" Value="#150078D4"/>
-                                                <Setter Property="TextBlock.Foreground" Value="#FF0078D4"/>
-                                            </DataTrigger>
+                    <!-- Customer -->
+                    <DataGridTemplateColumn Header="Customer" 
+                                            Width="*" MinWidth="150" 
+                                            SortMemberPath="customerName">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel VerticalAlignment="Center" Margin="13,0,0,0">
+                                    <TextBlock Text="{Binding CustomerName}" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding DeliveryCity}" FontSize="11" Foreground="Gray"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
 
-                                            <!-- Shipped (Purple) -->
-                                            <DataTrigger Binding="{Binding Status}" Value="Shipped">
-                                                <Setter Property="Background" Value="#158764B8"/>
-                                                <Setter Property="TextBlock.Foreground" Value="#FF8764B8"/>
-                                            </DataTrigger>
+                    <!-- Status Badge -->
+                    <DataGridTemplateColumn Header="Status" 
+                                            Width="Auto" MinWidth="100"
+                                            SortMemberPath="status">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border CornerRadius="4" 
+                                        Padding="8,2" Margin="13,0,0,0"
+                                        HorizontalAlignment="Left">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="#15888888"/>
+                                            <Setter Property="TextBlock.Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                            <Style.Triggers>
+                                                <!-- Confirmed (Blue) -->
+                                                <DataTrigger Binding="{Binding Status}" Value="Confirmed">
+                                                    <Setter Property="Background" Value="#150078D4"/>
+                                                    <Setter Property="TextBlock.Foreground" Value="#FF0078D4"/>
+                                                </DataTrigger>
 
-                                            <!-- Delivered (Green) -->
-                                            <DataTrigger Binding="{Binding Status}" Value="Delivered">
-                                                <Setter Property="Background" Value="#15107C10"/>
-                                                <Setter Property="TextBlock.Foreground" Value="#FF107C10"/>
-                                            </DataTrigger>
+                                                <!-- Shipped (Purple) -->
+                                                <DataTrigger Binding="{Binding Status}" Value="Shipped">
+                                                    <Setter Property="Background" Value="#158764B8"/>
+                                                    <Setter Property="TextBlock.Foreground" Value="#FF8764B8"/>
+                                                </DataTrigger>
 
-                                            <!-- Cancelled (Red) -->
-                                            <DataTrigger Binding="{Binding Status}" Value="Cancelled">
-                                                <Setter Property="Background" Value="#15E81123"/>
-                                                <Setter Property="TextBlock.Foreground" Value="#FFE81123"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Border.Style>
-                                
-                                <TextBlock Text="{Binding Status}" FontSize="12"/>
-                                
-                            </Border>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                                                <!-- Delivered (Green) -->
+                                                <DataTrigger Binding="{Binding Status}" Value="Delivered">
+                                                    <Setter Property="Background" Value="#15107C10"/>
+                                                    <Setter Property="TextBlock.Foreground" Value="#FF107C10"/>
+                                                </DataTrigger>
 
-                <!-- Payment Badge -->
-                <DataGridTemplateColumn Header="Payment" MinWidth="100" Width="Auto">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Border CornerRadius="4" 
-                                    Padding="8,2" Margin="13,0,0,0"
-                                    HorizontalAlignment="Left">
-                                <Border.Style>
-                                    <Style TargetType="Border">
-                                        <!-- Default (Unpaid - Red) -->
-                                        <Setter Property="Background" Value="#15E81123"/>
-                                        <Setter Property="TextBlock.Foreground" Value="#FFE81123"/>
+                                                <!-- Cancelled (Red) -->
+                                                <DataTrigger Binding="{Binding Status}" Value="Cancelled">
+                                                    <Setter Property="Background" Value="#15E81123"/>
+                                                    <Setter Property="TextBlock.Foreground" Value="#FFE81123"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
 
-                                        <Style.Triggers>
-                                            <!-- Partial (Orange) -->
-                                            <DataTrigger Binding="{Binding PaymentStatus}" Value="Partial">
-                                                <Setter Property="Background" Value="#15FF8C00"/>
-                                                <Setter Property="TextBlock.Foreground" Value="#FFFF8C00"/>
-                                            </DataTrigger>
+                                    <TextBlock Text="{Binding Status}" FontSize="12"/>
 
-                                            <!-- Paid (Green) -->
-                                            <DataTrigger Binding="{Binding PaymentStatus}" Value="Paid">
-                                                <Setter Property="Background" Value="#15107C10"/>
-                                                <Setter Property="TextBlock.Foreground" Value="#FF107C10"/>
-                                            </DataTrigger>
+                                </Border>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
 
-                                            <!-- Refunded (Gray) -->
-                                            <DataTrigger Binding="{Binding PaymentStatus}" Value="Refunded">
-                                                <Setter Property="Background" Value="#15888888"/>
-                                                <Setter Property="TextBlock.Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Border.Style>
-                                <TextBlock Text="{Binding PaymentStatus}" FontSize="12"/>
-                            </Border>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                    <!-- Payment Badge -->
+                    <DataGridTemplateColumn Header="Payment" MinWidth="100" Width="Auto">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border CornerRadius="4" 
+                                        Padding="8,2" Margin="13,0,0,0"
+                                        HorizontalAlignment="Left">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <!-- Default (Unpaid - Red) -->
+                                            <Setter Property="Background" Value="#15E81123"/>
+                                            <Setter Property="TextBlock.Foreground" Value="#FFE81123"/>
 
-                <!-- Financials -->
-                <DataGridTextColumn Header="Items" Binding="{Binding ItemCount}" MinWidth="80" Width="Auto"/>
+                                            <Style.Triggers>
+                                                <!-- Partial (Orange) -->
+                                                <DataTrigger Binding="{Binding PaymentStatus}" Value="Partial">
+                                                    <Setter Property="Background" Value="#15FF8C00"/>
+                                                    <Setter Property="TextBlock.Foreground" Value="#FFFF8C00"/>
+                                                </DataTrigger>
 
-                <DataGridTextColumn Header="Total" 
-                                    Binding="{Binding TotalAmount, StringFormat='Rs. {0:N2}'}" 
-                                    Width="Auto" MinWidth="120" FontWeight="SemiBold"/>
+                                                <!-- Paid (Green) -->
+                                                <DataTrigger Binding="{Binding PaymentStatus}" Value="Paid">
+                                                    <Setter Property="Background" Value="#15107C10"/>
+                                                    <Setter Property="TextBlock.Foreground" Value="#FF107C10"/>
+                                                </DataTrigger>
 
-                <!-- Actions -->
-                <DataGridTemplateColumn Width="Auto" MinWidth="60">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <StackPanel HorizontalAlignment="Left" 
-                                        VerticalAlignment="Center" 
-                                        Orientation="Horizontal" Margin="13,0,0,0">
-                                <ui:Button Icon="{ui:SymbolIcon Eye24}"
-                                           Appearance="Transparent"
-                                           ToolTip="View Details"
-                                           Command="{Binding DataContext.ViewModel.NavigateToDetailsCommand, RelativeSource={RelativeSource AncestorType=ui:DataGrid}}"
-                                           CommandParameter="{Binding}"/>
-                            </StackPanel>
-                            
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-            </ui:DataGrid.Columns>
-        </ui:DataGrid>
+                                                <!-- Refunded (Gray) -->
+                                                <DataTrigger Binding="{Binding PaymentStatus}" Value="Refunded">
+                                                    <Setter Property="Background" Value="#15888888"/>
+                                                    <Setter Property="TextBlock.Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <TextBlock Text="{Binding PaymentStatus}" FontSize="12"/>
+                                </Border>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- Financials -->
+                    <DataGridTextColumn Header="Items" Binding="{Binding ItemCount}" MinWidth="80" Width="Auto"/>
+
+                    <DataGridTextColumn Header="Total" 
+                                        Binding="{Binding TotalAmount, StringFormat='Rs. {0:N2}'}" 
+                                        Width="Auto" MinWidth="120" FontWeight="SemiBold"/>
+
+                    <!-- Actions -->
+                    <DataGridTemplateColumn Width="Auto" MinWidth="60">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel HorizontalAlignment="Left" 
+                                            VerticalAlignment="Center" 
+                                            Orientation="Horizontal" Margin="13,0,0,0">
+                                    <ui:Button Icon="{ui:SymbolIcon Eye24}"
+                                               Appearance="Transparent"
+                                               ToolTip="View Details"
+                                               Command="{Binding DataContext.ViewModel.NavigateToDetailsCommand, RelativeSource={RelativeSource AncestorType=ui:DataGrid}}"
+                                               CommandParameter="{Binding}"/>
+                                </StackPanel>
+
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </ui:DataGrid.Columns>
+            </ui:DataGrid>
+        </StackPanel>
 
         <!-- Loading Overlay -->
         <Grid Grid.Row="2" 
@@ -404,7 +407,7 @@
             </StackPanel>
         </Grid>
 
-        <!-- ROW 3: Pagination (Same as Product) -->
+        <!-- ROW 3: Pagination -->
         <Grid Grid.Row="3" Margin="0,10,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -415,7 +418,7 @@
             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
                 <TextBlock Text="Rows:" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="Gray"/>
                 <ComboBox ItemsSource="{Binding ViewModel.PageSizeOptions}"
-                          SelectedItem="{Binding ViewModel.Request.PageSize}"
+                          SelectedItem="{Binding ViewModel.PageSize}"
                           Width="70">
                     <b:Interaction.Triggers>
                         <b:EventTrigger EventName="SelectionChanged">
@@ -435,7 +438,7 @@
                            Command="{Binding ViewModel.PreviousPageCommand}"
                            IsEnabled="{Binding ViewModel.HasPreviousPage}"
                            Appearance="Secondary"/>
-                <TextBlock Text="{Binding ViewModel.Request.Page}" Margin="10,0" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding ViewModel.CurrentPage}" Margin="10,0" VerticalAlignment="Center"/>
                 <ui:Button Icon="{ui:SymbolIcon ChevronRight24}" 
                            Command="{Binding ViewModel.NextPageCommand}"
                            IsEnabled="{Binding ViewModel.HasNextPage}"

@@ -19,10 +19,15 @@ namespace PosClient.Desktop.Features.Orders.List
         // --- STATE ---
         [ObservableProperty] private GetOrderListRequest _request = new();
 
+        [ObservableProperty]
+        private string _searchText = "";
+
         // --- DATA ---
         [ObservableProperty] private ObservableCollection<OrderListItem> _orders = new();
 
         // --- PAGINATION ---
+        [ObservableProperty] private int _currentPage = 1;
+        [ObservableProperty] private int _pageSize = 10;
         [ObservableProperty] private int _totalCount;
         [ObservableProperty] private int _totalPages;
         [ObservableProperty] private bool _hasNextPage;
@@ -77,8 +82,10 @@ namespace PosClient.Desktop.Features.Orders.List
             IsLoading = true;
             IsEmptyResults = false;
 
-            // Assuming you have a helper to serialize the Request object to query string
-            // e.g. ?page=1&status=Pending&startDate=2024-01-01...
+            Request.Page = CurrentPage;
+            Request.PageSize = PageSize;
+            Request.Search = SearchText;
+
             string queryString = QueryStringHelper.ToQueryString(Request);
             string url = $"api/orders{queryString}";
 
@@ -110,7 +117,7 @@ namespace PosClient.Desktop.Features.Orders.List
         public async Task NextPage()
         {
             if (!HasNextPage) return;
-            Request.Page++;
+            CurrentPage++;
             await LoadData();
         }
 
@@ -118,14 +125,14 @@ namespace PosClient.Desktop.Features.Orders.List
         public async Task PreviousPage()
         {
             if (!HasPreviousPage) return;
-            Request.Page--;
+            CurrentPage--;
             await LoadData();
         }
 
         [RelayCommand]
         public async Task ChangePageSize()
         {
-            Request.Page = 1;
+            CurrentPage = 1;
             await LoadData();
         }
 
@@ -134,12 +141,19 @@ namespace PosClient.Desktop.Features.Orders.List
         {
             if (int.TryParse(pageText, out var page))
             {
-                page = Math.Clamp(page, 1, TotalPages);
-                if (Request.Page != page)
+                if (page < 1) page = 1;
+                if (page > TotalPages) page = TotalPages;
+
+                if (CurrentPage != page)
                 {
-                    Request.Page = page;
-                    await LoadData();
+                    CurrentPage = page;
+                    await Search();
                 }
+            }
+            else
+            {
+                // If invalid text, revert UI to current page
+                OnPropertyChanged(nameof(CurrentPage));
             }
         }
 
@@ -147,14 +161,14 @@ namespace PosClient.Desktop.Features.Orders.List
         [RelayCommand]
         public async Task Search()
         {
-            Request.Page = 1;
+            CurrentPage = 1;
             await LoadData();
         }
 
         [RelayCommand]
         public async Task ApplyFilters()
         {
-            Request.Page = 1;
+            CurrentPage = 1;
             await LoadData();
         }
 
@@ -172,7 +186,7 @@ namespace PosClient.Desktop.Features.Orders.List
         {
             Request.SortBy = sortBy;
             Request.SortOrder = sortOrder;
-            Request.Page = 1;
+            CurrentPage = 1;
             await LoadData();
         }
 

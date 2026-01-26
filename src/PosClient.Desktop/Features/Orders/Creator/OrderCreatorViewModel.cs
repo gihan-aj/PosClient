@@ -5,6 +5,7 @@ using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PosClient.Desktop.Features.Orders.Creator.AddOrderItem;
+using PosClient.Desktop.Features.Orders.List;
 using PosClient.Desktop.Infrastructure.Network;
 using PosClient.Desktop.Shared;
 using PosClient.Desktop.Shared.Utilities;
@@ -18,6 +19,7 @@ namespace PosClient.Desktop.Features.Orders.Creator
         private readonly INotificationService _notificationService;
         private readonly IContentDialogService _contentDialogService;
         private readonly IOrderStateService _orderStateService;
+        private readonly INavigationService _navigationService;
 
         // --- CUSTOMER ---
         [ObservableProperty] 
@@ -90,9 +92,36 @@ namespace PosClient.Desktop.Features.Orders.Creator
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(TotalAmount))]
+        [NotifyPropertyChangedFor(nameof(BalanceDue))]
         private decimal _discount;
 
+        partial void OnDiscountChanged(decimal value)
+        {
+            UpdatePaymentStatus();
+        }
+        
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(TotalAmount))]
+        [NotifyPropertyChangedFor(nameof(BalanceDue))]
+        private decimal _shippingFee;
+
+        partial void OnShippingFeeChanged(decimal value)
+        {
+            UpdatePaymentStatus();
+        }
+
         public decimal TotalAmount => Subtotal - Discount;
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(BalanceDue))]
+        private decimal _paidAmount;
+
+        partial void OnPaidAmountChanged(decimal value)
+        {
+            UpdatePaymentStatus();
+        }
+
+        public decimal BalanceDue => TotalAmount - PaidAmount;
 
         // -- NOTES --
         [ObservableProperty]
@@ -102,7 +131,8 @@ namespace PosClient.Desktop.Features.Orders.Creator
             IApiClient apiClient,
             IContentDialogService contentDialogService,
             INotificationService notificationService,
-            IOrderStateService orderStateService)
+            IOrderStateService orderStateService,
+            INavigationService navigationService)
         {
             _apiClient = apiClient;
             _contentDialogService = contentDialogService;
@@ -110,6 +140,7 @@ namespace PosClient.Desktop.Features.Orders.Creator
             _orderStateService = orderStateService;
 
             _orderStateService.PropertyChanged += OnOrderStatePropertyChanged;
+            _navigationService = navigationService;
         }
 
         private void OnOrderStatePropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -117,13 +148,29 @@ namespace PosClient.Desktop.Features.Orders.Creator
             if (e.PropertyName == nameof(IOrderStateService.Subtotal))
             {
                 OnPropertyChanged(nameof(Subtotal));
-
                 // Also update TotalAmount since it depends on Subtotal
                 OnPropertyChanged(nameof(TotalAmount));
+                OnPropertyChanged(nameof(BalanceDue));
+                UpdatePaymentStatus();
             }
         }
 
-        // --- Events ---
+        private void UpdatePaymentStatus()
+        {
+            if(PaidAmount <= 0)
+            {
+                SelectedPaymentStatus = PaymentStatus.Unpaid;
+            }
+            else if (PaidAmount >= TotalAmount)
+            {
+                SelectedPaymentStatus = PaymentStatus.Paid;
+            }
+            else
+            {
+                SelectedPaymentStatus = PaymentStatus.Partial;
+            }
+        }
+
         // This is called automatically by CommunityToolkit when SearchText changes
         partial void OnSearchTextChanged(string value)
         {
@@ -271,6 +318,21 @@ namespace PosClient.Desktop.Features.Orders.Creator
         private void RemoveItem(OrderItemDetails item)
         {
             _orderStateService.RemoveItem(item);
+        }
+
+        [RelayCommand]
+        private void SaveOrder() { }
+
+        [RelayCommand]
+        private void Cancel()
+        {
+            _navigationService.Navigate(typeof(OrderListPage));
+        }
+
+        [RelayCommand]
+        private void NavigateBack()
+        {
+            _navigationService.GoBack();
         }
 
         public void Dispose() 

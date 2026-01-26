@@ -22,6 +22,10 @@ namespace PosClient.Desktop.Features.Orders.State
         [ObservableProperty]
         private decimal _subtotal;
 
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(Subtotal))]
+        private decimal _shippingFee;
+
         public OrderStateService()
         {
             OrderItems.CollectionChanged += OnOrderItemsChanged;
