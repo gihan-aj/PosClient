@@ -201,7 +201,7 @@ namespace PosClient.Desktop.Features.Orders.List
         [RelayCommand]
         public void NavigateToDetails(OrderListItem order)
         {
-            _orderStateService.SetOrderForView(order.Id);
+            _orderStateService.SetOrderForView(order.Id, order.Status);
             _navigationService.Navigate(typeof(OrderDetailsPage));
         }
     }

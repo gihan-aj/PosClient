@@ -103,7 +103,10 @@ namespace PosClient.Desktop.Features.Orders.Details.OrderItems
         private async Task AddToOrder(ProductVariantRow row)
         {
             if (row.QuantityToAdd <= 0)
+            {
+                _notificationService.ShowError("You don't have enough stock to add the item to the order.", "Out of Stock!");
                 return;
+            }
 
             var orderItem = new OrderItemDetails
             {

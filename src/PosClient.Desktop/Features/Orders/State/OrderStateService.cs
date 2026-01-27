@@ -9,10 +9,19 @@ namespace PosClient.Desktop.Features.Orders.State
     public partial class OrderStateService : ObservableObject, IOrderStateService
     {
         private Guid? _selectedOrderId;
+        private OrderStatus? _status;
+        private readonly INotificationService _notificationService;
+
         public Guid? SelectedOrderId 
         { 
             get => _selectedOrderId; 
             set => SetProperty(ref _selectedOrderId, value); 
+        }
+
+        public OrderStatus? Status
+        {
+            get => _status;
+            set => SetProperty(ref _status, value);
         }
 
         public bool IsCreatingNewOrder => _selectedOrderId == Guid.Empty;
@@ -26,26 +35,30 @@ namespace PosClient.Desktop.Features.Orders.State
         [NotifyPropertyChangedFor(nameof(Subtotal))]
         private decimal _shippingFee;
 
-        public OrderStateService()
+        public OrderStateService(INotificationService notificationService)
         {
+            _notificationService = notificationService;
             OrderItems.CollectionChanged += OnOrderItemsChanged;
         }
 
-        public void SetOrderForView(Guid orderId)
+        public void SetOrderForView(Guid orderId, OrderStatus orderStatus)
         {
             SelectedOrderId = orderId;
+            Status = orderStatus;
             OrderItems.Clear();
         }
 
         public void SetOrderForCreation()
         {
             SelectedOrderId = Guid.Empty;
+            Status = Orders.OrderStatus.Pending;
             OrderItems.Clear();
         }
 
         public void ClearState()
         {
             _selectedOrderId = null;
+            _status = null;
             OrderItems.Clear();
         }
 
@@ -56,9 +69,12 @@ namespace PosClient.Desktop.Features.Orders.State
             {
                 var newTotal = existing.Quantity + newItem.Quantity;
                 existing.MaxQuantity = newItem.MaxQuantity;
-                if(newTotal > existing.MaxQuantity)
+                if(newTotal > existing.MaxQuantity && 
+                    Status != OrderStatus.Pending && 
+                    Status != OrderStatus.Confirmed)
                 {
                     existing.Quantity = existing.MaxQuantity;
+                    _notificationService.ShowWarning($"The quantity for '{existing.ProductName}' has been adjusted to the maximum available stock of {existing.MaxQuantity}.", "Not enough stock!");
                 }
                 else
                 {
@@ -68,7 +84,9 @@ namespace PosClient.Desktop.Features.Orders.State
             }
             else
             {
-                if (newItem.Quantity > newItem.MaxQuantity)
+                if (newItem.Quantity > newItem.MaxQuantity && 
+                    Status != OrderStatus.Pending && 
+                    Status != OrderStatus.Confirmed)
                     newItem.Quantity = newItem.MaxQuantity;
 
                 OrderItems.Add(newItem);
@@ -111,9 +129,13 @@ namespace PosClient.Desktop.Features.Orders.State
                 e.PropertyName == nameof(OrderItemDetails.Price))
             {
                 // Additional check: If user manually edited Quantity in the grid, enforce limit here too
-                if (sender is OrderItemDetails item && item.Quantity > item.MaxQuantity)
+                if (sender is OrderItemDetails item && 
+                    item.Quantity > item.MaxQuantity && 
+                    Status != OrderStatus.Pending && 
+                    Status != OrderStatus.Confirmed)
                 {
                     item.Quantity = item.MaxQuantity;
+                    _notificationService.ShowWarning($"The quantity for '{item.ProductName}' has been adjusted to the maximum available stock of {item.MaxQuantity}.", "Not enough stock!");
                 }
                 RecalculateTotals();
             }

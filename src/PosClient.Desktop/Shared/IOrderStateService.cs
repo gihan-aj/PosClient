@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using PosClient.Desktop.Features.Orders;
 using PosClient.Desktop.Features.Orders.Details;
 
 namespace PosClient.Desktop.Shared
@@ -8,11 +9,12 @@ namespace PosClient.Desktop.Shared
     {
         Guid? SelectedOrderId { get; }
         bool IsCreatingNewOrder { get; }
+        OrderStatus? Status { get; }
         ObservableCollection<OrderItemDetails> OrderItems { get; }
         decimal Subtotal { get; }
         decimal ShippingFee { get; set; }
 
-        void SetOrderForView(Guid orderId);
+        void SetOrderForView(Guid orderId, OrderStatus status);
         void SetOrderForCreation();
         void ClearState();
 
