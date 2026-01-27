@@ -4,6 +4,7 @@ using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PosClient.Desktop.Features.Orders.Details.Customer;
+using PosClient.Desktop.Features.Orders.Details.OrderItems;
 using PosClient.Desktop.Features.Orders.List;
 using PosClient.Desktop.Infrastructure.Network;
 using PosClient.Desktop.Shared;
@@ -21,6 +22,7 @@ namespace PosClient.Desktop.Features.Orders.Details
         private readonly INotificationService _notificationService;
         private readonly IContentDialogService _contentDialogService;
         private CreateCustomerViewModel _createCustomerViewModel;
+        private AddOrderItemsViewModel _addOrderItemsViewModel;
 
         [ObservableProperty] private string _pageTitle = "Order Details";
 
@@ -85,7 +87,8 @@ namespace PosClient.Desktop.Features.Orders.Details
             IApiClient apiClient,
             INotificationService notificationService,
             IContentDialogService contentDialogService,
-            CreateCustomerViewModel createCustomerViewModel)
+            CreateCustomerViewModel createCustomerViewModel,
+            AddOrderItemsViewModel addOrderItemsViewModel)
         {
             _orderStateService = orderStateService;
             _navigationService = navigationService;
@@ -93,6 +96,7 @@ namespace PosClient.Desktop.Features.Orders.Details
             _notificationService = notificationService;
             _contentDialogService = contentDialogService;
             _createCustomerViewModel = createCustomerViewModel;
+            _addOrderItemsViewModel = addOrderItemsViewModel;
         }
 
         public async Task OnNavigatedFromAsync()
@@ -237,6 +241,15 @@ namespace PosClient.Desktop.Features.Orders.Details
             var dialog = new CreateCustomerDialog(_createCustomerViewModel, presenter);
 
             await _contentDialogService.ShowAsync(dialog, CancellationToken.None);
+        }
+
+        [RelayCommand]
+        private async Task OpenAddOrderItemsDialog()
+        {
+            var presenter = _contentDialogService.GetDialogHost();
+            var dialog = new AddOrderItemsDialog(_addOrderItemsViewModel, presenter);
+
+            await _contentDialogService.ShowAsync(dialog,CancellationToken.None);
         }
 
         [RelayCommand]

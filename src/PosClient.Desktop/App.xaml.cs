@@ -104,6 +104,7 @@ namespace PosClient.Desktop
                 services.AddTransient<OrderDetailsPage>();
                 services.AddTransient<OrderDetailsViewModel>();
                 services.AddTransient<Features.Orders.Details.Customer.CreateCustomerViewModel>();
+                services.AddTransient<Features.Orders.Details.OrderItems.AddOrderItemsViewModel>();
 
                 services.AddSingleton<SettingsPage>();
                 services.AddSingleton<SettingsViewModel>();
