@@ -24,6 +24,15 @@ namespace PosClient.Desktop.Features.Orders.Details
 
         [ObservableProperty] private string _pageTitle = "Order Details";
 
+        [ObservableProperty] private bool _isCreatingNewOrder = false;
+
+        // -- Order Details --
+        [ObservableProperty] private OrderStatus _currentOrderStatus = OrderStatus.Pending;
+
+        [ObservableProperty] private string _orderNumber = "[Not Created Yet]";
+
+        [ObservableProperty] private DateTime _orderDate = DateTime.Now;
+
         // -- Customer --
         [ObservableProperty] private string _customerSearchText = "";
 
@@ -42,6 +51,30 @@ namespace PosClient.Desktop.Features.Orders.Details
         private CancellationTokenSource? _customerSearchCts;
 
         private bool _isCustomerSelecting;
+
+        // -- Delivery
+        [ObservableProperty] private bool _isDeliverySameAsCustomer = true;
+
+        [ObservableProperty] private string? _deliveryAddress;
+
+        [ObservableProperty] private string? _deliveryCity;
+
+        [ObservableProperty] private string? _deliveryCountry;
+
+        [ObservableProperty] private string? _deliveryPostalCode;
+
+        [ObservableProperty] private string? _deliveryRegion;
+
+        [ObservableProperty] private int _selectedCourierIndex = 0;
+
+        [ObservableProperty] private string? _trackingNumber;
+
+        // -- Payment detials --
+        [ObservableProperty] private decimal _paidAmount;
+
+        [ObservableProperty] private decimal _balanceDue;
+
+        [ObservableProperty] private PaymentStatus _selectedPaymentStatus = PaymentStatus.Unpaid;
 
         // -- Notes --
         [ObservableProperty] private string? _notes;
@@ -72,6 +105,7 @@ namespace PosClient.Desktop.Features.Orders.Details
             if (_orderStateService.IsCreatingNewOrder)
             {
                 PageTitle = "Create New Order";
+                IsCreatingNewOrder = true;
             }
             else if (_orderStateService.SelectedOrderId.HasValue)
             {

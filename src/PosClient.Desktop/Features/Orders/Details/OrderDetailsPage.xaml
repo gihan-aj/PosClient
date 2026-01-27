@@ -38,19 +38,107 @@
                 <ui:TextBlock Text="{Binding PageTitle}"
                               Style="{StaticResource TitleTextBlockStyle}"
                               VerticalAlignment="Center"/>
+
+                <!-- Status Badge (Header Context) -->
+                <Border CornerRadius="4" Padding="8,2" VerticalAlignment="Center" Margin="10,0,0,0">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Background" Value="#15888888"/>
+                            <!-- Default -->
+                            <Setter Property="TextBlock.Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentOrderStatus}" Value="Confirmed">
+                                    <Setter Property="Background" Value="#150078D4"/>
+                                    <Setter Property="TextBlock.Foreground" Value="#FF0078D4"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding CurrentOrderStatus}" Value="Processing">
+                                    <Setter Property="Background" Value="#158764B8"/>
+                                    <Setter Property="TextBlock.Foreground" Value="#FF8764B8"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding CurrentOrderStatus}" Value="Shipped">
+                                    <Setter Property="Background" Value="#15107C10"/>
+                                    <Setter Property="TextBlock.Foreground" Value="#FF107C10"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding CurrentOrderStatus}" Value="Cancelled">
+                                    <Setter Property="Background" Value="#15E81123"/>
+                                    <Setter Property="TextBlock.Foreground" Value="#FFE81123"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <TextBlock Text="{Binding CurrentOrderStatus}" FontSize="12" FontWeight="SemiBold"/>
+                </Border>
+
             </StackPanel>
 
+            <!-- Action Buttons -->
             <StackPanel Grid.Column="1"
                         Orientation="Horizontal">
-                <ui:Button Content="Cancel"
+                <!--<ui:Button Content="Cancel"
                            Appearance="Secondary"
                            Command="{Binding CancelCommand}"
-                           MinWidth="100" Margin="0,0,10,0"/>
-                <ui:Button Content="Save Order"
-                           Appearance="Primary"
+                           MinWidth="100" Margin="0,0,10,0"/>-->
+                <!-- Save Draft (Always visible for editable orders) -->
+                <ui:Button Content="Save Changes"
+                           Appearance="Secondary" Margin="0,0,10,0"
                            Icon="{ui:SymbolIcon Save24}"
                            Command="{Binding SaveCommand}"
                            MinWidth="100"/>
+
+                <!-- 1. Confirm (Visible if Pending) -->
+                <ui:Button Content="Confirm Order" 
+                           Appearance="Primary" 
+                           Icon="{ui:SymbolIcon Checkmark24}" 
+                           Command="{Binding ConfirmOrderCommand}" 
+                           MinWidth="120">
+                    <ui:Button.Style>
+                        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentOrderStatus}" Value="Pending">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:Button.Style>
+                </ui:Button>
+
+                <!-- 2. Start Processing (Visible if Confirmed) -->
+                <ui:Button Content="Start Processing" 
+                           Appearance="Primary" 
+                           Icon="{ui:SymbolIcon ArrowRight24}" 
+                           Command="{Binding StartProcessingCommand}" 
+                           MinWidth="120">
+                    <ui:Button.Style>
+                        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentOrderStatus}" Value="Confirmed">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:Button.Style>
+                </ui:Button>
+
+                <!-- 3. Ship Order (Visible if Processing) -->
+                <ui:Button Content="Ship Order" 
+                           Appearance="Primary" 
+                           Icon="{ui:SymbolIcon VehicleTruckProfile24}" 
+                           Command="{Binding ShipOrderCommand}" 
+                           MinWidth="120">
+                    <ui:Button.Style>
+                        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentOrderStatus}" Value="Processing">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:Button.Style>
+                </ui:Button>
+
             </StackPanel>
 
         </Grid>
@@ -71,7 +159,8 @@
                 <Border BorderThickness="1"
                         CornerRadius="8" Padding="10"
                         Background="{DynamicResource ControlFillColorDefaultBrush}" 
-                        BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}" >
+                        BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                        Margin="0,0,0,10">
 
                     <StackPanel>
                         
@@ -164,14 +253,254 @@
                                    Command="{Binding OpenNewCustomerDialogCommand}"
                                    Icon="{ui:SymbolIcon Add24}" 
                                    Appearance="Secondary" 
-                                   HorizontalAlignment="Stretch" 
+                                   HorizontalAlignment="Stretch" Margin="0,0,0,10"
                                    Visibility="{Binding SelectedCustomer, Converter={StaticResource InverseNullToVisibilityConverter}, FallbackValue=Collapsed}"/>
 
                     </StackPanel>
                     
                 </Border>
-                
+
+                <!-- Delivery -->
+                <Border Background="{DynamicResource ControlFillColorDefaultBrush}" 
+                        BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}" 
+                        BorderThickness="1" 
+                        CornerRadius="8" 
+                        Padding="10" Margin="0,0,0,10">
+                    <StackPanel>
+                        <!-- Header -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,10,10">
+                            <ui:SymbolIcon Symbol="VehicleTruckProfile24" FontSize="20" Margin="0,0,10,0"/>
+                            <TextBlock Text="Delivery Details" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
+
+                        <!-- Toggle -->
+                        <CheckBox Content="Same as customer address" 
+                                  IsChecked="{Binding IsDeliverySameAsCustomer, Mode=TwoWay}" 
+                                  Margin="0,0,0,5"/>
+
+                        <!-- Conditional delivery form -->
+                        <StackPanel Visibility="{Binding IsDeliverySameAsCustomer, Converter={StaticResource InverseBoolToVisConverter}}">
+
+                            <!-- Custom Delivery Fields -->
+                            <StackPanel Margin="0,0,0,10">
+                                <Label Content="Address" Target="{Binding ElementName=DelAddressBox}" Padding="0,0,0,4"/>
+                                <ui:TextBox x:Name="DelAddressBox" PlaceholderText="123 Main Street" 
+                                            Text="{Binding DeliveryAddress, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <Label Content="City" Target="{Binding ElementName=DelCityBox}" Padding="0,0,0,4"/>
+                                    <ui:TextBox x:Name="DelCityBox" PlaceholderText="Colombo" 
+                                                Text="{Binding DeliveryCity, UpdateSourceTrigger=PropertyChanged}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <Label Content="Country" Target="{Binding ElementName=DelCountry}" Padding="0,0,0,4"/>
+                                    <ui:TextBox x:Name="DelCountry" PlaceholderText="Sri Lanka" 
+                                                Text="{Binding DeliveryCountry, UpdateSourceTrigger=PropertyChanged}"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <Label Content="Postal Code" Target="{Binding ElementName=DelPostal}" Padding="0,0,0,4"/>
+                                    <ui:TextBox x:Name="DelPostal" PlaceholderText="76950" 
+                                                Text="{Binding DeliveryPostalCode, UpdateSourceTrigger=PropertyChanged}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <Label Content="Region" Target="{Binding ElementName=DelRegion}" Padding="0,0,0,4"/>
+                                    <ui:TextBox x:Name="DelRegion" PlaceholderText="Western" 
+                                                Text="{Binding DeliveryRegion, UpdateSourceTrigger=PropertyChanged}"/>
+                                </StackPanel>
+                            </Grid>
+
+                        </StackPanel>
+
+                        <!-- Courier Service -->
+                        <StackPanel Margin="0,0,0,10">
+                            <Label Content="Courier Service"  Target="{Binding ElementName=CourierCombobox}" Padding="0,0,0,4"/>
+                            <ComboBox x:Name="CourierCombobox" 
+                                      SelectedIndex="{Binding SelectedCourierIndex}">
+                                <ComboBoxItem Content="Pick Up"/>
+                                <ComboBoxItem Content="Local Courier"/>
+                                <ComboBoxItem Content="DHL Express"/>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <!-- Tracking Number -->
+                        <StackPanel Visibility="{Binding IsCreatingNewOrder, Converter={StaticResource InverseBoolToVisConverter}}" Margin="0,0,0,0">
+                            <Label Content="Tracking Number" Target="{Binding ElementName=TrackingNumber}" Padding="0,0,0,4"/>
+                            <ui:TextBox x:Name="TrackingNumber" 
+                                        PlaceholderText="e.g. TRK-990022"
+                                        Text="{Binding TrackingNumber, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+
+
+                    </StackPanel>
+                </Border>
+
+                <Border Background="{DynamicResource ControlFillColorDefaultBrush}" 
+                        BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}" 
+                        BorderThickness="1" 
+                        CornerRadius="8" 
+                        Padding="10" Margin="0,0,0,10">
+
+                    <StackPanel>
+                        <!-- Header -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,10,10">
+                            <ui:SymbolIcon Symbol="WalletCreditCard24" FontSize="20" Margin="0,0,10,0"/>
+                            <TextBlock Text="Payment Details" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
+
+                        <!-- Payment Summary Grid -->
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Paid Amount -->
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Paid Amount" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12"/>
+                                <TextBlock Text="{Binding PaidAmount, StringFormat='Rs. {0:N2}'}" FontWeight="SemiBold" FontSize="16"/>
+                            </StackPanel>
+
+                            <!-- Balance Due -->
+                            <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                                <TextBlock Text="Balance Due" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12" HorizontalAlignment="Right"/>
+                                <TextBlock Text="{Binding BalanceDue, StringFormat='Rs. {0:N2}'}" 
+                                           FontWeight="Bold" FontSize="16" 
+                                           Foreground="{DynamicResource SystemAccentColorBrush}"
+                                           HorizontalAlignment="Right"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Add Initial Payment (Button) -->
+                        <ui:Button Content="Add Initial Payment" 
+                                   Icon="{ui:SymbolIcon Add24}" 
+                                   Appearance="Secondary" Margin="0,0,0,10"
+                                   HorizontalAlignment="Stretch"
+                                   Command="{Binding OpenAddPaymentDialogCommand}"/>
+
+                        <!-- Status Badge -->
+                        <Border CornerRadius="4" Padding="8,4" HorizontalAlignment="Center" Margin="0,0,0,10    ">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Background" Value="#15E81123"/>
+                                    <!-- Default Red (Unpaid) -->
+                                    <Setter Property="TextBlock.Foreground" Value="#FFE81123"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedPaymentStatus}" Value="Partial">
+                                            <Setter Property="Background" Value="#15FF8C00"/>
+                                            <Setter Property="TextBlock.Foreground" Value="#FFFF8C00"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding SelectedPaymentStatus}" Value="Paid">
+                                            <Setter Property="Background" Value="#15107C10"/>
+                                            <Setter Property="TextBlock.Foreground" Value="#FF107C10"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <TextBlock Text="{Binding SelectedPaymentStatus}" FontWeight="SemiBold" FontSize="12"/>
+                        </Border>
+
+                    </StackPanel>
+                    
+                </Border>
+
             </StackPanel>
+            
+            <!-- Right Column -->
+            <Grid Grid.Column="2">
+                
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <!-- Order Details -->
+                <Border Background="{DynamicResource ControlFillColorDefaultBrush}" 
+                        BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}" 
+                        BorderThickness="1" 
+                        CornerRadius="8" 
+                        Padding="10" Margin="0,0,0,10">
+
+                    <StackPanel>
+
+                        <!-- Header -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,10,10">
+                            <ui:SymbolIcon Symbol="Receipt24" FontSize="20" Margin="0,0,10,0"/>
+                            <TextBlock Text="Order Details" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
+
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Order # -->
+                            <StackPanel Grid.Column="0">
+                                <ui:TextBlock Text="Order #" Appearance="Secondary" Margin="0,0,0,4"/>
+                                <TextBlock Text="{Binding OrderNumber}" FontWeight="Bold" FontSize="16"/>
+                            </StackPanel>
+
+                            <!-- Date -->
+                            <StackPanel Grid.Column="1">
+                                <ui:TextBlock Text="Order Date" Appearance="Secondary" Margin="0,0,0,4"/>
+                                <TextBlock Text="{Binding OrderDate, StringFormat='MMM dd, yyyy'}" FontWeight="SemiBold" FontSize="14"/>
+                            </StackPanel>
+                        </Grid>
+
+                    </StackPanel>
+                    
+                </Border>
+
+                <Border Grid.Row="1" Margin="0,0,0,10"
+                        Background="{DynamicResource ControlFillColorDefaultBrush}" 
+                        BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}" 
+                        BorderThickness="1" 
+                        CornerRadius="8" 
+                        Padding="10"
+                        VerticalAlignment="Stretch">
+
+                    <Grid>
+                        
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Header & Add Button -->
+                        <Grid Grid.Row="0" Margin="0,0,0,10">
+                            <StackPanel Orientation="Horizontal">
+                                <ui:SymbolIcon Symbol="ShoppingBag24" FontSize="20" Margin="0,0,10,0"/>
+                                <TextBlock Text="Order Items" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <ui:Button HorizontalAlignment="Right" 
+                                       Icon="{ui:SymbolIcon Add24}" 
+                                       Content="Add Item" Appearance="Primary"
+                                       Command="{Binding OpenAddOrderItemsDialogCommand}"/>
+                        </Grid>
+
+                    </Grid>
+                    
+                </Border>
+                
+            </Grid>
             
         </Grid>
         
