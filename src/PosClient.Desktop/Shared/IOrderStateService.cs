@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using PosClient.Desktop.Features.Orders.Creator;
+using PosClient.Desktop.Features.Orders.Details;
 
 namespace PosClient.Desktop.Shared
 {

@@ -141,7 +141,7 @@ namespace PosClient.Desktop.Features.Orders.Creator.AddOrderItem
                 MaxQuantity = row.Data.CurrentStock
             };
 
-            _orderState.AddItem(orderItem);
+            //_orderState.AddItem(orderItem);
             row.IsInCart = true;
 
             _notificationService.ShowSuccess($"{row.Data.ProductName} added to the cart.", "Product added!");

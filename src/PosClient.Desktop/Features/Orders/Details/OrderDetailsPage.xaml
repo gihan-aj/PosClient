@@ -496,10 +496,98 @@
                                        Command="{Binding OpenAddOrderItemsDialogCommand}"/>
                         </Grid>
 
+                        <!-- Items Grid -->
+                        <DataGrid Grid.Row="1" 
+                                  ItemsSource="{Binding OrderItems}"
+                                  AutoGenerateColumns="False" 
+                                  CanUserAddRows="False"
+                                  HeadersVisibility="Column"
+                                  BorderThickness="1"
+                                  BorderBrush="{DynamicResource ControlElevationBorderBrush}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Product" Width="*" Binding="{Binding ProductName}"/>
+                                <DataGridTextColumn Header="Variant" MinWidth="120" Width="Auto" Binding="{Binding Variant}"/>
+                                <DataGridTextColumn Header="Price" MinWidth="100" Width="Auto" Binding="{Binding Price, StringFormat='Rs. {0:N2}'}"/>
+
+                                <DataGridTemplateColumn Header="Qty" MinWidth="120" Width="Auto">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ui:NumberBox Value="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}" 
+                                                          Minimum="1" SmallChange="1"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <DataGridTextColumn Header="Total" Width="100" Binding="{Binding Total, StringFormat='Rs. {0:N2}'}"/>
+
+                                <DataGridTemplateColumn Width="70">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ui:Button Icon="{ui:SymbolIcon Delete24}" Appearance="Transparent"
+                                                       Foreground="IndianRed"
+                                                       Command="{Binding DataContext.RemoveItemCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                       CommandParameter="{Binding}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <!-- Financial Totals -->
+                        <StackPanel Grid.Row="2" HorizontalAlignment="Right" Width="250" Margin="0,16,0,0">
+                            <Grid Margin="0,2">
+                                <TextBlock Text="Subtotal"/>
+                                <TextBlock Text="{Binding Subtotal, StringFormat='Rs. {0:N2}'}" HorizontalAlignment="Right"/>
+                            </Grid>
+                            <Grid Margin="0,2">
+                                <TextBlock Text="Discount"/>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <TextBlock Text="-" Foreground="#E04F5F" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                    <ui:NumberBox Value="{Binding Discount, UpdateSourceTrigger=PropertyChanged}" 
+                                                  SmallChange="100" LargeChange="500"
+                                                  SpinButtonPlacementMode="Compact"
+                                                  Width="80"/>
+                                </StackPanel>
+                            </Grid>
+                            <Grid Margin="0,2">
+                                <TextBlock Text="Shipping Fee"/>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <TextBlock Text="+" Foreground="{DynamicResource SystemAccentColorBrush}" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                    <ui:NumberBox Value="{Binding ShippingFee, UpdateSourceTrigger=PropertyChanged}" 
+                                                  SmallChange="100" LargeChange="500"
+                                                  SpinButtonPlacementMode="Compact"
+                                                  Width="80"/>
+                                </StackPanel>
+                            </Grid>
+                            <Separator Margin="0,8"/>
+                            <Grid>
+                                <TextBlock Text="Total" FontWeight="Bold" FontSize="18"/>
+                                <TextBlock Text="{Binding TotalAmount, StringFormat='Rs. {0:N2}'}" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18" Foreground="{DynamicResource SystemAccentColorBrush}"/>
+                            </Grid>
+                        </StackPanel>
+
                     </Grid>
                     
                 </Border>
-                
+
+                <!-- Notes (Bottom) -->
+                <Border Grid.Row="2" Margin="0,0,0,10"
+                        Background="{DynamicResource ControlFillColorDefaultBrush}" 
+                        BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}" 
+                        BorderThickness="1" 
+                        CornerRadius="8" 
+                        Padding="10">
+                    <StackPanel Grid.Column="2">
+                        <Label Content="Notes" Target="{Binding ElementName=Notes}" Padding="0,0,0,4"/>
+                        <ui:TextBox x:Name="Notes" 
+                                    PlaceholderText="Customer special requests..." 
+                                    AcceptsReturn="True" 
+                                    Height="80" 
+                                    TextWrapping="Wrap"
+                                    Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                </Border>
+
             </Grid>
             
         </Grid>

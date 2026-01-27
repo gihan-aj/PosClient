@@ -86,7 +86,7 @@ namespace PosClient.Desktop.Features.Orders.Creator
 
         // --- ORDER ITEMS & TOTALS ---
 
-        public ObservableCollection<OrderItemDetails> OrderItems => _orderStateService.OrderItems;
+        public ObservableCollection<OrderItemDetails> OrderItems => new();
 
         public decimal Subtotal => _orderStateService.Subtotal;
 
@@ -317,7 +317,7 @@ namespace PosClient.Desktop.Features.Orders.Creator
         [RelayCommand]
         private void RemoveItem(OrderItemDetails item)
         {
-            _orderStateService.RemoveItem(item);
+            //_orderStateService.RemoveItem(item);
         }
 
         [RelayCommand]

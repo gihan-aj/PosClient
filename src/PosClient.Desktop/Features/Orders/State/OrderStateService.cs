@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using CommunityToolkit.Mvvm.ComponentModel;
-using PosClient.Desktop.Features.Orders.Creator;
+using PosClient.Desktop.Features.Orders.Details;
 using PosClient.Desktop.Shared;
 
 namespace PosClient.Desktop.Features.Orders.State

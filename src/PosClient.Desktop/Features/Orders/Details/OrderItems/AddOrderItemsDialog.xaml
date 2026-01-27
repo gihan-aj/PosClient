@@ -63,15 +63,15 @@
                   BorderBrush="{DynamicResource ControlElevationBorderBrush}">
 
             <DataGrid.Columns>
-                <DataGridTextColumn Header="SKU" Binding="{Binding Data.Sku}" Width="160"/>
-                <DataGridTextColumn Header="Product" Binding="{Binding Data.ProductName}" Width="*"/>
-                <DataGridTextColumn Header="Color" Binding="{Binding Data.Color}" Width="80"/>
-                <DataGridTextColumn Header="Size" Binding="{Binding Data.Size}" Width="60"/>
-                <DataGridTextColumn Header="Stock" Binding="{Binding Data.CurrentStock}" Width="70"/>
-                <DataGridTextColumn Header="Price" Binding="{Binding Data.SellingPrice, StringFormat='Rs. {0:N2}'}" Width="80"/>
+                <DataGridTextColumn Header="SKU" Binding="{Binding Data.Sku}" Width="160" SortMemberPath="Sku"/>
+                <DataGridTextColumn Header="Product" Binding="{Binding Data.ProductName}" Width="*" SortMemberPath="ProductName"/>
+                <DataGridTextColumn Header="Color" Binding="{Binding Data.Color}" Width="80" SortMemberPath="Color"/>
+                <DataGridTextColumn Header="Size" Binding="{Binding Data.Size}" Width="60" SortMemberPath="Size"/>
+                <DataGridTextColumn Header="Stock" Binding="{Binding Data.CurrentStock}" Width="70" CanUserSort="False"/>
+                <DataGridTextColumn Header="Price" Binding="{Binding Data.SellingPrice, StringFormat='Rs. {0:N2}'}" Width="80" SortMemberPath="Price"/>
 
                 <!-- Action Column -->
-                <DataGridTemplateColumn Header="Add to Order" Width="160">
+                <DataGridTemplateColumn Header="Add to Order" Width="160" CanUserSort="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">

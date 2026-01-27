@@ -72,11 +72,31 @@ namespace PosClient.Desktop.Features.Orders.Details
         [ObservableProperty] private string? _trackingNumber;
 
         // -- Payment detials --
-        [ObservableProperty] private decimal _paidAmount;
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(BalanceDue))]
+        private decimal _paidAmount;
 
-        [ObservableProperty] private decimal _balanceDue;
+        public decimal BalanceDue => TotalAmount - PaidAmount;
 
         [ObservableProperty] private PaymentStatus _selectedPaymentStatus = PaymentStatus.Unpaid;
+
+        // -- Order items --
+        public ObservableCollection<OrderItemDetails> OrderItems => _orderStateService.OrderItems;
+
+        // -- Totals --
+        public decimal Subtotal => _orderStateService.Subtotal;
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(TotalAmount))]
+        [NotifyPropertyChangedFor(nameof(BalanceDue))]
+        private decimal _discount;
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(TotalAmount))]
+        [NotifyPropertyChangedFor(nameof(BalanceDue))]
+        private decimal _shippingFee;
+
+        public decimal TotalAmount => Subtotal - Discount + ShippingFee;
 
         // -- Notes --
         [ObservableProperty] private string? _notes;
@@ -97,6 +117,20 @@ namespace PosClient.Desktop.Features.Orders.Details
             _contentDialogService = contentDialogService;
             _createCustomerViewModel = createCustomerViewModel;
             _addOrderItemsViewModel = addOrderItemsViewModel;
+
+            _orderStateService.PropertyChanged += OnOrderStatePropertyChanged;
+        }
+
+        private void OnOrderStatePropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(IOrderStateService.Subtotal))
+            {
+                OnPropertyChanged(nameof(Subtotal));
+                // Also update TotalAmount since it depends on Subtotal
+                OnPropertyChanged(nameof(TotalAmount));
+                OnPropertyChanged(nameof(BalanceDue));
+                UpdatePaymentStatus();
+            }
         }
 
         public async Task OnNavigatedFromAsync()
@@ -243,6 +277,29 @@ namespace PosClient.Desktop.Features.Orders.Details
             await _contentDialogService.ShowAsync(dialog, CancellationToken.None);
         }
 
+        // -- Payment Status --
+        partial void OnPaidAmountChanged(decimal value)
+        {
+            UpdatePaymentStatus();
+        }
+
+        private void UpdatePaymentStatus()
+        {
+            if (PaidAmount <= 0)
+            {
+                SelectedPaymentStatus = PaymentStatus.Unpaid;
+            }
+            else if (PaidAmount >= TotalAmount)
+            {
+                SelectedPaymentStatus = PaymentStatus.Paid;
+            }
+            else
+            {
+                SelectedPaymentStatus = PaymentStatus.Partial;
+            }
+        }
+
+        // -- Order Items --
         [RelayCommand]
         private async Task OpenAddOrderItemsDialog()
         {
@@ -252,6 +309,13 @@ namespace PosClient.Desktop.Features.Orders.Details
             await _contentDialogService.ShowAsync(dialog,CancellationToken.None);
         }
 
+        [RelayCommand]
+        private void RemoveItem(OrderItemDetails item)
+        {
+            _orderStateService.RemoveItem(item);
+        }
+
+        // -- Go back --
         [RelayCommand]
         private void NavigateBack()
         {
