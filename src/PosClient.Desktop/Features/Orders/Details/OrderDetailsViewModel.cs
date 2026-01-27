@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.DirectoryServices;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -329,9 +328,70 @@ namespace PosClient.Desktop.Features.Orders.Details
         }
 
         [RelayCommand]
-        private void Save()
+        private async Task Save()
         {
+            if (SelectedCustomer == null)
+            {
+                _notificationService.ShowWarning("Please select a customer.", "Validation Failed");
+                return;
+            }
 
+            if (!OrderItems.Any())
+            {
+                _notificationService.ShowWarning("Please add at least one item to the order.", "Validation Failed");
+                return;
+            }
+
+            if (_orderStateService.IsCreatingNewOrder)
+            {
+                await CreateNewOrder();
+            }
+            else
+            {
+                // Placeholder for Update logic
+                _notificationService.ShowInformation("Update logic not implemented yet.", "Info");
+            }
+        }
+
+        private async Task CreateNewOrder()
+        {
+            var request = new CreateOrderRequest
+            {
+                CustomerId = SelectedCustomer!.Id, // Validated above
+
+                Items = OrderItems.Select(i => new CreateOrderItemDto
+                {
+                    ProductVariantId = i.VariantId,
+                    Quantity = i.Quantity,
+                    UnitPrice = i.Price
+                }).ToList(),
+
+                // Address Logic
+                DeliveryAddress = IsDeliverySameAsCustomer ? SelectedCustomer.Address : DeliveryAddress,
+                DeliveryCity = IsDeliverySameAsCustomer ? SelectedCustomer.City : DeliveryCity,
+                DeliveryPostalCode = IsDeliverySameAsCustomer ? SelectedCustomer.PostalCode : DeliveryPostalCode,
+                DeliveryCountry = IsDeliverySameAsCustomer ? SelectedCustomer.Country : DeliveryCountry,
+                DeliveryRegion = IsDeliverySameAsCustomer ? SelectedCustomer.Region : DeliveryRegion,
+
+                TrackingNumber = TrackingNumber,
+                // CourierId = ... (Map logic here when you have courier objects)
+
+                ShippingFee = ShippingFee,
+                Discount = Discount,
+                PaidAmount = PaidAmount,
+                Notes = Notes
+            };
+
+            var result = await _apiClient.PostAsync("api/orders", request);
+
+            if (result.IsSuccess)
+            {
+                _notificationService.ShowSuccess("Order created successfully!", "Success");
+
+                // Cleanup and Navigate
+                _orderStateService.ClearState();
+                _navigationService.Navigate(typeof(OrderListPage));
+            }
         }
     }
 }

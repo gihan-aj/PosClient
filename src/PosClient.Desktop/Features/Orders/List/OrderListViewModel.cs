@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using PosClient.Desktop.Features.Orders.Creator;
 using PosClient.Desktop.Features.Orders.Details;
 using PosClient.Desktop.Infrastructure.Network;
 using PosClient.Desktop.Shared;
@@ -196,7 +195,6 @@ namespace PosClient.Desktop.Features.Orders.List
         public void NavigateToCreate()
         {
             _orderStateService.SetOrderForCreation();
-            //_navigationService.Navigate(typeof(OrderCreatorPage));
             _navigationService.Navigate(typeof(OrderDetailsPage));
         }
 
@@ -204,7 +202,7 @@ namespace PosClient.Desktop.Features.Orders.List
         public void NavigateToDetails(OrderListItem order)
         {
             _orderStateService.SetOrderForView(order.Id);
-            _navigationService.Navigate(typeof(OrderDetailsPage)); // Future
+            _navigationService.Navigate(typeof(OrderDetailsPage));
         }
     }
 }

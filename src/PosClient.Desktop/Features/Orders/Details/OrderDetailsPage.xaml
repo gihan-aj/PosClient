@@ -542,7 +542,7 @@
                             <Grid Margin="0,2">
                                 <TextBlock Text="Discount"/>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                    <TextBlock Text="-" Foreground="#E04F5F" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                    <TextBlock Text="- Rs." Foreground="#E04F5F" VerticalAlignment="Center" Margin="0,0,5,0"/>
                                     <ui:NumberBox Value="{Binding Discount, UpdateSourceTrigger=PropertyChanged}" 
                                                   SmallChange="100" LargeChange="500"
                                                   SpinButtonPlacementMode="Compact"
@@ -552,7 +552,7 @@
                             <Grid Margin="0,2">
                                 <TextBlock Text="Shipping Fee"/>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                    <TextBlock Text="+" Foreground="{DynamicResource SystemAccentColorBrush}" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                    <TextBlock Text="+ Rs." Foreground="{DynamicResource SystemAccentColorBrush}" VerticalAlignment="Center" Margin="0,0,5,0"/>
                                     <ui:NumberBox Value="{Binding ShippingFee, UpdateSourceTrigger=PropertyChanged}" 
                                                   SmallChange="100" LargeChange="500"
                                                   SpinButtonPlacementMode="Compact"
