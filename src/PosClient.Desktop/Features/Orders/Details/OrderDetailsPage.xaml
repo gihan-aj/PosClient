@@ -40,7 +40,7 @@
                               VerticalAlignment="Center"/>
 
                 <!-- Status Badge (Header Context) -->
-                <Border CornerRadius="4" Padding="8,2" VerticalAlignment="Center" Margin="10,0,0,0">
+                <Border Visibility="{Binding IsCreatingNewOrder, Converter={StaticResource InverseBoolToVisConverter}}" CornerRadius="4" Padding="8,2" VerticalAlignment="Center" Margin="10,0,0,0">
                     <Border.Style>
                         <Style TargetType="Border">
                             <Setter Property="Background" Value="#15888888"/>
@@ -80,22 +80,33 @@
                            MinWidth="100" Margin="0,0,10,0"/>-->
                 <!-- Save Draft (Always visible for editable orders) -->
                 <ui:Button Content="Save Changes"
-                           Appearance="Secondary" Margin="0,0,10,0"
+                           Margin="0,0,0,0"
                            Icon="{ui:SymbolIcon Save24}"
                            Command="{Binding SaveCommand}"
-                           MinWidth="100"/>
+                           MinWidth="100">
+                    <ui:Button.Style>
+                        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                            <Setter Property="Appearance" Value="Secondary"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsCreatingNewOrder}" Value="True">
+                                    <Setter Property="Appearance" Value="Primary"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:Button.Style>
+                </ui:Button>
 
                 <!-- 1. Confirm (Visible if Pending) -->
                 <ui:Button Content="Confirm Order" 
                            Appearance="Primary" 
                            Icon="{ui:SymbolIcon Checkmark24}" 
                            Command="{Binding ConfirmOrderCommand}" 
-                           MinWidth="120">
+                           MinWidth="120" Margin="10,0,0,0">
                     <ui:Button.Style>
                         <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
                             <Setter Property="Visibility" Value="Collapsed"/>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding CurrentOrderStatus}" Value="Pending">
+                                <DataTrigger Binding="{Binding ShowConfirmationButton}" Value="True">
                                     <Setter Property="Visibility" Value="Visible"/>
                                 </DataTrigger>
                             </Style.Triggers>
@@ -108,7 +119,7 @@
                            Appearance="Primary" 
                            Icon="{ui:SymbolIcon ArrowRight24}" 
                            Command="{Binding StartProcessingCommand}" 
-                           MinWidth="120">
+                           MinWidth="120"  Margin="10,0,0,0">
                     <ui:Button.Style>
                         <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
                             <Setter Property="Visibility" Value="Collapsed"/>
@@ -126,7 +137,7 @@
                            Appearance="Primary" 
                            Icon="{ui:SymbolIcon VehicleTruckProfile24}" 
                            Command="{Binding ShipOrderCommand}" 
-                           MinWidth="120">
+                           MinWidth="120"  Margin="10,0,0,0">
                     <ui:Button.Style>
                         <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
                             <Setter Property="Visibility" Value="Collapsed"/>
@@ -276,6 +287,7 @@
                         <!-- Toggle -->
                         <CheckBox Content="Same as customer address" 
                                   IsChecked="{Binding IsDeliverySameAsCustomer, Mode=TwoWay}" 
+                                  Visibility="{Binding IsCreatingNewOrder, Converter={StaticResource BoolToVisConverter}}"
                                   Margin="0,0,0,5"/>
 
                         <!-- Conditional delivery form -->
@@ -465,8 +477,8 @@
                             </StackPanel>
 
                             <!-- Date -->
-                            <StackPanel Grid.Column="1">
-                                <ui:TextBlock Text="Order Date" Appearance="Secondary" Margin="0,0,0,4"/>
+                            <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                                <ui:TextBlock HorizontalAlignment="Right" Text="Order Date" Appearance="Secondary" Margin="0,0,0,4"/>
                                 <TextBlock Text="{Binding OrderDate, StringFormat='MMM dd, yyyy'}" FontWeight="SemiBold" FontSize="14"/>
                             </StackPanel>
                         </Grid>

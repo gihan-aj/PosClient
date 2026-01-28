@@ -18,6 +18,7 @@ namespace PosClient.Desktop.Shared
         void SetOrderForCreation();
         void ClearState();
 
+        void LoadOrderItems(IEnumerable<OrderItemDetails> items);
         void AddItem(OrderItemDetails item);
         void RemoveItem(OrderItemDetails item);
         bool HasItem(Guid variantId);

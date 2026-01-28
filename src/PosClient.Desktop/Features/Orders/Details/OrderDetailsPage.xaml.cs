@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PosClient.Desktop.Shared;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
@@ -17,15 +18,39 @@ namespace PosClient.Desktop.Features.Orders.Details
     /// <summary>
     /// Interaction logic for OrderDetailsPage.xaml
     /// </summary>
-    public partial class OrderDetailsPage : INavigableView<OrderDetailsViewModel>
+    public partial class OrderDetailsPage : INavigableView<OrderDetailsViewModel>, IConfirmNavigation
     {
-        public OrderDetailsPage(OrderDetailsViewModel viewModel)
+        private readonly IDialogService _dialogService;
+        public OrderDetailsPage(OrderDetailsViewModel viewModel, IDialogService dialogService)
         {
             ViewModel = viewModel;
             DataContext = viewModel;
             InitializeComponent();
+            _dialogService = dialogService;
         }
 
         public OrderDetailsViewModel ViewModel { get; }
+
+        public async Task<bool> CanNavigateAwayAsync()
+        {
+            if (!ViewModel.IsPageDirty)
+                return true;
+
+            var confirm = await _dialogService.ShowNavigationConfirmationAsync();
+
+            switch (confirm)
+            {
+                case Wpf.Ui.Controls.ContentDialogResult.Primary:
+                    await ViewModel.SaveCommand.ExecuteAsync(null);
+                    return true;
+
+                case Wpf.Ui.Controls.ContentDialogResult.Secondary:
+                    return true;
+
+                default:
+                    return false;
+
+            }
+        }
     }
 }

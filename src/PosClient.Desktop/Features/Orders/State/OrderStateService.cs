@@ -62,6 +62,15 @@ namespace PosClient.Desktop.Features.Orders.State
             OrderItems.Clear();
         }
 
+        public void LoadOrderItems(IEnumerable<OrderItemDetails> items)
+        {
+            OrderItems.Clear();
+            foreach (var item in items)
+            {
+                OrderItems.Add(item);
+            }
+        }
+
         public void AddItem(OrderItemDetails newItem)
         {
             var existing = OrderItems.FirstOrDefault(x => x.VariantId == newItem.VariantId);

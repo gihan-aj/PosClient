@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Text.Json;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -24,12 +25,22 @@ namespace PosClient.Desktop.Features.Orders.Details
         private CreateCustomerViewModel _createCustomerViewModel;
         private AddOrderItemsViewModel _addOrderItemsViewModel;
 
+        private string _originalSnapshotJson = string.Empty;
+
         [ObservableProperty] private string _pageTitle = "Order Details";
 
-        [ObservableProperty] private bool _isCreatingNewOrder = false;
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(ShowConfirmationButton))]
+        private bool _isCreatingNewOrder = false;
+
+        private bool IsOrderDetailsLoading = false;
 
         // -- Order Details --
-        [ObservableProperty] private OrderStatus _currentOrderStatus = OrderStatus.Pending;
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(ShowConfirmationButton))]
+        private OrderStatus _currentOrderStatus = OrderStatus.Pending;
+
+        public bool ShowConfirmationButton => !IsCreatingNewOrder && CurrentOrderStatus == OrderStatus.Pending;
 
         [ObservableProperty] private string _orderNumber = "[Not Created Yet]";
 
@@ -106,6 +117,17 @@ namespace PosClient.Desktop.Features.Orders.Details
         // -- Notes --
         [ObservableProperty] private string? _notes;
 
+        // For navigation confirmation
+        public bool IsPageDirty
+        {
+            get
+            {
+                var currentSnapshot = TakeSnapshot();
+                var currentJson = JsonSerializer.Serialize(currentSnapshot);
+                return !string.Equals(_originalSnapshotJson, currentJson, StringComparison.Ordinal);
+            }
+        }
+
         public OrderDetailsViewModel(
             IOrderStateService orderStateService,
             INavigationService navigationService,
@@ -154,6 +176,7 @@ namespace PosClient.Desktop.Features.Orders.Details
             else if (_orderStateService.SelectedOrderId.HasValue)
             {
                 PageTitle = "Order Details";
+                await LoadOrderDetails(_orderStateService.SelectedOrderId.Value);
             }
             else
             {
@@ -161,12 +184,16 @@ namespace PosClient.Desktop.Features.Orders.Details
             }
 
             LoadCouriersCommand.Execute(null);
+            _originalSnapshotJson = JsonSerializer.Serialize(TakeSnapshot());
         }
 
         // -- Customer --
         partial void OnCustomerSearchTextChanged(string value)
         {
             if (_isCustomerSelecting)
+                return;
+
+            if (IsOrderDetailsLoading)
                 return;
 
             if (string.IsNullOrEmpty(value))
@@ -198,7 +225,7 @@ namespace PosClient.Desktop.Features.Orders.Details
 
         partial void OnSelectedCustomerChanged(CustomerDetails? value)
         {
-            if (value != null)
+            if (value != null && !IsOrderDetailsLoading)
             {
                 _isCustomerSelecting = true; // Raise flag
                 CustomerSearchText = value.Name; // Update text
@@ -354,6 +381,46 @@ namespace PosClient.Desktop.Features.Orders.Details
             _navigationService.Navigate(typeof(OrderListPage));
         }
 
+        private async Task LoadOrderDetails(Guid orderId)
+        {
+            IsOrderDetailsLoading = true;
+
+            var url = $"api/orders/{orderId}";
+            var result = await _apiClient.GetAsync<OrderDetails>(url);
+            if (result.IsSuccess && result.Data != null)
+            {
+                var order = result.Data;
+                OrderNumber = order.OrderNumber;
+                OrderDate = order.OrderDate;
+                CurrentOrderStatus = order.Status;
+                // Load Customer
+                if (order.Customer != null)
+                {
+                    //CustomerSearchText = order.Customer.Name;
+                    SelectedCustomer = order.Customer;
+                }
+                // Load Couriers
+                CourierId = order.CourierId;
+                TrackingNumber = order.TrackingNumber;
+                // Load Delivery Address
+                IsDeliverySameAsCustomer = false;
+                DeliveryAddress = order.DeliveryAddress;
+                DeliveryCity = order.DeliveryCity;
+                DeliveryCountry = order.DeliveryCountry;
+                DeliveryPostalCode = order.DeliveryPostalCode;
+                DeliveryRegion = order.DeliveryRegion;
+                // Load Order Items
+                _orderStateService.LoadOrderItems(order.Items);
+                // Load Financials
+                ShippingFee = order.ShippingFee;
+                Discount = order.DiscountAmount;
+                PaidAmount = order.AmountPaid;
+                Notes = order.Notes;
+            }
+
+            IsOrderDetailsLoading = false;
+        }
+
         [RelayCommand]
         private async Task Save()
         {
@@ -419,6 +486,36 @@ namespace PosClient.Desktop.Features.Orders.Details
                 _orderStateService.ClearState();
                 _navigationService.Navigate(typeof(OrderListPage));
             }
+        }
+
+        private void UpdatePendingOrder()
+        {
+
+        }
+
+        private OrderDetails TakeSnapshot()
+        {
+            OrderDetails snapshot = new OrderDetails
+            {
+                OrderNumber = this.OrderNumber,
+                OrderDate = this.OrderDate,
+                Status = this.CurrentOrderStatus,
+                CustomerId = this.SelectedCustomer?.Id ?? Guid.Empty,
+                CourierId = this.CourierId,
+                DeliveryAddress = this.DeliveryAddress!,
+                DeliveryCity = this.DeliveryCity,
+                DeliveryCountry = this.DeliveryCountry,
+                DeliveryPostalCode = this.DeliveryPostalCode,
+                DeliveryRegion = this.DeliveryRegion,
+                TrackingNumber = this.TrackingNumber,
+                AmountPaid = this.PaidAmount,
+                Items = this.OrderItems.ToList(),
+                DiscountAmount = this.Discount,
+                ShippingFee = this.ShippingFee,
+                Notes = this.Notes
+            };
+
+            return snapshot;
         }
     }
 }
