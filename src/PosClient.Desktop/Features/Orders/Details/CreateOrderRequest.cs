@@ -1,4 +1,6 @@
-﻿namespace PosClient.Desktop.Features.Orders.Details
+﻿using PosClient.Desktop.Shared;
+
+namespace PosClient.Desktop.Features.Orders.Details
 {
     public class CreateOrderRequest
     {
@@ -14,14 +16,16 @@
 
         // Tracking (Optional for creation, but good to have)
         public string? TrackingNumber { get; set; }
-        public int CourierId { get; set; } // If you have courier IDs
+        public Guid? CourierId { get; set; } 
 
         // Financials
         public decimal ShippingFee { get; set; }
-        public decimal Discount { get; set; }
-        public decimal PaidAmount { get; set; } // Initial payment
+        public decimal TaxAmount { get; set; }
+        public decimal DiscountAmount { get; set; } // Initial payment
 
         public string? Notes { get; set; }
+
+        public List<CreateOrderPaymentDto> Payments { get; set; } = new();
     }
 
     public class CreateOrderItemDto
@@ -29,5 +33,14 @@
         public Guid ProductVariantId { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
+    }
+
+    public class CreateOrderPaymentDto
+    {
+        public decimal Amount { get; set; }
+        public DateTime PaymentDate { get; set; }
+        public PaymentMethod PaymentMethod { get; set; }
+        public string? TransactionId { get; set; }
+        public string? Notes { get; set; }
     }
 }

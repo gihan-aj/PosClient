@@ -2,6 +2,7 @@
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using PosClient.Desktop.Features.Orders.Details.Couriers;
 using PosClient.Desktop.Features.Orders.Details.Customer;
 using PosClient.Desktop.Features.Orders.Details.OrderItems;
 using PosClient.Desktop.Features.Orders.List;
@@ -52,6 +53,11 @@ namespace PosClient.Desktop.Features.Orders.Details
         private CancellationTokenSource? _customerSearchCts;
 
         private bool _isCustomerSelecting;
+
+        // -- Courier --
+        [ObservableProperty] private Guid? _courierId;
+
+        public ObservableCollection<CourierDetails> Couriers {  get; set; } = new();
 
         // -- Delivery
         [ObservableProperty] private bool _isDeliverySameAsCustomer = true;
@@ -118,6 +124,7 @@ namespace PosClient.Desktop.Features.Orders.Details
             _addOrderItemsViewModel = addOrderItemsViewModel;
 
             _orderStateService.PropertyChanged += OnOrderStatePropertyChanged;
+
         }
 
         private void OnOrderStatePropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -152,6 +159,8 @@ namespace PosClient.Desktop.Features.Orders.Details
             {
                 _navigationService.Navigate(typeof(OrderListPage));
             }
+
+            LoadCouriersCommand.Execute(null);
         }
 
         // -- Customer --
@@ -260,6 +269,7 @@ namespace PosClient.Desktop.Features.Orders.Details
             }
         }
 
+
         [RelayCommand]
         private async Task OpenNewCustomerDialog()
         {
@@ -274,6 +284,23 @@ namespace PosClient.Desktop.Features.Orders.Details
             var dialog = new CreateCustomerDialog(_createCustomerViewModel, presenter);
 
             await _contentDialogService.ShowAsync(dialog, CancellationToken.None);
+        }
+
+        // -- Couriers --
+        [RelayCommand]
+        private async Task LoadCouriers()
+        {
+            var queryString = QueryStringHelper.ToQueryString(new GetCouriersRequest());
+            var url = $"api/couriers/all{queryString}";
+
+            var result = await _apiClient.GetAsync<List<CourierDetails>>(url);
+            if(result.IsSuccess && result.Data != null)
+            {
+                foreach(var item in result.Data)
+                {
+                    Couriers.Add(item);
+                }
+            }
         }
 
         // -- Payment Status --
@@ -374,11 +401,11 @@ namespace PosClient.Desktop.Features.Orders.Details
                 DeliveryRegion = IsDeliverySameAsCustomer ? SelectedCustomer.Region : DeliveryRegion,
 
                 TrackingNumber = TrackingNumber,
-                // CourierId = ... (Map logic here when you have courier objects)
+                CourierId = CourierId,
 
                 ShippingFee = ShippingFee,
-                Discount = Discount,
-                PaidAmount = PaidAmount,
+                DiscountAmount = Discount,
+                //TaxAmount = TaxAmount,
                 Notes = Notes
             };
 

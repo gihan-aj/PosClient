@@ -329,11 +329,19 @@
                         <!-- Courier Service -->
                         <StackPanel Margin="0,0,0,10">
                             <Label Content="Courier Service"  Target="{Binding ElementName=CourierCombobox}" Padding="0,0,0,4"/>
-                            <ComboBox x:Name="CourierCombobox" 
+                            <!--<ComboBox x:Name="CourierCombobox" 
                                       SelectedIndex="{Binding SelectedCourierIndex}">
                                 <ComboBoxItem Content="Pick Up"/>
                                 <ComboBoxItem Content="Local Courier"/>
                                 <ComboBoxItem Content="DHL Express"/>
+                            </ComboBox>-->
+                            <ComboBox x:Name="CourierCombobox" 
+                                      ItemsSource="{Binding Couriers}"
+                                      DisplayMemberPath="Name" 
+                                      SelectedValuePath="Id"
+                                      SelectedValue="{Binding CourierId}"
+                                      ToolTip="Select the Courier"
+                                      Margin="0,0,10,0">
                             </ComboBox>
                         </StackPanel>
 
