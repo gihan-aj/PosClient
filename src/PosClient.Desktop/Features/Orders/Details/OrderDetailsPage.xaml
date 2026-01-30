@@ -185,7 +185,8 @@
                         </StackPanel>
                         
                         <!-- Customer search -->
-                        <customer:CustomerSearchControl Margin="0,0,0,10" />
+                        <customer:CustomerSearchControl Margin="0,0,0,10" 
+                                                        Visibility="{Binding IsCreatingNewOrder , Converter={StaticResource BoolToVisConverter}}" />
 
                         <!-- Selected Customer View -->
                         <Border Background="{DynamicResource ControlFillColorSecondaryBrush}" 
@@ -279,10 +280,54 @@
                         Padding="10" Margin="0,0,0,10">
                     <StackPanel>
                         <!-- Header -->
-                        <StackPanel Orientation="Horizontal" Margin="0,0,10,10">
-                            <ui:SymbolIcon Symbol="VehicleTruckProfile24" FontSize="20" Margin="0,0,10,0"/>
-                            <TextBlock Text="Delivery Details" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                        </StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,10,10">
+                                <ui:SymbolIcon Symbol="VehicleTruckProfile24" FontSize="20" Margin="0,0,10,0"/>
+                                <TextBlock Text="Delivery Details" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <!-- Edit Button: Visible when NOT creating AND NOT editing -->
+                                <ui:Button Icon="{ui:SymbolIcon Edit24}" Appearance="Transparent"
+                                           Command="{Binding EditDeliveryCommand}"
+                                           ToolTip="Edit Details">
+                                    <ui:Button.Style>
+                                        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding IsCreatingNewOrder}" Value="False"/>
+                                                        <Condition Binding="{Binding IsEditingDelivery}" Value="False"/>
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ui:Button.Style>
+                                </ui:Button>
+
+                                <!-- Save/Cancel Buttons: Visible ONLY when Editing -->
+                                <StackPanel Orientation="Horizontal"
+                                            Visibility="{Binding IsEditingDelivery, Converter={StaticResource BoolToVisConverter}}">
+
+                                    <ui:Button Icon="{ui:SymbolIcon Checkmark24}" Appearance="Primary" Margin="0,0,10,0"
+                                               Command="{Binding SaveDeliveryCommand}" 
+                                               ToolTip="Save Changes"/>
+
+                                    <ui:Button Icon="{ui:SymbolIcon Dismiss24}" Appearance="Secondary"
+                                               Command="{Binding CancelEditDeliveryCommand}" 
+                                               ToolTip="Cancel"/>
+                                </StackPanel>
+                            </StackPanel>
+
+                        </Grid>
+                        
 
                         <!-- Toggle -->
                         <CheckBox Content="Same as customer address" 
@@ -297,7 +342,8 @@
                             <StackPanel Margin="0,0,0,10">
                                 <Label Content="Address" Target="{Binding ElementName=DelAddressBox}" Padding="0,0,0,4"/>
                                 <ui:TextBox x:Name="DelAddressBox" PlaceholderText="123 Main Street" 
-                                            Text="{Binding DeliveryAddress, UpdateSourceTrigger=PropertyChanged}"/>
+                                            Text="{Binding DeliveryAddress, UpdateSourceTrigger=PropertyChanged}"
+                                            IsReadOnly="{Binding IsDeliveryReadOnly, Mode=OneWay}"/>
                             </StackPanel>
 
                             <Grid Margin="0,0,0,10">
@@ -309,12 +355,14 @@
                                 <StackPanel Grid.Column="0">
                                     <Label Content="City" Target="{Binding ElementName=DelCityBox}" Padding="0,0,0,4"/>
                                     <ui:TextBox x:Name="DelCityBox" PlaceholderText="Colombo" 
-                                                Text="{Binding DeliveryCity, UpdateSourceTrigger=PropertyChanged}"/>
+                                                Text="{Binding DeliveryCity, UpdateSourceTrigger=PropertyChanged}"
+                                                IsReadOnly="{Binding IsDeliveryReadOnly, Mode=OneWay}"/>
                                 </StackPanel>
                                 <StackPanel Grid.Column="2">
                                     <Label Content="Country" Target="{Binding ElementName=DelCountry}" Padding="0,0,0,4"/>
                                     <ui:TextBox x:Name="DelCountry" PlaceholderText="Sri Lanka" 
-                                                Text="{Binding DeliveryCountry, UpdateSourceTrigger=PropertyChanged}"/>
+                                                Text="{Binding DeliveryCountry, UpdateSourceTrigger=PropertyChanged}"
+                                                IsReadOnly="{Binding IsDeliveryReadOnly, Mode=OneWay}"/>
                                 </StackPanel>
                             </Grid>
 
@@ -327,12 +375,14 @@
                                 <StackPanel Grid.Column="0">
                                     <Label Content="Postal Code" Target="{Binding ElementName=DelPostal}" Padding="0,0,0,4"/>
                                     <ui:TextBox x:Name="DelPostal" PlaceholderText="76950" 
-                                                Text="{Binding DeliveryPostalCode, UpdateSourceTrigger=PropertyChanged}"/>
+                                                Text="{Binding DeliveryPostalCode, UpdateSourceTrigger=PropertyChanged}"
+                                                IsReadOnly="{Binding IsDeliveryReadOnly, Mode=OneWay}"/>
                                 </StackPanel>
                                 <StackPanel Grid.Column="2">
                                     <Label Content="Region" Target="{Binding ElementName=DelRegion}" Padding="0,0,0,4"/>
                                     <ui:TextBox x:Name="DelRegion" PlaceholderText="Western" 
-                                                Text="{Binding DeliveryRegion, UpdateSourceTrigger=PropertyChanged}"/>
+                                                Text="{Binding DeliveryRegion, UpdateSourceTrigger=PropertyChanged}"
+                                                IsReadOnly="{Binding IsDeliveryReadOnly, Mode=OneWay}"/>
                                 </StackPanel>
                             </Grid>
 
@@ -341,19 +391,13 @@
                         <!-- Courier Service -->
                         <StackPanel Margin="0,0,0,10">
                             <Label Content="Courier Service"  Target="{Binding ElementName=CourierCombobox}" Padding="0,0,0,4"/>
-                            <!--<ComboBox x:Name="CourierCombobox" 
-                                      SelectedIndex="{Binding SelectedCourierIndex}">
-                                <ComboBoxItem Content="Pick Up"/>
-                                <ComboBoxItem Content="Local Courier"/>
-                                <ComboBoxItem Content="DHL Express"/>
-                            </ComboBox>-->
                             <ComboBox x:Name="CourierCombobox" 
                                       ItemsSource="{Binding Couriers}"
                                       DisplayMemberPath="Name" 
                                       SelectedValuePath="Id"
                                       SelectedValue="{Binding CourierId}"
                                       ToolTip="Select the Courier"
-                                      Margin="0,0,10,0">
+                                      IsEnabled="{Binding IsDeliveryReadOnly, Mode=OneWay, Converter={StaticResource InvertedBoolConverter}}">
                             </ComboBox>
                         </StackPanel>
 
@@ -362,7 +406,8 @@
                             <Label Content="Tracking Number" Target="{Binding ElementName=TrackingNumber}" Padding="0,0,0,4"/>
                             <ui:TextBox x:Name="TrackingNumber" 
                                         PlaceholderText="e.g. TRK-990022"
-                                        Text="{Binding TrackingNumber, UpdateSourceTrigger=PropertyChanged}"/>
+                                        Text="{Binding TrackingNumber, UpdateSourceTrigger=PropertyChanged}"
+                                        IsReadOnly="{Binding IsDeliveryReadOnly, Mode=OneWay}"/>
                         </StackPanel>
 
 
@@ -604,7 +649,8 @@
                                     AcceptsReturn="True" 
                                     Height="80" 
                                     TextWrapping="Wrap"
-                                    Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}"/>
+                                    Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}"
+                                    IsReadOnly="{Binding IsDeliveryReadOnly, Mode=OneWay}"/>
                     </StackPanel>
                 </Border>
 

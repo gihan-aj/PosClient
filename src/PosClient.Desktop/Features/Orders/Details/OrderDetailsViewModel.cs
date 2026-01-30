@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Text.Json;
+using System.Threading.Tasks;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -21,6 +22,7 @@ namespace PosClient.Desktop.Features.Orders.Details
         private readonly INavigationService _navigationService;
         private readonly IApiClient _apiClient;
         private readonly INotificationService _notificationService;
+        private readonly IDialogService _dialogService;
         private readonly IContentDialogService _contentDialogService;
         private CreateCustomerViewModel _createCustomerViewModel;
         private AddOrderItemsViewModel _addOrderItemsViewModel;
@@ -128,6 +130,22 @@ namespace PosClient.Desktop.Features.Orders.Details
             }
         }
 
+        // -- Edit State Flags --
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsDeliveryReadOnly))]
+        private bool _isEditingDelivery;
+
+        public bool IsDeliveryReadOnly => !IsCreatingNewOrder && !IsEditingDelivery;
+
+        // Backup fields for reverse logic
+        private string? _originalDeliveryAddress;
+        private string? _originalDeliveryCity;
+        private string? _originalDeliveryRegion;
+        private string? _originalDeliveryCountry;
+        private string? _originalDeliveryPostalCode;
+        private Guid? _originalCourierId;
+        private string? _originalTrackingNumber;
+
         public OrderDetailsViewModel(
             IOrderStateService orderStateService,
             INavigationService navigationService,
@@ -135,18 +153,19 @@ namespace PosClient.Desktop.Features.Orders.Details
             INotificationService notificationService,
             IContentDialogService contentDialogService,
             CreateCustomerViewModel createCustomerViewModel,
-            AddOrderItemsViewModel addOrderItemsViewModel)
+            AddOrderItemsViewModel addOrderItemsViewModel,
+            IDialogService dialogService)
         {
             _orderStateService = orderStateService;
             _navigationService = navigationService;
             _apiClient = apiClient;
             _notificationService = notificationService;
+            _dialogService = dialogService;
             _contentDialogService = contentDialogService;
             _createCustomerViewModel = createCustomerViewModel;
             _addOrderItemsViewModel = addOrderItemsViewModel;
 
             _orderStateService.PropertyChanged += OnOrderStatePropertyChanged;
-
         }
 
         private void OnOrderStatePropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -184,7 +203,7 @@ namespace PosClient.Desktop.Features.Orders.Details
             }
 
             LoadCouriersCommand.Execute(null);
-            _originalSnapshotJson = JsonSerializer.Serialize(TakeSnapshot());
+            SaveSnapshotAsOriginal();
         }
 
         // -- Customer --
@@ -493,6 +512,11 @@ namespace PosClient.Desktop.Features.Orders.Details
 
         }
 
+        private void SaveSnapshotAsOriginal()
+        {
+            _originalSnapshotJson = JsonSerializer.Serialize(TakeSnapshot());
+        }
+
         private OrderDetails TakeSnapshot()
         {
             OrderDetails snapshot = new OrderDetails
@@ -516,6 +540,88 @@ namespace PosClient.Desktop.Features.Orders.Details
             };
 
             return snapshot;
+        }
+
+        // -- Edit Commands --
+        [RelayCommand]
+        private async Task EditDelivery()
+        {
+            var confirm = await _dialogService.ShowConfirmationAsync(
+                "Edit Delivery Details",
+                "Are you sure you want to edit the delivery details?",
+                "Yes, Edit",
+                "Cancel");
+
+            if (confirm)
+            {
+                // Backup current values
+                _originalDeliveryAddress = DeliveryAddress;
+                _originalDeliveryCity = DeliveryCity;
+                _originalDeliveryRegion = DeliveryRegion;
+                _originalDeliveryCountry = DeliveryCountry;
+                _originalDeliveryPostalCode = DeliveryPostalCode;
+                _originalCourierId = CourierId;
+                _originalTrackingNumber = TrackingNumber;
+
+                IsEditingDelivery = true;
+            }
+        }
+
+        [RelayCommand]
+        private void CancelEditDelivery()
+        {
+            // Revert values
+            DeliveryAddress = _originalDeliveryAddress;
+            DeliveryCity = _originalDeliveryCity;
+            DeliveryRegion = _originalDeliveryRegion;
+            DeliveryCountry = _originalDeliveryCountry;
+            DeliveryPostalCode = _originalDeliveryPostalCode;
+            CourierId = _originalCourierId;
+            TrackingNumber = _originalTrackingNumber;
+
+            IsEditingDelivery = false;
+        }
+
+        [RelayCommand]
+        private async Task SaveDelivery()
+        {
+            if (!_orderStateService.SelectedOrderId.HasValue)
+                return;
+
+            if (string.IsNullOrWhiteSpace(DeliveryAddress))
+            {
+                _notificationService.ShowError("Delivery address cannot be empty.", "Validation Error!");
+                return;
+            }
+
+            if(CourierId == null || CourierId == Guid.Empty)
+            {
+                _notificationService.ShowError("Please select a courier.", "Validation Error!");
+                return;
+            }
+
+            var orderId = _orderStateService.SelectedOrderId.Value;
+
+            var request = new UpdateOrderDeliveryRequest
+            {
+                Id = orderId,
+                CourierId = CourierId,
+                DeliveryAddress = DeliveryAddress ?? "",
+                DeliveryCity = DeliveryCity,
+                DeliveryRegion = DeliveryRegion,
+                DeliveryCountry = DeliveryCountry,
+                DeliveryPostalCode = DeliveryPostalCode,
+                TrackingNumber = TrackingNumber,
+                Notes = Notes
+            };
+
+            var result = await _apiClient.PutAsync($"api/orders/{orderId}", request);
+            if (result.IsSuccess)
+            {
+                _notificationService.ShowSuccess("Delivery details updated.");
+                IsEditingDelivery = false;
+                SaveSnapshotAsOriginal();
+            }
         }
     }
 }
