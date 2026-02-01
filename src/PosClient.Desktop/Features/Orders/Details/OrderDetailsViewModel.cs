@@ -416,13 +416,22 @@ namespace PosClient.Desktop.Features.Orders.Details
         }
 
         [RelayCommand]
-        private void EditItemQuantity(OrderItemDetails orderItem)
+        private async Task EditItemQuantity(OrderItemDetails orderItem)
         {
             if (IsCreatingNewOrder)
                 return;
 
-            orderItem.OriginalQuantity = orderItem.Quantity;
-            orderItem.IsEditing = true;
+            var confirm = await _dialogService.ShowConfirmationAsync(
+                "Edit Item Quantity",
+                $"Are you sure you want to edit the quantity for '{orderItem.ProductName}'?",
+                "Yes, Edit",
+                "Cancel");
+
+            if (confirm)
+            {
+                orderItem.OriginalQuantity = orderItem.Quantity;
+                orderItem.IsEditing = true;
+            }     
         }
 
         [RelayCommand]

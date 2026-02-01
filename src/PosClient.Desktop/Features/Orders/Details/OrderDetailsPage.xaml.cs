@@ -52,5 +52,17 @@ namespace PosClient.Desktop.Features.Orders.Details
 
             }
         }
+
+        private void NumberBox_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if((bool)e.NewValue && sender is Control control)
+            {
+                // Use Dispatcher to ensure the visual state has updated before forcing focus
+                control.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    control.Focus();
+                }));
+            }
+        }
     }
 }

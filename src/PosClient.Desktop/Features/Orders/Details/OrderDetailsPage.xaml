@@ -78,18 +78,36 @@
                            Appearance="Secondary"
                            Command="{Binding CancelCommand}"
                            MinWidth="100" Margin="0,0,10,0"/>-->
-                <!-- Save Draft (Always visible for editable orders) -->
+                <!-- Cancel -->
+                <ui:Button Content="Cancel Order"
+                           Appearance="Danger" Margin="0,0,0,0"
+                           Icon="{ui:SymbolIcon Dismiss24}"
+                           Command="{Binding CancelOrderCommand}"
+                           MinWidth="100">
+                    <ui:Button.Style>
+                        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                            <Setter Property="Visibility" Value="Visible"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsCreatingNewOrder}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:Button.Style>
+                </ui:Button>
+                
+                <!-- Save Draft -->
                 <ui:Button Content="Save Changes"
-                           Margin="0,0,0,0"
+                           Appearance="Primary" Margin="0,0,0,0"
                            Icon="{ui:SymbolIcon Save24}"
                            Command="{Binding SaveCommand}"
                            MinWidth="100">
                     <ui:Button.Style>
                         <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
-                            <Setter Property="Appearance" Value="Secondary"/>
+                            <Setter Property="Visibility" Value="Collapsed"/>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsCreatingNewOrder}" Value="True">
-                                    <Setter Property="Appearance" Value="Primary"/>
+                                    <Setter Property="Visibility" Value="Visible"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -583,7 +601,8 @@
                                                               Minimum="1" SmallChange="1"
                                                               SpinButtonPlacementMode="Compact"
                                                               ClearButtonEnabled="False"
-                                                              MinWidth="80" Width="Auto" Margin="0,0,10,0">
+                                                              MinWidth="80" Width="Auto" Margin="0,0,10,0"
+                                                              IsEnabledChanged="NumberBox_IsEnabledChanged">
                                                     <ui:NumberBox.Style>
                                                         <Style TargetType="ui:NumberBox" BasedOn="{StaticResource {x:Type ui:NumberBox}}">
                                                             <Setter Property="IsEnabled" Value="False"/>
@@ -597,6 +616,7 @@
                                                             </Style.Triggers>
                                                         </Style>
                                                     </ui:NumberBox.Style>
+
                                                 </ui:NumberBox>
 
                                                 <StackPanel Orientation="Horizontal" 
