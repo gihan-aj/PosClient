@@ -34,6 +34,7 @@ namespace PosClient.Desktop.Features.Orders.Details
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(ShowConfirmationButton))]
         [NotifyPropertyChangedFor(nameof(IsDeliveryReadOnly))]
+        [NotifyPropertyChangedFor(nameof(IsFinancialsReadOnly))]
         private bool _isCreatingNewOrder = false;
 
         private bool IsOrderDetailsLoading = false;
@@ -115,7 +116,12 @@ namespace PosClient.Desktop.Features.Orders.Details
         [NotifyPropertyChangedFor(nameof(BalanceDue))]
         private decimal _shippingFee;
 
-        public decimal TotalAmount => Subtotal - Discount + ShippingFee;
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(TotalAmount))]
+        [NotifyPropertyChangedFor(nameof(BalanceDue))]
+        private decimal _tax;
+
+        public decimal TotalAmount => Subtotal - Discount + ShippingFee + Tax;
 
         // -- Notes --
         [ObservableProperty] private string? _notes;
@@ -150,6 +156,17 @@ namespace PosClient.Desktop.Features.Orders.Details
         // -- Edit State Flags - Add items --
         private bool _isInternalItemCollectionUpdate;
         private bool _isAddingNewItemToExistsingOrder = false;
+
+        // -- Edit State Flags - Financial details --
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsFinancialsReadOnly))]
+        private bool _isEditingFinancials;
+
+        public bool IsFinancialsReadOnly => !IsCreatingNewOrder &&  !IsEditingFinancials;
+
+        private decimal _originalShippingFee;
+        private decimal _originalDiscount;
+        private decimal _originalTax;
 
         public OrderDetailsViewModel(
             IOrderStateService orderStateService,
@@ -524,6 +541,59 @@ namespace PosClient.Desktop.Features.Orders.Details
             }
 
             return false;
+        }
+
+        // -- Financial details --
+        [RelayCommand]
+        private async Task EditFinancials()
+        {
+            var confirm = await _dialogService.ShowConfirmationAsync(
+                "Edit Financial Details",
+                "Are you sure you want to edit the financial details?",
+                "Yes, Edit",
+                "Cancel");
+
+            if(confirm)
+            {
+                _originalShippingFee = ShippingFee;
+                _originalDiscount = Discount;
+                _originalTax = Tax;
+                IsEditingFinancials = true;
+            }          
+        }
+
+        [RelayCommand]
+        private void CancelEditFinancials()
+        {
+            ShippingFee = _originalShippingFee;
+            Discount = _originalDiscount;
+            Tax = _originalTax;
+            IsEditingFinancials = false;
+        }
+
+        [RelayCommand]
+        private async Task SaveFinancials()
+        {
+            if (!_orderStateService.SelectedOrderId.HasValue) 
+                return;
+
+            var url = $"api/orders/{_orderStateService.SelectedOrderId.Value}/financials";
+            var payload = new
+            {
+                OrderId = _orderStateService.SelectedOrderId.Value,
+                ShippingFee = ShippingFee,
+                DiscountAmount = Discount,
+                TaxAmount = Tax
+            };
+
+            var result = await _apiClient.PutAsync(url, payload);
+
+            if (result.IsSuccess)
+            {
+                _notificationService.ShowSuccess("Financials updated", "Success");
+                IsEditingFinancials = false;
+                SaveSnapshotAsOriginal();
+            }
         }
 
         // -- Go back --

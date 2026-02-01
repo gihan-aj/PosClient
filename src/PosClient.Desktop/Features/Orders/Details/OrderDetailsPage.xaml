@@ -334,7 +334,7 @@
                                 <StackPanel Orientation="Horizontal"
                                             Visibility="{Binding IsEditingDelivery, Converter={StaticResource BoolToVisConverter}}">
 
-                                    <ui:Button Icon="{ui:SymbolIcon Checkmark24}" Appearance="Primary" Margin="0,0,10,0"
+                                    <ui:Button Icon="{ui:SymbolIcon Checkmark24}" Appearance="Success" Margin="0,0,10,0"
                                                Command="{Binding SaveDeliveryCommand}" 
                                                ToolTip="Save Changes"/>
 
@@ -669,35 +669,168 @@
 
                         <!-- Financial Totals -->
                         <StackPanel Grid.Row="2" HorizontalAlignment="Right" Width="250" Margin="0,16,0,0">
+
+                            <!-- Financials Edit Header -->
+                            <Grid Margin="0,0,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Edit Button (View Mode) -->
+                                <ui:Button Grid.Column="1"
+                                           Icon="{ui:SymbolIcon Edit24}" 
+                                           Appearance="Transparent"
+                                           ToolTip="Edit Financials"
+                                           Command="{Binding EditFinancialsCommand}"
+                                           HorizontalAlignment="Right">
+                                    <ui:Button.Style>
+                                        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding IsCreatingNewOrder}" Value="False"/>
+                                                        <Condition Binding="{Binding IsEditingFinancials}" Value="False"/>
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ui:Button.Style>
+                                </ui:Button>
+
+                                <!-- Save/Cancel Buttons (Edit Mode) -->
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right"
+                                            Visibility="{Binding IsEditingFinancials, Converter={StaticResource BoolToVisConverter}}">
+                                    <ui:Button Icon="{ui:SymbolIcon Checkmark24}" Appearance="Success" Padding="6,4" Margin="0,0,5,0"
+                                               Command="{Binding SaveFinancialsCommand}" ToolTip="Save"/>
+                                    <ui:Button Icon="{ui:SymbolIcon Dismiss24}" Appearance="Secondary" Padding="6,4"
+                                               Command="{Binding CancelEditFinancialsCommand}" ToolTip="Cancel"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Subtotal -->
                             <Grid Margin="0,2">
                                 <TextBlock Text="Subtotal"/>
                                 <TextBlock Text="{Binding Subtotal, StringFormat='Rs. {0:N2}'}" HorizontalAlignment="Right"/>
                             </Grid>
+                            
+                            <!-- Discount -->
                             <Grid Margin="0,2">
-                                <TextBlock Text="Discount"/>
+                                <TextBlock Text="Discount" VerticalAlignment="Center"/>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                    
                                     <TextBlock Text="- Rs." Foreground="#E04F5F" VerticalAlignment="Center" Margin="0,0,5,0"/>
+
+                                    <!-- Read Only Text -->
+                                    <TextBlock Text="{Binding Discount, StringFormat='N2'}" 
+                                               VerticalAlignment="Center" 
+                                               HorizontalAlignment="Right"
+                                               FontWeight="SemiBold">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding IsCreatingNewOrder}" Value="False"/>
+                                                            <Condition Binding="{Binding IsEditingFinancials}" Value="False"/>
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </MultiDataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+
+                                    <!-- Editable Box -->
                                     <ui:NumberBox Value="{Binding Discount, UpdateSourceTrigger=PropertyChanged}" 
                                                   SmallChange="100" LargeChange="500"
                                                   SpinButtonPlacementMode="Compact"
-                                                  Width="80"/>
+                                                  Width="90">
+                                        <ui:NumberBox.Style>
+                                            <Style TargetType="ui:NumberBox" BasedOn="{StaticResource {x:Type ui:NumberBox}}">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                                <Style.Triggers>
+                                                    <!-- Hide if ReadOnly Mode (Not Creating AND Not Editing) -->
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding IsCreatingNewOrder}" Value="False"/>
+                                                            <Condition Binding="{Binding IsEditingFinancials}" Value="False"/>
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </MultiDataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ui:NumberBox.Style>
+                                    </ui:NumberBox>
+                                    
                                 </StackPanel>
                             </Grid>
+                            
+                            <!-- Shipping Fee -->
                             <Grid Margin="0,2">
+                                
                                 <TextBlock Text="Shipping Fee"/>
+                                
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                    
                                     <TextBlock Text="+ Rs." Foreground="{DynamicResource SystemAccentColorBrush}" VerticalAlignment="Center" Margin="0,0,5,0"/>
+
+                                    <!-- Read Only Text -->
+                                    <TextBlock Text="{Binding ShippingFee, StringFormat='N2'}" 
+                                               VerticalAlignment="Center" 
+                                               HorizontalAlignment="Right"
+                                               FontWeight="SemiBold">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding IsCreatingNewOrder}" Value="False"/>
+                                                            <Condition Binding="{Binding IsEditingFinancials}" Value="False"/>
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </MultiDataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+
+                                    <!-- Editable Box -->
                                     <ui:NumberBox Value="{Binding ShippingFee, UpdateSourceTrigger=PropertyChanged}" 
                                                   SmallChange="100" LargeChange="500"
                                                   SpinButtonPlacementMode="Compact"
-                                                  Width="80"/>
+                                                  Width="90">
+                                        <ui:NumberBox.Style>
+                                            <Style TargetType="ui:NumberBox" BasedOn="{StaticResource {x:Type ui:NumberBox}}">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                                <Style.Triggers>
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding IsCreatingNewOrder}" Value="False"/>
+                                                            <Condition Binding="{Binding IsEditingFinancials}" Value="False"/>
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </MultiDataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ui:NumberBox.Style>
+                                    </ui:NumberBox>
+                                    
                                 </StackPanel>
+                                
                             </Grid>
+                            
                             <Separator Margin="0,8"/>
+                            
                             <Grid>
                                 <TextBlock Text="Total" FontWeight="Bold" FontSize="18"/>
                                 <TextBlock Text="{Binding TotalAmount, StringFormat='Rs. {0:N2}'}" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18" Foreground="{DynamicResource SystemAccentColorBrush}"/>
                             </Grid>
+                            
                         </StackPanel>
 
                     </Grid>
