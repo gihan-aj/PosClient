@@ -568,24 +568,73 @@
                                   CanUserAddRows="False"
                                   HeadersVisibility="Column"
                                   BorderThickness="1"
+                                  HorizontalScrollBarVisibility="Auto"
                                   BorderBrush="{DynamicResource ControlElevationBorderBrush}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Product" Width="*" Binding="{Binding ProductName}"/>
                                 <DataGridTextColumn Header="Variant" MinWidth="120" Width="Auto" Binding="{Binding Variant}"/>
                                 <DataGridTextColumn Header="Price" MinWidth="100" Width="Auto" Binding="{Binding Price, StringFormat='Rs. {0:N2}'}"/>
 
-                                <DataGridTemplateColumn Header="Qty" MinWidth="120" Width="Auto">
+                                <DataGridTemplateColumn Header="Qty" Width="160">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <ui:NumberBox Value="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}" 
-                                                          Minimum="1" SmallChange="1"/>
+                                            <StackPanel Orientation="Horizontal">
+                                                <ui:NumberBox Value="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}" 
+                                                              Minimum="1" SmallChange="1"
+                                                              SpinButtonPlacementMode="Compact"
+                                                              ClearButtonEnabled="False"
+                                                              MinWidth="80" Width="Auto" Margin="0,0,10,0">
+                                                    <ui:NumberBox.Style>
+                                                        <Style TargetType="ui:NumberBox" BasedOn="{StaticResource {x:Type ui:NumberBox}}">
+                                                            <Setter Property="IsEnabled" Value="False"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding DataContext.IsCreatingNewOrder, RelativeSource={RelativeSource AncestorType=DataGrid}}" Value="True">
+                                                                    <Setter Property="IsEnabled" Value="True"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                                                                    <Setter Property="IsEnabled" Value="True"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </ui:NumberBox.Style>
+                                                </ui:NumberBox>
+
+                                                <StackPanel Orientation="Horizontal" 
+                                                            Visibility="{Binding DataContext.IsCreatingNewOrder, RelativeSource={RelativeSource AncestorType=DataGrid}, Converter={StaticResource InverseBoolToVisConverter}}">
+
+                                                    <!-- Edit Button -->
+                                                    <ui:Button Icon="{ui:SymbolIcon Edit24}" 
+                                                               Appearance="Transparent"
+                                                               ToolTip="Change Quantity"
+                                                               Command="{Binding DataContext.EditItemQuantityCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                               CommandParameter="{Binding}"
+                                                               Visibility="{Binding IsEditing, Converter={StaticResource InverseBoolToVisConverter}}"/>
+
+                                                    <!-- Save/Cancel Buttons -->
+                                                    <StackPanel Orientation="Horizontal" 
+                                                                Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisConverter}}">
+                                                        <ui:Button Icon="{ui:SymbolIcon Checkmark24}" 
+                                                                   Appearance="Success"
+                                                                   ToolTip="Save"
+                                                                   Command="{Binding DataContext.SaveItemQuantityCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                                   CommandParameter="{Binding}"
+                                                                   Padding="4" Margin="0,0,5,0"/>
+                                                        <ui:Button Icon="{ui:SymbolIcon Dismiss24}" 
+                                                                   Appearance="Secondary"
+                                                                   ToolTip="Cancel"
+                                                                   Command="{Binding DataContext.CancelEditItemCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                                   CommandParameter="{Binding}"
+                                                                   Padding="4"/>
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </StackPanel>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <DataGridTextColumn Header="Total" Width="100" Binding="{Binding Total, StringFormat='Rs. {0:N2}'}"/>
+                                <DataGridTextColumn Header="Total" Width="120" Binding="{Binding Total, StringFormat='Rs. {0:N2}'}"/>
 
-                                <DataGridTemplateColumn Width="70">
+                                <DataGridTemplateColumn Width="50">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <ui:Button Icon="{ui:SymbolIcon Delete24}" Appearance="Transparent"

@@ -33,6 +33,7 @@ namespace PosClient.Desktop.Features.Orders.Details
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(ShowConfirmationButton))]
+        [NotifyPropertyChangedFor(nameof(IsDeliveryReadOnly))]
         private bool _isCreatingNewOrder = false;
 
         private bool IsOrderDetailsLoading = false;
@@ -130,7 +131,7 @@ namespace PosClient.Desktop.Features.Orders.Details
             }
         }
 
-        // -- Edit State Flags --
+        // -- Edit State Flags - Delivery Details --
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IsDeliveryReadOnly))]
         private bool _isEditingDelivery;
@@ -145,6 +146,10 @@ namespace PosClient.Desktop.Features.Orders.Details
         private string? _originalDeliveryPostalCode;
         private Guid? _originalCourierId;
         private string? _originalTrackingNumber;
+
+        // -- Edit State Flags - Add items --
+        private bool _isInternalItemCollectionUpdate;
+        private bool _isAddingNewItemToExistsingOrder = false;
 
         public OrderDetailsViewModel(
             IOrderStateService orderStateService,
@@ -166,6 +171,29 @@ namespace PosClient.Desktop.Features.Orders.Details
             _addOrderItemsViewModel = addOrderItemsViewModel;
 
             _orderStateService.PropertyChanged += OnOrderStatePropertyChanged;
+
+            _orderStateService.OrderItems.CollectionChanged += OnOrderItemCollectionChanged;
+        }
+
+        private async void OnOrderItemCollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (IsCreatingNewOrder || _isInternalItemCollectionUpdate || !_isAddingNewItemToExistsingOrder)
+                return;
+
+            if(e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add && e.NewItems != null)
+            {
+                foreach (OrderItemDetails newItem in e.NewItems)
+                {
+                    bool success = await SaveNewOrderItemToBackend(newItem);
+                    if (!success)
+                    {
+                        // Rollback on failure
+                        _isInternalItemCollectionUpdate = true;
+                        _orderStateService.RemoveItem(newItem);
+                        _isInternalItemCollectionUpdate = false;
+                    }
+                }
+            }
         }
 
         private void OnOrderStatePropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -376,15 +404,117 @@ namespace PosClient.Desktop.Features.Orders.Details
         private async Task OpenAddOrderItemsDialog()
         {
             var presenter = _contentDialogService.GetDialogHost();
-            var dialog = new AddOrderItemsDialog(_addOrderItemsViewModel, presenter);
+            var vm = new AddOrderItemsViewModel(_apiClient, _orderStateService, _notificationService);
+            var dialog = new AddOrderItemsDialog(vm, presenter);
+
+            if (!IsCreatingNewOrder)
+                _isAddingNewItemToExistsingOrder = true;
 
             await _contentDialogService.ShowAsync(dialog,CancellationToken.None);
+
+            _isAddingNewItemToExistsingOrder = false;
         }
 
         [RelayCommand]
-        private void RemoveItem(OrderItemDetails item)
+        private void EditItemQuantity(OrderItemDetails orderItem)
         {
-            _orderStateService.RemoveItem(item);
+            if (IsCreatingNewOrder)
+                return;
+
+            orderItem.OriginalQuantity = orderItem.Quantity;
+            orderItem.IsEditing = true;
+        }
+
+        [RelayCommand]
+        private void CancelEditItem(OrderItemDetails orderItem)
+        {
+            orderItem.Quantity = orderItem.OriginalQuantity;
+            orderItem.IsEditing = false;
+        }
+
+        [RelayCommand]
+        private async Task SaveItemQuantity(OrderItemDetails orderItem)
+        {
+            if (IsCreatingNewOrder)
+                return;
+
+            if (!_orderStateService.SelectedOrderId.HasValue)
+                return;
+
+            var url = $"api/orders/{_orderStateService.SelectedOrderId.Value}/items/{orderItem.Id}/quantity";
+            var payload = new 
+            { 
+                OrderId = _orderStateService.SelectedOrderId.Value,
+                OrderItemId = orderItem.Id,
+                Quantity = orderItem.Quantity 
+            };
+
+            var result = await _apiClient.PutAsync(url, payload); // Assuming Put/Patch
+
+            if (result.IsSuccess)
+            {
+                orderItem.IsEditing = false;
+                SaveSnapshotAsOriginal();
+
+                _notificationService.ShowSuccess("Quantity updated", "Success");
+            }
+        }
+
+        [RelayCommand]
+        private async Task RemoveItem(OrderItemDetails item)
+        {
+            if(IsCreatingNewOrder)
+            {
+                _orderStateService.RemoveItem(item);
+                return;
+            }
+
+            var confirm = await _dialogService.ShowConfirmationAsync(
+                "Remove Item",
+                $"Are you sure you want to remove '{item.ProductName}' from the order?",
+                "Yes, Remove",
+                "Cancel");
+
+            if (confirm)
+            {
+                var url = $"api/orders/{_orderStateService.SelectedOrderId}/items/{item.Id}";
+                var result = await _apiClient.DeleteAsync(url);
+
+                if (result.IsSuccess)
+                {
+                    _orderStateService.RemoveItem(item); // Update UI list
+                    item.IsEditing = false;
+                    SaveSnapshotAsOriginal();
+                    _notificationService.ShowSuccess("Item removed");
+                }
+            }
+        }
+
+        private async Task<bool> SaveNewOrderItemToBackend(OrderItemDetails item)
+        {
+            var orderId = _orderStateService.SelectedOrderId;
+            if (!orderId.HasValue) 
+                return false;
+
+            var url = $"api/orders/{orderId}/items";
+            var payload = new
+            {
+                OrderId = orderId.Value,
+                ProductVariantId = item.VariantId,
+                Quantity = item.Quantity
+            };
+
+            var result = await _apiClient.PostAsync(url, payload);
+
+            if (result.IsSuccess)
+            {
+                SaveSnapshotAsOriginal();
+
+                _notificationService.ShowSuccess("Item added to order");
+                return true;
+            }
+
+            return false;
         }
 
         // -- Go back --
@@ -615,13 +745,19 @@ namespace PosClient.Desktop.Features.Orders.Details
                 Notes = Notes
             };
 
-            var result = await _apiClient.PutAsync($"api/orders/{orderId}", request);
+            var result = await _apiClient.PutAsync($"api/orders/{orderId}/delivery", request);
             if (result.IsSuccess)
             {
                 _notificationService.ShowSuccess("Delivery details updated.");
                 IsEditingDelivery = false;
                 SaveSnapshotAsOriginal();
             }
+        }
+
+        public void Dispose()
+        {
+            _orderStateService.PropertyChanged -= OnOrderStatePropertyChanged;
+            _orderStateService.OrderItems.CollectionChanged -= OnOrderItemCollectionChanged;
         }
     }
 }
