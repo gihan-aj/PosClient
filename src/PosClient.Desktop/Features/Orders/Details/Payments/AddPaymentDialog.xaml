@@ -1,0 +1,93 @@
+﻿<ui:ContentDialog x:Class="PosClient.Desktop.Features.Orders.Details.Payments.AddPaymentDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:local="clr-namespace:PosClient.Desktop.Features.Orders.Details.Payments"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance Type=local:AddPaymentViewModel}"
+             Title="Add Payment"
+             CloseButtonText="Cancel"
+             >
+    <Grid Width="400">
+
+        <StackPanel >
+
+            <!-- Amount -->
+            <StackPanel Margin="0,0,0,10">
+                <Label Content="Amount *" Target="{Binding ElementName=AmountBox}"/>
+                <ui:NumberBox x:Name="AmountBox"
+                              Value="{Binding Amount, UpdateSourceTrigger=PropertyChanged}"
+                              Minimum="0"
+                              PlaceholderText="0.00"
+                              SpinButtonPlacementMode="Compact"/>
+            </StackPanel>
+
+            <!-- Method & Date -->
+            <Grid Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <Label Content="Method *" Target="{Binding ElementName=MethodCombo}"/>
+                    <ComboBox x:Name="MethodCombo"
+                              ItemsSource="{Binding PaymentMethods}"
+                              SelectedItem="{Binding SelectedPaymentMethod}"
+                              HorizontalAlignment="Stretch"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2">
+                    <Label Content="Date *" Target="{Binding ElementName=DatePick}"/>
+
+                    <DatePicker x:Name="DatePick" SelectedDate="{Binding PaymentDate}"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Transaction ID -->
+            <StackPanel Margin="0,0,0,10">
+                <Label Content="Transaction ID" Target="{Binding ElementName=TransIdBox}"/>
+                <ui:TextBox x:Name="TransIdBox" 
+                            Text="{Binding TransactionId, UpdateSourceTrigger=PropertyChanged}"
+                            PlaceholderText="e.g. Bank Ref #"/>
+            </StackPanel>
+
+            <!-- Notes -->
+            <StackPanel Margin="0,0,0,10">
+                <Label Content="Notes" Target="{Binding ElementName=NotesBox}"/>
+                <ui:TextBox x:Name="NotesBox" 
+                            Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}"
+                            PlaceholderText="Optional notes..."
+                            Height="60" AcceptsReturn="True" TextWrapping="Wrap"/>
+            </StackPanel>
+
+            <ui:Button Command="{Binding SaveCommand}" 
+                       Content="Add Payment" 
+                       Appearance="Primary" 
+                       HorizontalAlignment="Stretch" 
+                       Margin="0,10,0,0"/>
+
+            <!-- Loading -->
+            <!--<ui:ProgressRing IsIndeterminate="True" 
+                             Visibility="{Binding IsSaving, Converter={StaticResource BooleanToVisibilityConverter}}"
+                             HorizontalAlignment="Center" Height="20" Width="20"/>-->      
+
+        </StackPanel>
+        <!-- Loading Overlay (Sits on top of the StackPanel) -->
+        <Grid Visibility="{Binding IsSaving, Converter={StaticResource BoolToVisConverter}}"
+              Background="{DynamicResource ApplicationBackgroundBrush}"
+              Opacity="0.8"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch">
+            <StackPanel Orientation="Horizontal" 
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                <ui:ProgressRing IsIndeterminate="True" Width="20" Height="20" Margin="0,0,10,0"/>
+                <TextBlock Text="Saving..." VerticalAlignment="Center"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</ui:ContentDialog>

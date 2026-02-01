@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.Input;
 using PosClient.Desktop.Features.Orders.Details.Couriers;
 using PosClient.Desktop.Features.Orders.Details.Customer;
 using PosClient.Desktop.Features.Orders.Details.OrderItems;
+using PosClient.Desktop.Features.Orders.Details.Payments;
 using PosClient.Desktop.Features.Orders.List;
 using PosClient.Desktop.Infrastructure.Network;
 using PosClient.Desktop.Shared;
@@ -99,6 +100,8 @@ namespace PosClient.Desktop.Features.Orders.Details
         public decimal BalanceDue => TotalAmount - PaidAmount;
 
         [ObservableProperty] private PaymentStatus _selectedPaymentStatus = PaymentStatus.Unpaid;
+
+        public ObservableCollection<PaymentDetails> PaymentHistory { get; set; } = new();
 
         // -- Order items --
         public ObservableCollection<OrderItemDetails> OrderItems => _orderStateService.OrderItems;
@@ -644,6 +647,12 @@ namespace PosClient.Desktop.Features.Orders.Details
                 Discount = order.DiscountAmount;
                 PaidAmount = order.AmountPaid;
                 Notes = order.Notes;
+
+                PaymentHistory.Clear();
+                foreach(var payment in order.Payments)
+                {
+                    PaymentHistory.Add(payment);
+                }
             }
 
             IsOrderDetailsLoading = false;
@@ -701,6 +710,14 @@ namespace PosClient.Desktop.Features.Orders.Details
                 ShippingFee = ShippingFee,
                 DiscountAmount = Discount,
                 //TaxAmount = TaxAmount,
+                OrderPayments = PaymentHistory.Select( p => new CreateOrderPaymentDto
+                {
+                    Amount = p.Amount,
+                    PaymentDate = p.PaymentDate,
+                    PaymentMethod = p.PaymentMethod,
+                    TransactionId = p.TransactionId,
+                    Notes = p.Notes
+                }).ToList(),
                 Notes = Notes
             };
 
@@ -712,6 +729,7 @@ namespace PosClient.Desktop.Features.Orders.Details
 
                 // Cleanup and Navigate
                 _orderStateService.ClearState();
+                SaveSnapshotAsOriginal();
                 _navigationService.Navigate(typeof(OrderListPage));
             }
         }
@@ -831,6 +849,31 @@ namespace PosClient.Desktop.Features.Orders.Details
                 IsEditingDelivery = false;
                 SaveSnapshotAsOriginal();
             }
+        }
+
+        // -- Payments --
+        [RelayCommand]
+        private async Task OpenAddPaymentDialog()
+        {
+            var presenter = _contentDialogService.GetDialogHost();
+            var vm = new AddPaymentViewModel(_apiClient, _orderStateService, _notificationService);
+            vm.Initialize(BalanceDue);
+
+            vm.OnPaymentAdded += (newPayment) =>
+            {
+                PaymentHistory.Add(newPayment);
+                PaidAmount += newPayment.Amount;
+                UpdatePaymentStatus();
+                SaveSnapshotAsOriginal();
+            };
+
+            var dialog = new AddPaymentDialog(vm, presenter);
+
+            await _contentDialogService.ShowAsync(dialog, CancellationToken.None);
+
+            //var orderId = _orderStateService.SelectedOrderId;
+            //if(orderId.HasValue)
+            //    await LoadOrderDetails(orderId.Value);
         }
 
         public void Dispose()

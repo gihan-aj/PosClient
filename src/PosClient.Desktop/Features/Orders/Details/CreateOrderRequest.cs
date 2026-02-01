@@ -25,7 +25,7 @@ namespace PosClient.Desktop.Features.Orders.Details
 
         public string? Notes { get; set; }
 
-        public List<CreateOrderPaymentDto> Payments { get; set; } = new();
+        public List<CreateOrderPaymentDto> OrderPayments { get; set; } = new();
     }
 
     public class CreateOrderItemDto
@@ -37,6 +37,7 @@ namespace PosClient.Desktop.Features.Orders.Details
 
     public class CreateOrderPaymentDto
     {
+        public Guid Id { get; set; } = Guid.Empty;
         public decimal Amount { get; set; }
         public DateTime PaymentDate { get; set; }
         public PaymentMethod PaymentMethod { get; set; }

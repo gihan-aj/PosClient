@@ -432,6 +432,7 @@
                     </StackPanel>
                 </Border>
 
+                <!-- Payment Details -->
                 <Border Background="{DynamicResource ControlFillColorDefaultBrush}" 
                         BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}" 
                         BorderThickness="1" 
@@ -454,7 +455,7 @@
 
                             <!-- Paid Amount -->
                             <StackPanel Grid.Column="0">
-                                <TextBlock Text="Paid Amount" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12"/>
+                                <TextBlock Text="Total Paid" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="12"/>
                                 <TextBlock Text="{Binding PaidAmount, StringFormat='Rs. {0:N2}'}" FontWeight="SemiBold" FontSize="16"/>
                             </StackPanel>
 
@@ -468,8 +469,46 @@
                             </StackPanel>
                         </Grid>
 
+                        <ui:ListView ItemsSource="{Binding PaymentHistory}"
+                                     Margin="0,0,0,10" 
+                                     BorderThickness="1" 
+                                     BorderBrush="{DynamicResource ControlElevationBorderBrush}"
+                                     MaxHeight="150">
+
+                            <ui:ListView.Style>
+                                <Style TargetType="ListView" BasedOn="{StaticResource {x:Type ListBox}}">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsCreatingNewOrder}" Value="False">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding PaymentHistory.Count}" Value="0">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ui:ListView.Style>
+
+                            <ui:ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding PaymentMethod}" FontWeight="SemiBold"/>
+                                            <TextBlock Text="{Binding PaymentDate, StringFormat='MMM dd, yyyy'}" FontSize="11" Opacity="0.6"/>
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="1" Text="{Binding Amount, StringFormat='Rs. {0:N2}'}" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ui:ListView.ItemTemplate>
+
+                        </ui:ListView>
+
                         <!-- Add Initial Payment (Button) -->
-                        <ui:Button Content="Add Initial Payment" 
+                        <ui:Button Content="Add Payment" 
                                    Icon="{ui:SymbolIcon Add24}" 
                                    Appearance="Secondary" Margin="0,0,0,10"
                                    HorizontalAlignment="Stretch"
