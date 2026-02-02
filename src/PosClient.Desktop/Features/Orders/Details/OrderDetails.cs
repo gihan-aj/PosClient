@@ -11,7 +11,7 @@ namespace PosClient.Desktop.Features.Orders.Details
         public CustomerDetails? Customer { get; set; }
         public DateTime OrderDate { get; set; }
         public OrderStatus Status { get; set; }
-        public PaymentStatus PaymentStatus { get; set; }
+        public OrderPaymentStatus PaymentStatus { get; set; }
         // Financials
         public decimal SubTotal { get; set; }
         public decimal DiscountAmount { get; set; }

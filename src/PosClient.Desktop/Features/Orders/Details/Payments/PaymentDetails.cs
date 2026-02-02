@@ -10,5 +10,6 @@ namespace PosClient.Desktop.Features.Orders.Details.Payments
         public PaymentMethod PaymentMethod { get; set; }
         public string? TransactionId { get; set; }
         public string? Notes { get; set; }
+        public PaymentStatus Status { get; set; }
     }
 }

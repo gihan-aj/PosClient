@@ -99,7 +99,10 @@ namespace PosClient.Desktop.Features.Orders.Details
 
         public decimal BalanceDue => TotalAmount - PaidAmount;
 
-        [ObservableProperty] private PaymentStatus _selectedPaymentStatus = PaymentStatus.Unpaid;
+        [ObservableProperty] private OrderPaymentStatus _selectedPaymentStatus = OrderPaymentStatus.Unpaid;
+
+        [ObservableProperty]
+        public bool _isOrderpaid;
 
         public ObservableCollection<PaymentDetails> PaymentHistory { get; set; } = new();
 
@@ -407,15 +410,20 @@ namespace PosClient.Desktop.Features.Orders.Details
         {
             if (PaidAmount <= 0)
             {
-                SelectedPaymentStatus = PaymentStatus.Unpaid;
+                SelectedPaymentStatus = OrderPaymentStatus.Unpaid;
+                IsOrderpaid = false;
             }
             else if (PaidAmount >= TotalAmount)
             {
-                SelectedPaymentStatus = PaymentStatus.Paid;
+                SelectedPaymentStatus = PaidAmount > TotalAmount
+                    ? OrderPaymentStatus.Overpaid
+                    : OrderPaymentStatus.Paid;
+                IsOrderpaid = true;
             }
             else
             {
-                SelectedPaymentStatus = PaymentStatus.Partial;
+                SelectedPaymentStatus = OrderPaymentStatus.Partial;
+                IsOrderpaid = false;
             }
         }
 
@@ -595,6 +603,7 @@ namespace PosClient.Desktop.Features.Orders.Details
             {
                 _notificationService.ShowSuccess("Financials updated", "Success");
                 IsEditingFinancials = false;
+                UpdatePaymentStatus();
                 SaveSnapshotAsOriginal();
             }
         }
@@ -874,6 +883,48 @@ namespace PosClient.Desktop.Features.Orders.Details
             //var orderId = _orderStateService.SelectedOrderId;
             //if(orderId.HasValue)
             //    await LoadOrderDetails(orderId.Value);
+        }
+
+        [RelayCommand]
+        private async Task VoidPayment(PaymentDetails payment)
+        {
+            if (IsCreatingNewOrder)
+            {
+                PaymentHistory.Remove(payment);
+                PaidAmount -= payment.Amount;
+                UpdatePaymentStatus();
+                return;
+            }
+
+            var confirm = await _dialogService.ShowConfirmationAsync(
+                "Void Payment",
+                $"Are you sure you want to void the payment of Rs. {payment.Amount} made on {payment.PaymentDate:d}?",
+                "Yes, Void",
+                "Cancel");
+
+            if (confirm)
+            {
+                var orderId = _orderStateService.SelectedOrderId;
+                if(orderId != null)
+                {
+                    var url = $"api/orders/{orderId}/payments/{payment.Id}/void";
+                    var result = await _apiClient.PutAsync(url, new { });
+
+                    if (result.IsSuccess)
+                    {
+                        _notificationService.ShowSuccess("Payment voided successfully", "Success");
+
+                        // Update UI
+                        PaymentHistory.Remove(payment);
+                        PaidAmount -= payment.Amount;
+
+                        // Force update status
+                        OnPropertyChanged(nameof(BalanceDue)); // Recalculate
+                        UpdatePaymentStatus();
+                        SaveSnapshotAsOriginal();
+                    }
+                }
+            }
         }
 
         public void Dispose()

@@ -1,13 +1,11 @@
 ﻿namespace PosClient.Desktop.Shared
 {
-    public enum PaymentMethod
+    public enum PaymentStatus
     {
-        Cash = 1,
-        CreditCard = 2,
-        DebitCard = 3,
-        MobilePayment = 4,
-        BankTransfer = 5,
-        GiftCard = 6,
-        Other = 99
+        Pending = 1,    // Online payment initiated, waiting for webhook
+        Completed = 2,  // Money successfully captured (Cash or Online success)
+        Failed = 3,     // Card declined
+        Voided = 4,     // Cashier mistake, transaction ignored
+        Refunded = 5    // Specific status for refund records
     }
 }

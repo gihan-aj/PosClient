@@ -49,13 +49,13 @@ namespace PosClient.Desktop.Features.Orders.List
             OrderStatus.Cancelled
         };
 
-        public ObservableCollection<PaymentStatus?> PaymentStatusOptions { get; } = new()
+        public ObservableCollection<OrderPaymentStatus?> PaymentStatusOptions { get; } = new()
         {
-            PaymentStatus.Unpaid,
-            PaymentStatus.Partial,
-            PaymentStatus.Paid,
-            PaymentStatus.Refunded,
-            PaymentStatus.Failed
+            OrderPaymentStatus.Unpaid,
+            OrderPaymentStatus.Partial,
+            OrderPaymentStatus.Paid,
+            OrderPaymentStatus.Refunded,
+            OrderPaymentStatus.Overpaid
         };
 
         public OrderListViewModel(

@@ -441,10 +441,43 @@
 
                     <StackPanel>
                         <!-- Header -->
-                        <StackPanel Orientation="Horizontal" Margin="0,0,10,10">
-                            <ui:SymbolIcon Symbol="WalletCreditCard24" FontSize="20" Margin="0,0,10,0"/>
-                            <TextBlock Text="Payment Details" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                        </StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,10,10">
+                                <ui:SymbolIcon Symbol="WalletCreditCard24" FontSize="20" Margin="0,0,10,0"/>
+                                <TextBlock Text="Payment Details" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <!-- Status Badge -->
+                                <Border CornerRadius="4" Padding="8,4" HorizontalAlignment="Center" Margin="0,0,0,10    ">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="#15E81123"/>
+                                            <!-- Default Red (Unpaid) -->
+                                            <Setter Property="TextBlock.Foreground" Value="#FFE81123"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SelectedPaymentStatus}" Value="Partial">
+                                                    <Setter Property="Background" Value="#15FF8C00"/>
+                                                    <Setter Property="TextBlock.Foreground" Value="#FFFF8C00"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding SelectedPaymentStatus}" Value="Paid">
+                                                    <Setter Property="Background" Value="#15107C10"/>
+                                                    <Setter Property="TextBlock.Foreground" Value="#FF107C10"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <TextBlock Text="{Binding SelectedPaymentStatus}" FontWeight="SemiBold" FontSize="12"/>
+                                </Border>   
+                            </StackPanel>
+
+                        </Grid>
+                        
 
                         <!-- Payment Summary Grid -->
                         <Grid Margin="0,0,0,10">
@@ -495,46 +528,37 @@
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
+                                        
                                         <StackPanel>
                                             <TextBlock Text="{Binding PaymentMethod}" FontWeight="SemiBold"/>
                                             <TextBlock Text="{Binding PaymentDate, StringFormat='MMM dd, yyyy'}" FontSize="11" Opacity="0.6"/>
                                         </StackPanel>
+                                        
                                         <TextBlock Grid.Column="1" Text="{Binding Amount, StringFormat='Rs. {0:N2}'}" VerticalAlignment="Center"/>
+
+                                        <ui:Button Grid.Column="2" Margin="10,0,0,0"
+                                                   Icon="{ui:SymbolIcon Dismiss24}" 
+                                                   Appearance="Transparent"
+                                                   Foreground="IndianRed"
+                                                   ToolTip="Void Payment"
+                                                   Command="{Binding DataContext.VoidPaymentCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
+                                                   CommandParameter="{Binding}"/>
+                                            
                                     </Grid>
                                 </DataTemplate>
                             </ui:ListView.ItemTemplate>
 
                         </ui:ListView>
 
-                        <!-- Add Initial Payment (Button) -->
+                        <!-- Add Payment (Button) -->
                         <ui:Button Content="Add Payment" 
+                                   Visibility="{Binding IsOrderpaid, Converter={StaticResource InverseBoolToVisConverter}, Mode=OneWay}"
                                    Icon="{ui:SymbolIcon Add24}" 
                                    Appearance="Secondary" Margin="0,0,0,10"
                                    HorizontalAlignment="Stretch"
                                    Command="{Binding OpenAddPaymentDialogCommand}"/>
-
-                        <!-- Status Badge -->
-                        <Border CornerRadius="4" Padding="8,4" HorizontalAlignment="Center" Margin="0,0,0,10    ">
-                            <Border.Style>
-                                <Style TargetType="Border">
-                                    <Setter Property="Background" Value="#15E81123"/>
-                                    <!-- Default Red (Unpaid) -->
-                                    <Setter Property="TextBlock.Foreground" Value="#FFE81123"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding SelectedPaymentStatus}" Value="Partial">
-                                            <Setter Property="Background" Value="#15FF8C00"/>
-                                            <Setter Property="TextBlock.Foreground" Value="#FFFF8C00"/>
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding SelectedPaymentStatus}" Value="Paid">
-                                            <Setter Property="Background" Value="#15107C10"/>
-                                            <Setter Property="TextBlock.Foreground" Value="#FF107C10"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Border.Style>
-                            <TextBlock Text="{Binding SelectedPaymentStatus}" FontWeight="SemiBold" FontSize="12"/>
-                        </Border>
 
                     </StackPanel>
                     
