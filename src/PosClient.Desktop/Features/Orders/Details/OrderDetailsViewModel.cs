@@ -927,6 +927,72 @@ namespace PosClient.Desktop.Features.Orders.Details
             }
         }
 
+        // -- Confirmation --
+        [RelayCommand]
+        private async Task ConfirmOrder()
+        {
+            if (IsCreatingNewOrder)
+                return;
+
+            if (!_orderStateService.SelectedOrderId.HasValue) 
+                return;
+
+            var orderId = _orderStateService.SelectedOrderId;
+
+            var confirm = await _dialogService.ShowConfirmationAsync(
+                "Confirm Order",
+                 "Are you sure you want to confirm this order? This will signal the team to start processing/production.",
+                "Yes, Confirm",
+                "Cancel");
+
+            if (confirm)
+            {
+                var url = $"api/orders/{orderId.Value}/confirm";
+                var result = await _apiClient.PutAsync(url, new { });
+
+                if (result.IsSuccess)
+                {
+                    _notificationService.ShowSuccess("Order confirmed successfully.");
+                    CurrentOrderStatus = OrderStatus.Confirmed;
+                    SaveSnapshotAsOriginal();
+                }
+            }
+
+        }
+
+        // -- Processing --
+        [RelayCommand]
+        private async Task StartProcessing()
+        {
+            if (IsCreatingNewOrder)
+                return;
+
+            if (!_orderStateService.SelectedOrderId.HasValue) 
+                return;
+
+            var orderId = _orderStateService.SelectedOrderId;
+
+            var confirm = await _dialogService.ShowConfirmationAsync(
+                "Start Processing",
+                 "Are you ready to start processing this order? This will notify the production/packing team.",
+                "Yes, Start",
+                "Cancel");
+
+            if (confirm)
+            {
+                var url = $"api/orders/{orderId.Value}/process";
+                var result = await _apiClient.PutAsync(url, new { });
+
+                if (result.IsSuccess)
+                {
+                    _notificationService.ShowSuccess("Order processing started.");
+                    CurrentOrderStatus = OrderStatus.Processing;
+                    SaveSnapshotAsOriginal();
+                }
+            }
+
+        }
+
         public void Dispose()
         {
             _orderStateService.PropertyChanged -= OnOrderStatePropertyChanged;
