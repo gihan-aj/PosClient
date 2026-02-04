@@ -47,18 +47,43 @@
                             <!-- Default -->
                             <Setter Property="TextBlock.Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}"/>
                             <Style.Triggers>
+                                <!-- Confirmed (Blue) -->
                                 <DataTrigger Binding="{Binding CurrentOrderStatus}" Value="Confirmed">
                                     <Setter Property="Background" Value="#150078D4"/>
                                     <Setter Property="TextBlock.Foreground" Value="#FF0078D4"/>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding CurrentOrderStatus}" Value="Processing">
+
+                                <!-- Processing (Purple) -->
+                                <!--<DataTrigger Binding="{Binding CurrentOrderStatus}" Value="Processing">
                                     <Setter Property="Background" Value="#158764B8"/>
                                     <Setter Property="TextBlock.Foreground" Value="#FF8764B8"/>
+                                </DataTrigger>-->
+
+                                <!-- ReadyToPack (Teal - Production Done) -->
+                                <DataTrigger Binding="{Binding CurrentOrderStatus}" Value="ReadyToPack">
+                                    <Setter Property="Background" Value="#1500B294"/>
+                                    <Setter Property="TextBlock.Foreground" Value="#FF00B294"/>
                                 </DataTrigger>
+
+                                <!-- ReadyToShip (Orange - Packed, Waiting) -->
+                                <DataTrigger Binding="{Binding CurrentOrderStatus}" Value="Packed">
+                                    <Setter Property="Background" Value="#15CA5010"/>
+                                    <Setter Property="TextBlock.Foreground" Value="#FFCA5010"/>
+                                </DataTrigger>
+
+                                <!-- Shipped (Green/Teal for Delivered or specific Shipped color) -->
                                 <DataTrigger Binding="{Binding CurrentOrderStatus}" Value="Shipped">
                                     <Setter Property="Background" Value="#15107C10"/>
                                     <Setter Property="TextBlock.Foreground" Value="#FF107C10"/>
                                 </DataTrigger>
+
+                                <!-- Delivered (Green) -->
+                                <DataTrigger Binding="{Binding CurrentOrderStatus}" Value="Delivered">
+                                    <Setter Property="Background" Value="#15107C10"/>
+                                    <Setter Property="TextBlock.Foreground" Value="#FF107C10"/>
+                                </DataTrigger>
+
+                                <!-- Cancelled (Red) -->
                                 <DataTrigger Binding="{Binding CurrentOrderStatus}" Value="Cancelled">
                                     <Setter Property="Background" Value="#15E81123"/>
                                     <Setter Property="TextBlock.Foreground" Value="#FFE81123"/>
@@ -114,7 +139,7 @@
                     </ui:Button.Style>
                 </ui:Button>
 
-                <!-- 1. Confirm (Visible if Pending) -->
+                <!-- 1. Confirm (Pending -> Confirmed) -->
                 <ui:Button Content="Confirm Order" 
                            Appearance="Primary" 
                            Icon="{ui:SymbolIcon Checkmark24}" 
@@ -132,12 +157,12 @@
                     </ui:Button.Style>
                 </ui:Button>
 
-                <!-- 2. Start Processing (Visible if Confirmed) -->
-                <ui:Button Content="Start Processing" 
+                <!-- 2. Mark as packed (Confirmed -> Packed) -->
+                <ui:Button Content="Mark As Packed" 
                            Appearance="Primary" 
                            Icon="{ui:SymbolIcon ArrowRight24}" 
-                           Command="{Binding StartProcessingCommand}" 
-                           MinWidth="120"  Margin="10,0,0,0">
+                           Command="{Binding MarkAsPackedCommand}" 
+                           MinWidth="120" Margin="10,0,0,0">
                     <ui:Button.Style>
                         <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
                             <Setter Property="Visibility" Value="Collapsed"/>
@@ -150,17 +175,71 @@
                     </ui:Button.Style>
                 </ui:Button>
 
-                <!-- 3. Ship Order (Visible if Processing) -->
-                <ui:Button Content="Ship Order" 
+                <!-- 3. Finish Production (Processing -> ReadyToPack) -->
+                <!--<ui:Button Content="Finish Production" 
                            Appearance="Primary" 
-                           Icon="{ui:SymbolIcon VehicleTruckProfile24}" 
-                           Command="{Binding ShipOrderCommand}" 
-                           MinWidth="120"  Margin="10,0,0,0">
+                           Icon="{ui:SymbolIcon Box24}" 
+                           Command="{Binding CompleteProcessingCommand}" 
+                           MinWidth="120" Margin="10,0,0,0">
                     <ui:Button.Style>
                         <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
                             <Setter Property="Visibility" Value="Collapsed"/>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding CurrentOrderStatus}" Value="Processing">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:Button.Style>
+                </ui:Button>-->
+
+                <!-- 4. Pack Order (Packed -> Shipped) -->
+                <ui:Button Content="Mark As Shipped" 
+                           Appearance="Primary" 
+                           Icon="{ui:SymbolIcon Backpack24}" 
+                           Command="{Binding MarkAsShippedCommand}" 
+                           MinWidth="120" Margin="10,0,0,0">
+                    <ui:Button.Style>
+                        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentOrderStatus}" Value="Packed">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:Button.Style>
+                </ui:Button>
+
+                <!-- 5. Ship Order (ReadyToShip -> Shipped) -->
+                <!--<ui:Button Content="Ship Order" 
+                           Appearance="Primary" 
+                           Icon="{ui:SymbolIcon VehicleTruckProfile24}" 
+                           Command="{Binding ShipOrderCommand}" 
+                           MinWidth="120" Margin="10,0,0,0">
+                    <ui:Button.Style>
+                        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentOrderStatus}" Value="ReadyToShip">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:Button.Style>
+                </ui:Button>-->
+
+                <!-- 6. Mark Delivered (Shipped -> Delivered) -->
+                <ui:Button Content="Mark As Delivered" 
+                           Appearance="Success" 
+                           Icon="{ui:SymbolIcon CheckmarkCircle24}" 
+                           Command="{Binding MarkAsDeliveredCommand}" 
+                           MinWidth="120" Margin="10,0,0,0">
+                    <ui:Button.Style>
+                        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentOrderStatus}" Value="Shipped">
                                     <Setter Property="Visibility" Value="Visible"/>
                                 </DataTrigger>
                             </Style.Triggers>
@@ -322,6 +401,7 @@
                                                     <MultiDataTrigger.Conditions>
                                                         <Condition Binding="{Binding IsCreatingNewOrder}" Value="False"/>
                                                         <Condition Binding="{Binding IsEditingDelivery}" Value="False"/>
+                                                        <Condition Binding="{Binding CanEditDeliveryDetails}" Value="True"/>
                                                     </MultiDataTrigger.Conditions>
                                                     <Setter Property="Visibility" Value="Visible"/>
                                                 </MultiDataTrigger>
@@ -639,7 +719,8 @@
                             <ui:Button HorizontalAlignment="Right" 
                                        Icon="{ui:SymbolIcon Add24}" 
                                        Content="Add Item" Appearance="Primary"
-                                       Command="{Binding OpenAddOrderItemsDialogCommand}"/>
+                                       Command="{Binding OpenAddOrderItemsDialogCommand}"
+                                       Visibility="{Binding CanEditItems, Converter={StaticResource BoolToVisConverter}}"/>
                         </Grid>
 
                         <!-- Items Grid -->
@@ -683,7 +764,7 @@
                                                 </ui:NumberBox>
 
                                                 <StackPanel Orientation="Horizontal" 
-                                                            Visibility="{Binding DataContext.IsCreatingNewOrder, RelativeSource={RelativeSource AncestorType=DataGrid}, Converter={StaticResource InverseBoolToVisConverter}}">
+                                                            Visibility="{Binding DataContext.CanEditItems, RelativeSource={RelativeSource AncestorType=DataGrid}, Converter={StaticResource BoolToVisConverter}}">
 
                                                     <!-- Edit Button -->
                                                     <ui:Button Icon="{ui:SymbolIcon Edit24}" 
@@ -723,7 +804,8 @@
                                             <ui:Button Icon="{ui:SymbolIcon Delete24}" Appearance="Transparent"
                                                        Foreground="IndianRed"
                                                        Command="{Binding DataContext.RemoveItemCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                                       CommandParameter="{Binding}"/>
+                                                       CommandParameter="{Binding}"
+                                                       Visibility="{Binding DataContext.CanEditItems, RelativeSource={RelativeSource AncestorType=DataGrid}, Converter={StaticResource BoolToVisConverter}}"/>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
@@ -755,6 +837,7 @@
                                                     <MultiDataTrigger.Conditions>
                                                         <Condition Binding="{Binding IsCreatingNewOrder}" Value="False"/>
                                                         <Condition Binding="{Binding IsEditingFinancials}" Value="False"/>
+                                                        <Condition Binding="{Binding CanEditFinancialDetails}" Value="True"/>
                                                     </MultiDataTrigger.Conditions>
                                                     <Setter Property="Visibility" Value="Visible"/>
                                                 </MultiDataTrigger>
@@ -821,6 +904,7 @@
                                                         <MultiDataTrigger.Conditions>
                                                             <Condition Binding="{Binding IsCreatingNewOrder}" Value="False"/>
                                                             <Condition Binding="{Binding IsEditingFinancials}" Value="False"/>
+                                                            <Condition Binding="{Binding CanEditFinancialDetails}" Value="False"/>
                                                         </MultiDataTrigger.Conditions>
                                                         <Setter Property="Visibility" Value="Collapsed"/>
                                                     </MultiDataTrigger>

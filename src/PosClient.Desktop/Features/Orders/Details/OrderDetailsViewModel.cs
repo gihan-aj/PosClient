@@ -35,6 +35,7 @@ namespace PosClient.Desktop.Features.Orders.Details
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(ShowConfirmationButton))]
         [NotifyPropertyChangedFor(nameof(IsDeliveryReadOnly))]
+        [NotifyPropertyChangedFor(nameof(CanEditItems))]
         [NotifyPropertyChangedFor(nameof(IsFinancialsReadOnly))]
         private bool _isCreatingNewOrder = false;
 
@@ -43,6 +44,9 @@ namespace PosClient.Desktop.Features.Orders.Details
         // -- Order Details --
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(ShowConfirmationButton))]
+        [NotifyPropertyChangedFor(nameof(CanEditDeliveryDetails))]
+        [NotifyPropertyChangedFor(nameof(CanEditFinancialDetails))]
+        [NotifyPropertyChangedFor(nameof(CanEditItems))]
         private OrderStatus _currentOrderStatus = OrderStatus.Pending;
 
         public bool ShowConfirmationButton => !IsCreatingNewOrder && CurrentOrderStatus == OrderStatus.Pending;
@@ -150,6 +154,8 @@ namespace PosClient.Desktop.Features.Orders.Details
 
         public bool IsDeliveryReadOnly => !IsCreatingNewOrder && !IsEditingDelivery;
 
+        public bool CanEditDeliveryDetails => CurrentOrderStatus != OrderStatus.Shipped && CurrentOrderStatus != OrderStatus.Delivered;
+
         // Backup fields for reverse logic
         private string? _originalDeliveryAddress;
         private string? _originalDeliveryCity;
@@ -163,12 +169,16 @@ namespace PosClient.Desktop.Features.Orders.Details
         private bool _isInternalItemCollectionUpdate;
         private bool _isAddingNewItemToExistsingOrder = false;
 
+        public bool CanEditItems => CurrentOrderStatus != OrderStatus.Shipped && CurrentOrderStatus != OrderStatus.Delivered && !IsCreatingNewOrder;
+
         // -- Edit State Flags - Financial details --
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IsFinancialsReadOnly))]
         private bool _isEditingFinancials;
 
         public bool IsFinancialsReadOnly => !IsCreatingNewOrder &&  !IsEditingFinancials;
+
+        public bool CanEditFinancialDetails => CurrentOrderStatus != OrderStatus.Shipped && CurrentOrderStatus != OrderStatus.Delivered;
 
         private decimal _originalShippingFee;
         private decimal _originalDiscount;
@@ -961,8 +971,41 @@ namespace PosClient.Desktop.Features.Orders.Details
         }
 
         // -- Processing --
+        //[RelayCommand]
+        //private async Task StartProcessing()
+        //{
+        //    if (IsCreatingNewOrder)
+        //        return;
+
+        //    if (!_orderStateService.SelectedOrderId.HasValue) 
+        //        return;
+
+        //    var orderId = _orderStateService.SelectedOrderId;
+
+        //    var confirm = await _dialogService.ShowConfirmationAsync(
+        //        "Start Processing",
+        //         "Are you ready to start processing this order? This will notify the production/packing team.",
+        //        "Yes, Start",
+        //        "Cancel");
+
+        //    if (confirm)
+        //    {
+        //        var url = $"api/orders/{orderId.Value}/process";
+        //        var result = await _apiClient.PutAsync(url, new { });
+
+        //        if (result.IsSuccess)
+        //        {
+        //            _notificationService.ShowSuccess("Order processing started.");
+        //            CurrentOrderStatus = OrderStatus.Confirmed;
+        //            SaveSnapshotAsOriginal();
+        //        }
+        //    }
+
+        //}
+
+        // -- Mark as Packed --
         [RelayCommand]
-        private async Task StartProcessing()
+        private async Task MarkAsPacked()
         {
             if (IsCreatingNewOrder)
                 return;
@@ -973,20 +1016,81 @@ namespace PosClient.Desktop.Features.Orders.Details
             var orderId = _orderStateService.SelectedOrderId;
 
             var confirm = await _dialogService.ShowConfirmationAsync(
-                "Start Processing",
-                 "Are you ready to start processing this order? This will notify the production/packing team.",
-                "Yes, Start",
-                "Cancel");
+                "Mark as Packed",
+                 "Are you sure you want to mark this order as packed? This will notify the shipping team."
+                );
 
             if (confirm)
             {
-                var url = $"api/orders/{orderId.Value}/process";
+                var url = $"api/orders/{orderId.Value}/ready-to-ship";
                 var result = await _apiClient.PutAsync(url, new { });
 
                 if (result.IsSuccess)
                 {
-                    _notificationService.ShowSuccess("Order processing started.");
-                    CurrentOrderStatus = OrderStatus.Processing;
+                    _notificationService.ShowSuccess("Order is ready to be shipped.");
+                    CurrentOrderStatus = OrderStatus.Packed;
+                    SaveSnapshotAsOriginal();
+                }
+            }
+
+        }
+
+        [RelayCommand]
+        private async Task MarkAsShipped()
+        {
+            if (IsCreatingNewOrder)
+                return;
+
+            if (!_orderStateService.SelectedOrderId.HasValue) 
+                return;
+
+            var orderId = _orderStateService.SelectedOrderId;
+
+            var confirm = await _dialogService.ShowConfirmationAsync(
+                "Mark as Shipped",
+                 "Are you sure you want to mark this order as shipped?"
+                );
+
+            if (confirm)
+            {
+                var url = $"api/orders/{orderId.Value}/ship";
+                var result = await _apiClient.PutAsync(url, new { });
+
+                if (result.IsSuccess)
+                {
+                    _notificationService.ShowSuccess("Order is marked as shipped.");
+                    CurrentOrderStatus = OrderStatus.Shipped;
+                    SaveSnapshotAsOriginal();
+                }
+            }
+
+        }
+
+        [RelayCommand]
+        private async Task MarkAsDelivered()
+        {
+            if (IsCreatingNewOrder)
+                return;
+
+            if (!_orderStateService.SelectedOrderId.HasValue) 
+                return;
+
+            var orderId = _orderStateService.SelectedOrderId;
+
+            var confirm = await _dialogService.ShowConfirmationAsync(
+                "Mark as Delivered",
+                 "Are you sure you want to mark this order as delivered?"
+                );
+
+            if (confirm)
+            {
+                var url = $"api/orders/{orderId.Value}/deliver";
+                var result = await _apiClient.PutAsync(url, new { });
+
+                if (result.IsSuccess)
+                {
+                    _notificationService.ShowSuccess("Order is marked as delivered.");
+                    CurrentOrderStatus = OrderStatus.Delivered;
                     SaveSnapshotAsOriginal();
                 }
             }

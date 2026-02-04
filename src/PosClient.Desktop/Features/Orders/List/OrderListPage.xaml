@@ -293,10 +293,29 @@
                                                     <Setter Property="TextBlock.Foreground" Value="#FF0078D4"/>
                                                 </DataTrigger>
 
-                                                <!-- Shipped (Purple) -->
-                                                <DataTrigger Binding="{Binding Status}" Value="Shipped">
+                                                <!-- Processing (Purple) -->
+                                                <DataTrigger Binding="{Binding Status}" Value="Processing">
                                                     <Setter Property="Background" Value="#158764B8"/>
                                                     <Setter Property="TextBlock.Foreground" Value="#FF8764B8"/>
+                                                </DataTrigger>
+
+                                                <!-- ReadyToPack (Teal - Production Done) -->
+                                                <DataTrigger Binding="{Binding Status}" Value="ReadyToPack">
+                                                    <Setter Property="Background" Value="#1500B294"/>
+                                                    <Setter Property="TextBlock.Foreground" Value="#FF00B294"/>
+                                                </DataTrigger>
+
+                                                <!-- ReadyToShip (Orange - Packed, Waiting) -->
+                                                <DataTrigger Binding="{Binding Status}" Value="Packed">
+                                                    <Setter Property="Background" Value="#15CA5010"/>
+                                                    <!-- Orange Red -->
+                                                    <Setter Property="TextBlock.Foreground" Value="#FFCA5010"/>
+                                                </DataTrigger>
+
+                                                <!-- Shipped (Indigo/Blue-Violet) -->
+                                                <DataTrigger Binding="{Binding Status}" Value="Shipped">
+                                                    <Setter Property="Background" Value="#156B69D6"/>
+                                                    <Setter Property="TextBlock.Foreground" Value="#FF6B69D6"/>
                                                 </DataTrigger>
 
                                                 <!-- Delivered (Green) -->
