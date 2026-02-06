@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using PosClient.Desktop.Features.Orders.Details.CancelOrder;
 using PosClient.Desktop.Features.Orders.Details.Couriers;
 using PosClient.Desktop.Features.Orders.Details.Customer;
 using PosClient.Desktop.Features.Orders.Details.OrderItems;
@@ -1095,6 +1096,28 @@ namespace PosClient.Desktop.Features.Orders.Details
                 }
             }
 
+        }
+
+        [RelayCommand]
+        private async Task CancelOrder()
+        {
+            var orderId = _orderStateService.SelectedOrderId;
+            if (orderId == null || orderId == Guid.Empty)
+                return;
+
+            var presenter = _contentDialogService.GetDialogHost();
+            var vm = new CancelOrderViewModel(_apiClient, _notificationService, orderId.Value);
+
+            vm.OnOrderCancelled += () =>
+            {
+                CurrentOrderStatus = OrderStatus.Cancelled;
+                SaveSnapshotAsOriginal();
+                _navigationService.Navigate(typeof(OrderListPage));
+            };
+
+            var dialog = new CancelOrderDialog(vm, presenter);
+
+            await _contentDialogService.ShowAsync(dialog, CancellationToken.None);
         }
 
         public void Dispose()

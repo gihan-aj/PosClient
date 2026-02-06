@@ -1,0 +1,61 @@
+﻿<ui:ContentDialog x:Class="PosClient.Desktop.Features.Orders.Details.CancelOrder.CancelOrderDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:local="clr-namespace:PosClient.Desktop.Features.Orders.Details.CancelOrder"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance Type=local:CancelOrderViewModel}"
+             Title="Cancel Order"
+             CloseButtonText="Close">
+    <Grid Width="400">
+
+        <StackPanel>
+
+            <ui:InfoBar Title="Warning" 
+                        Message="This action cannot be undone." 
+                        Severity="Warning" 
+                        IsOpen="True" 
+                        IsClosable="False"
+                        Margin="0,0,0,10"/>
+
+            <StackPanel Margin="0,0,0,10">
+                <Label Content="Reason for Cancellation *" Target="{Binding ElementName=ReasonBox}"/>
+                <ui:TextBox x:Name="ReasonBox"
+                            Text="{Binding Reason, UpdateSourceTrigger=PropertyChanged}"
+                            PlaceholderText="e.g. Customer changed mind"
+                            AcceptsReturn="True"
+                            Height="80"
+                            TextWrapping="Wrap"/>
+            </StackPanel>
+
+            <CheckBox Content="Return items to stock" 
+                      IsChecked="{Binding ReturnToStock}"
+                      IsEnabled="{Binding IsSaving, Converter={StaticResource InverseBoolConverter}}"
+                      Margin="0,0,0,10"/>
+
+            <ui:Button Command="{Binding ConfirmCancelCommand}" 
+                       Content="Cancel Order" 
+                       Appearance="Primary" 
+                       HorizontalAlignment="Stretch" 
+                       Margin="0,10,0,0"/>
+
+        </StackPanel>
+
+        <!-- Loading Overlay (Sits on top of the StackPanel) -->
+        <Grid Visibility="{Binding IsSaving, Converter={StaticResource BoolToVisConverter}}"
+              Background="{DynamicResource ApplicationBackgroundBrush}"
+              Opacity="0.8"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch">
+            <StackPanel Orientation="Horizontal" 
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                <ui:ProgressRing IsIndeterminate="True" Width="20" Height="20" Margin="0,0,10,0"/>
+                <TextBlock Text="Saving..." VerticalAlignment="Center"/>
+            </StackPanel>
+        </Grid>
+
+    </Grid>
+</ui:ContentDialog>

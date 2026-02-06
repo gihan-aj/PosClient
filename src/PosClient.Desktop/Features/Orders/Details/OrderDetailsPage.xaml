@@ -111,10 +111,13 @@
                            MinWidth="100">
                     <ui:Button.Style>
                         <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
-                            <Setter Property="Visibility" Value="Visible"/>
+                            <Setter Property="Visibility" Value="Collapsed"/>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsCreatingNewOrder}" Value="True">
-                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                <DataTrigger Binding="{Binding CurrentOrderStatus}" Value="Confirmed">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding CurrentOrderStatus}" Value="Packed">
+                                    <Setter Property="Visibility" Value="Visible"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
