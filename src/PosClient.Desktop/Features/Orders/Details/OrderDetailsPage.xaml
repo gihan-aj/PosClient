@@ -436,6 +436,11 @@
                                   Visibility="{Binding IsCreatingNewOrder, Converter={StaticResource BoolToVisConverter}}"
                                   Margin="0,0,0,5"/>
 
+                        <CheckBox Content="Cash On Delivery" 
+                                  IsChecked="{Binding IsCashOnDelivery, Mode=TwoWay}" 
+                                  IsEnabled="{Binding IsCashOnDeliveryEnabled, Mode=OneWay}"
+                                  Margin="0,0,0,5"/>
+
                         <!-- Conditional delivery form -->
                         <StackPanel Visibility="{Binding IsDeliverySameAsCustomer, Converter={StaticResource InverseBoolToVisConverter}}">
 
@@ -723,7 +728,7 @@
                                        Icon="{ui:SymbolIcon Add24}" 
                                        Content="Add Item" Appearance="Primary"
                                        Command="{Binding OpenAddOrderItemsDialogCommand}"
-                                       Visibility="{Binding CanEditItems, Converter={StaticResource BoolToVisConverter}}"/>
+                                       Visibility="{Binding CanAddItems, Converter={StaticResource BoolToVisConverter}}"/>
                         </Grid>
 
                         <!-- Items Grid -->
@@ -907,7 +912,7 @@
                                                         <MultiDataTrigger.Conditions>
                                                             <Condition Binding="{Binding IsCreatingNewOrder}" Value="False"/>
                                                             <Condition Binding="{Binding IsEditingFinancials}" Value="False"/>
-                                                            <Condition Binding="{Binding CanEditFinancialDetails}" Value="False"/>
+
                                                         </MultiDataTrigger.Conditions>
                                                         <Setter Property="Visibility" Value="Collapsed"/>
                                                     </MultiDataTrigger>

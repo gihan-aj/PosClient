@@ -29,6 +29,7 @@ namespace PosClient.Desktop.Features.Orders.Details
         public Guid? CourierId { get; set; }
         public string? CourierName { get; set; }
         public string? TrackingNumber { get; set; }
+        public bool IsCashOnDelivery { get; set; }
         public string? Notes { get; set; }
         // Collections
         public List<OrderItemDetails> Items { get; set; } = [];

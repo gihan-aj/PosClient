@@ -32,7 +32,7 @@
 
             <CheckBox Content="Return items to stock" 
                       IsChecked="{Binding ReturnToStock}"
-                      IsEnabled="{Binding IsSaving, Converter={StaticResource InverseBoolConverter}}"
+                      IsEnabled="{Binding IsSaving, Converter={StaticResource InvertedBoolConverter}}"
                       Margin="0,0,0,10"/>
 
             <ui:Button Command="{Binding ConfirmCancelCommand}" 

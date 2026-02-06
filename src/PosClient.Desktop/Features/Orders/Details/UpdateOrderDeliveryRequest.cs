@@ -10,6 +10,7 @@
         public string? DeliveryCountry { get; set; }
         public string? DeliveryPostalCode { get; set; }
         public string? TrackingNumber { get; set; }
+        public bool IsCashOnDelivery { get; set; }
         public string? Notes { get; set; }
     }
 }

@@ -23,6 +23,8 @@ namespace PosClient.Desktop.Features.Orders.Details
         public decimal TaxAmount { get; set; }
         public decimal DiscountAmount { get; set; } // Initial payment
 
+        public bool IsCashOnDelivery { get; set; }
+
         public string? Notes { get; set; }
 
         public List<CreateOrderPaymentDto> OrderPayments { get; set; } = new();

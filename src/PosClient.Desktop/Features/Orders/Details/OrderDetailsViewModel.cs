@@ -37,7 +37,9 @@ namespace PosClient.Desktop.Features.Orders.Details
         [NotifyPropertyChangedFor(nameof(ShowConfirmationButton))]
         [NotifyPropertyChangedFor(nameof(IsDeliveryReadOnly))]
         [NotifyPropertyChangedFor(nameof(CanEditItems))]
+        [NotifyPropertyChangedFor(nameof(CanAddItems))]
         [NotifyPropertyChangedFor(nameof(IsFinancialsReadOnly))]
+        [NotifyPropertyChangedFor(nameof(IsCashOnDeliveryEnabled))]
         private bool _isCreatingNewOrder = false;
 
         private bool IsOrderDetailsLoading = false;
@@ -48,6 +50,7 @@ namespace PosClient.Desktop.Features.Orders.Details
         [NotifyPropertyChangedFor(nameof(CanEditDeliveryDetails))]
         [NotifyPropertyChangedFor(nameof(CanEditFinancialDetails))]
         [NotifyPropertyChangedFor(nameof(CanEditItems))]
+        [NotifyPropertyChangedFor(nameof(CanAddItems))]
         private OrderStatus _currentOrderStatus = OrderStatus.Pending;
 
         public bool ShowConfirmationButton => !IsCreatingNewOrder && CurrentOrderStatus == OrderStatus.Pending;
@@ -96,6 +99,12 @@ namespace PosClient.Desktop.Features.Orders.Details
         [ObservableProperty] private int _selectedCourierIndex = 0;
 
         [ObservableProperty] private string? _trackingNumber;
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsCashOnDeliveryEnabled))]
+        private bool _isCashOnDelivery;
+
+        public bool IsCashOnDeliveryEnabled => IsCreatingNewOrder || (CanEditDeliveryDetails && IsEditingDelivery);
 
         // -- Payment detials --
         [ObservableProperty]
@@ -151,11 +160,14 @@ namespace PosClient.Desktop.Features.Orders.Details
         // -- Edit State Flags - Delivery Details --
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IsDeliveryReadOnly))]
+        [NotifyPropertyChangedFor(nameof(IsCashOnDeliveryEnabled))]
         private bool _isEditingDelivery;
 
         public bool IsDeliveryReadOnly => !IsCreatingNewOrder && !IsEditingDelivery;
 
-        public bool CanEditDeliveryDetails => CurrentOrderStatus != OrderStatus.Shipped && CurrentOrderStatus != OrderStatus.Delivered;
+        public bool CanEditDeliveryDetails => CurrentOrderStatus != OrderStatus.Shipped && 
+            CurrentOrderStatus != OrderStatus.Delivered && 
+            CurrentOrderStatus != OrderStatus.Cancelled;
 
         // Backup fields for reverse logic
         private string? _originalDeliveryAddress;
@@ -165,12 +177,19 @@ namespace PosClient.Desktop.Features.Orders.Details
         private string? _originalDeliveryPostalCode;
         private Guid? _originalCourierId;
         private string? _originalTrackingNumber;
+        private bool _originalIsCashOnDelivery;
 
         // -- Edit State Flags - Add items --
         private bool _isInternalItemCollectionUpdate;
         private bool _isAddingNewItemToExistsingOrder = false;
 
-        public bool CanEditItems => CurrentOrderStatus != OrderStatus.Shipped && CurrentOrderStatus != OrderStatus.Delivered && !IsCreatingNewOrder;
+        public bool CanEditItems => CurrentOrderStatus != OrderStatus.Shipped && 
+            CurrentOrderStatus != OrderStatus.Delivered && 
+            CurrentOrderStatus != OrderStatus.Cancelled && 
+            !IsCreatingNewOrder;
+        public bool CanAddItems => CurrentOrderStatus != OrderStatus.Shipped && 
+            CurrentOrderStatus != OrderStatus.Delivered &&
+            CurrentOrderStatus != OrderStatus.Cancelled;
 
         // -- Edit State Flags - Financial details --
         [ObservableProperty]
@@ -179,7 +198,9 @@ namespace PosClient.Desktop.Features.Orders.Details
 
         public bool IsFinancialsReadOnly => !IsCreatingNewOrder &&  !IsEditingFinancials;
 
-        public bool CanEditFinancialDetails => CurrentOrderStatus != OrderStatus.Shipped && CurrentOrderStatus != OrderStatus.Delivered;
+        public bool CanEditFinancialDetails => CurrentOrderStatus != OrderStatus.Shipped && 
+            CurrentOrderStatus != OrderStatus.Delivered && 
+            CurrentOrderStatus != OrderStatus.Cancelled;
 
         private decimal _originalShippingFee;
         private decimal _originalDiscount;
@@ -653,6 +674,7 @@ namespace PosClient.Desktop.Features.Orders.Details
                 // Load Couriers
                 CourierId = order.CourierId;
                 TrackingNumber = order.TrackingNumber;
+                IsCashOnDelivery = order.IsCashOnDelivery;
                 // Load Delivery Address
                 IsDeliverySameAsCustomer = false;
                 DeliveryAddress = order.DeliveryAddress;
@@ -726,6 +748,7 @@ namespace PosClient.Desktop.Features.Orders.Details
 
                 TrackingNumber = TrackingNumber,
                 CourierId = CourierId,
+                IsCashOnDelivery = IsCashOnDelivery,
 
                 ShippingFee = ShippingFee,
                 DiscountAmount = Discount,
@@ -779,6 +802,7 @@ namespace PosClient.Desktop.Features.Orders.Details
                 DeliveryPostalCode = this.DeliveryPostalCode,
                 DeliveryRegion = this.DeliveryRegion,
                 TrackingNumber = this.TrackingNumber,
+                IsCashOnDelivery = this.IsCashOnDelivery,
                 AmountPaid = this.PaidAmount,
                 Items = this.OrderItems.ToList(),
                 DiscountAmount = this.Discount,
@@ -809,6 +833,7 @@ namespace PosClient.Desktop.Features.Orders.Details
                 _originalDeliveryPostalCode = DeliveryPostalCode;
                 _originalCourierId = CourierId;
                 _originalTrackingNumber = TrackingNumber;
+                _originalIsCashOnDelivery = IsCashOnDelivery;
 
                 IsEditingDelivery = true;
             }
@@ -825,6 +850,7 @@ namespace PosClient.Desktop.Features.Orders.Details
             DeliveryPostalCode = _originalDeliveryPostalCode;
             CourierId = _originalCourierId;
             TrackingNumber = _originalTrackingNumber;
+            IsCashOnDelivery = _originalIsCashOnDelivery;
 
             IsEditingDelivery = false;
         }
@@ -859,6 +885,7 @@ namespace PosClient.Desktop.Features.Orders.Details
                 DeliveryCountry = DeliveryCountry,
                 DeliveryPostalCode = DeliveryPostalCode,
                 TrackingNumber = TrackingNumber,
+                IsCashOnDelivery = IsCashOnDelivery,
                 Notes = Notes
             };
 
