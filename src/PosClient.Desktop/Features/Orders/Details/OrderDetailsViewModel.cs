@@ -167,7 +167,7 @@ namespace PosClient.Desktop.Features.Orders.Details
 
         public bool CanEditDeliveryDetails => CurrentOrderStatus != OrderStatus.Shipped && 
             CurrentOrderStatus != OrderStatus.Delivered && 
-            CurrentOrderStatus != OrderStatus.Cancelled;
+                CurrentOrderStatus != OrderStatus.Cancelled;
 
         // Backup fields for reverse logic
         private string? _originalDeliveryAddress;
